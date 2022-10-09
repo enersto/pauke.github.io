@@ -1,1 +1,2 @@
-enersto CNAME quirky-gates-9cb57e.netlify.com.
+A: 75.2.60.5
+pauke CNAME stoic-liskov-929121.netlify.com.
