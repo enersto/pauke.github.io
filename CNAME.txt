@@ -1,2 +1,2 @@
 A: 75.2.60.5
-pauke CNAME stoic-liskov-929121.netlify.com.
+pauke CNAME stoic-liskov-929121.netlify.app
