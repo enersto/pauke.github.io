@@ -21,8 +21,11 @@ menu:
   main:
     - name: About
       url: /about/
+    - name: Tag
+      url: /tags/
     - name: Telegram
       url: https://t.me/quatsch_von_h
+      
 params:
   MathJaxCDN: //cdnjs.cloudflare.com/ajax/libs
   MathJaxVersion: 2.7.5
