@@ -1,5 +1,5 @@
 ---
-date: "2018-01-01"
+date: "2018-12-01"
 menu: main
 title: About
 weight: 50
@@ -17,15 +17,12 @@ The core principle of my writing place, this site, is ,or I manage to be, about:
 
 * Fortschritt, positive und unbekante Weiterentwicklung.(positive and unknown development)
 
-The left part of the title "自留地"(individual reservation part) means, the posts in here are not so formal, but are more about the ephemeral thoughts and immaturity ideals. Mostly, it is a place to try how long and how much can I continually write.
 
 More specific, I might write **the topic in here** with:
 
 * **data analysis thought related;**
 * **data analysis tools things, most is by R;**
 * **work related, financial risk controlling things;**
-* **thoughts about public issues;**
-* **other habits things,such as history, language, biology, science stuffs(I’m a curious guy)**
 
 ## Why does this site exist
 I’m totally aware about how continually writing can shape and improve a person’s mind and ability, and I have done a couple trying before on [CSDN](https://blog.csdn.net/u014531714) and [Zhihu](https://www.zhihu.com/people/enersto/activities). But like most usual users of these platforms, I don’t have insisted the writing plan continually, and only left a little couple of posts.
@@ -53,10 +50,7 @@ As for the language of this site, it all depends on which one makes me more comf
 ## The way you can find me
 
 - [stack overflow](https://stackoverflow.com/users/7549197/pauke-huang) 
-- [Github](https://github.com/enersto)
 - [mail](enersto@live.com)
-- [豆瓣](https://www.douban.com/people/enersto/)
-- [Instagram](https://www.instagram.com/enerstohuang/)
 - [Telegram]( https://t.me/enerstohuang)
 
 
