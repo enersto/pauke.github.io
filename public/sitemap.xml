@@ -14,16 +14,28 @@
     <loc>/post/</loc>
     <lastmod>2022-10-10T00:00:00+00:00</lastmod>
   </url><url>
+    <loc>/tags/caret/</loc>
+    <lastmod>2021-01-31T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>/categories/</loc>
-    <lastmod>2020-01-17T00:00:00+00:00</lastmod>
+    <lastmod>2021-01-31T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/categories/english/</loc>
+    <lastmod>2021-01-31T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/tags/machine-learning/</loc>
+    <lastmod>2021-01-31T00:00:00+00:00</lastmod>
   </url><url>
     <loc>/categories/r/</loc>
-    <lastmod>2020-01-17T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>/2020/01/17/r%E5%AE%9E%E7%8E%B0%E7%9A%84%E6%95%B0%E6%8D%AE%E6%A8%A1%E6%8B%9F/</loc>
-    <lastmod>2020-01-17T00:00:00+00:00</lastmod>
+    <lastmod>2021-01-31T00:00:00+00:00</lastmod>
   </url><url>
     <loc>/tags/</loc>
+    <lastmod>2021-01-31T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/2021/01/31/workflow-with-caret/</loc>
+    <lastmod>2021-01-31T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/2020/01/17/r%E5%AE%9E%E7%8E%B0%E7%9A%84%E6%95%B0%E6%8D%AE%E6%A8%A1%E6%8B%9F/</loc>
     <lastmod>2020-01-17T00:00:00+00:00</lastmod>
   </url><url>
     <loc>/tags/time_series/</loc>
@@ -52,18 +64,6 @@
   </url><url>
     <loc>/2019/03/25/%E4%BF%A1%E7%94%A8%E8%AF%84%E5%88%86%E5%8D%A1%E6%A8%A1%E5%9E%8B%E4%B8%8E%E5%88%BB%E5%BA%A6/</loc>
     <lastmod>2019-03-25T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>/tags/caret/</loc>
-    <lastmod>2019-01-31T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>/categories/english/</loc>
-    <lastmod>2019-01-31T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>/tags/machine-learning/</loc>
-    <lastmod>2019-01-31T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>/2019/01/31/workflow-with-caret/</loc>
-    <lastmod>2019-01-31T00:00:00+00:00</lastmod>
   </url><url>
     <loc>/2019/01/18/about-this-site-build-blogdown-hugo-and-theme-tanka/</loc>
     <lastmod>2019-01-18T00:00:00+00:00</lastmod>
