@@ -6,7 +6,25 @@
     <description>Recent content in Tags on IFF</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Mon, 15 Apr 2019 00:00:00 +0000</lastBuildDate><atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 17 Jan 2020 00:00:00 +0000</lastBuildDate><atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>time_series</title>
+      <link>/tags/time_series/</link>
+      <pubDate>Fri, 17 Jan 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/time_series/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>随机数</title>
+      <link>/tags/%E9%9A%8F%E6%9C%BA%E6%95%B0/</link>
+      <pubDate>Fri, 17 Jan 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/%E9%9A%8F%E6%9C%BA%E6%95%B0/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>clv</title>
       <link>/tags/clv/</link>
@@ -85,24 +103,6 @@
       <pubDate>Fri, 18 Jan 2019 00:00:00 +0000</pubDate>
       
       <guid>/tags/theme/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>time_series</title>
-      <link>/tags/time_series/</link>
-      <pubDate>Thu, 17 Jan 2019 00:00:00 +0000</pubDate>
-      
-      <guid>/tags/time_series/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>随机数</title>
-      <link>/tags/%E9%9A%8F%E6%9C%BA%E6%95%B0/</link>
-      <pubDate>Thu, 17 Jan 2019 00:00:00 +0000</pubDate>
-      
-      <guid>/tags/%E9%9A%8F%E6%9C%BA%E6%95%B0/</guid>
       <description></description>
     </item>
     

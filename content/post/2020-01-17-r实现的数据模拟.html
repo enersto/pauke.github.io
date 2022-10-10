@@ -1,7 +1,7 @@
 ---
 title: R实现的数据模拟
 author: pauke
-date: '2019-01-17'
+date: '2020-01-17'
 slug: r实现的数据模拟
 categories:
   - R
@@ -16,28 +16,31 @@ output:
 
 <div id="TOC">
 <ul>
-<li><a>数据模拟</a><ul>
-<li><a>促销与销量数据模拟</a></li>
-<li><a>交易和满意度数据模拟</a><ul>
-<li><a>设定观察数量</a></li>
-<li><a>销量数据模拟</a></li>
-<li><a>满意度数据模拟</a></li>
+<li><a href="#数据模拟" id="toc-数据模拟">数据模拟</a>
+<ul>
+<li><a href="#促销与销量数据模拟" id="toc-促销与销量数据模拟">促销与销量数据模拟</a></li>
+<li><a href="#交易和满意度数据模拟" id="toc-交易和满意度数据模拟">交易和满意度数据模拟</a>
+<ul>
+<li><a href="#设定观察数量" id="toc-设定观察数量">设定观察数量</a></li>
+<li><a href="#销量数据模拟" id="toc-销量数据模拟">销量数据模拟</a></li>
+<li><a href="#满意度数据模拟" id="toc-满意度数据模拟">满意度数据模拟</a></li>
 </ul></li>
-<li><a>时间序列数据模拟</a><ul>
-<li><a href="#-random-walk-process">随机游走进程 Random Walk process模拟</a></li>
-<li><a href="#-maq">移动平均 MA(q)模拟</a></li>
-<li><a href="#ar1">AR(1)模拟</a></li>
-<li><a href="#arma11-process-">ARMA(1,1) process 模拟</a></li>
+<li><a href="#时间序列数据模拟" id="toc-时间序列数据模拟">时间序列数据模拟</a>
+<ul>
+<li><a href="#随机游走进程-random-walk-process模拟" id="toc-随机游走进程-random-walk-process模拟">随机游走进程 Random Walk process模拟</a></li>
+<li><a href="#移动平均-maq模拟" id="toc-移动平均-maq模拟">移动平均 MA(q)模拟</a></li>
+<li><a href="#ar1模拟" id="toc-ar1模拟">AR(1)模拟</a></li>
+<li><a href="#arma11-process-模拟" id="toc-arma11-process-模拟">ARMA(1,1) process 模拟</a></li>
 </ul></li>
-<li><a>总结</a></li>
+<li><a href="#总结" id="toc-总结">总结</a></li>
 </ul></li>
 </ul>
 </div>
 
-<div class="section level2">
+<div id="数据模拟" class="section level2">
 <h2>数据模拟</h2>
 <p>数据模拟最直接的意义在于更好的便于R语言操作和统计学知识的练习。但另一方面，也是对市场分析中数据分析的逻辑和内在关联的总结演练。</p>
-<div class="section level3">
+<div id="促销与销量数据模拟" class="section level3">
 <h3>促销与销量数据模拟</h3>
 <pre class="r"><code>#建立数据框
 n.store &lt;- 50
@@ -93,61 +96,46 @@ store$p2sales &lt;- floor(n.sale2*(1+store$p2prom*0.25))
 
 
 head(store)</code></pre>
-<pre><code>##   store_num year week p1sales p2sales p1price p2price p1prom p2prom
-## 1       101    1    1     993    1622   13.49    8.99      0      1
-## 2       101    1    2    1255    1357   12.99   12.49      1      0
-## 3       101    1    3     971    1372   13.49   11.99      0      0
-## 4       101    1    4    1041    1665   10.99   11.99      0      1
-## 5       101    1    5    1000    1366   13.49   10.99      0      0
-## 6       101    1    6    1026    1387   10.99   12.49      0      0
-##   country
-## 1      US
-## 2      US
-## 3      US
-## 4      US
-## 5      US
-## 6      US</code></pre>
+<pre><code>##   store_num year week p1sales p2sales p1price p2price p1prom p2prom country
+## 1       101    1    1    1002    1623   12.99   12.49      0      1      US
+## 2       101    1    2    1245    1394   12.99   10.99      1      0      US
+## 3       101    1    3    1038    1367   12.49    8.99      0      0      US
+## 4       101    1    4    1014    1667   12.99   10.99      0      1      US
+## 5       101    1    5     978    1379   12.99    8.99      0      0      US
+## 6       101    1    6    1055    1321   12.49   12.49      0      0      US</code></pre>
 <pre class="r"><code>str(store)</code></pre>
 <pre><code>## &#39;data.frame&#39;:    7800 obs. of  10 variables:
 ##  $ store_num: Factor w/ 50 levels &quot;101&quot;,&quot;102&quot;,&quot;103&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
 ##  $ year     : int  1 1 1 1 1 1 1 1 1 1 ...
 ##  $ week     : int  1 2 3 4 5 6 7 8 9 10 ...
-##  $ p1sales  : num  993 1255 971 1041 1000 ...
-##  $ p2sales  : num  1622 1357 1372 1665 1366 ...
-##  $ p1price  : num  13.5 13 13.5 11 13.5 ...
-##  $ p2price  : num  8.99 12.49 11.99 11.99 10.99 ...
+##  $ p1sales  : num  1002 1245 1038 1014 978 ...
+##  $ p2sales  : num  1623 1394 1367 1667 1379 ...
+##  $ p1price  : num  13 13 12.5 13 13 ...
+##  $ p2price  : num  12.49 10.99 8.99 10.99 8.99 ...
 ##  $ p1prom   : int  0 1 0 0 0 0 0 0 0 0 ...
 ##  $ p2prom   : int  1 0 0 1 0 0 0 1 1 0 ...
 ##  $ country  : Factor w/ 7 levels &quot;AU&quot;,&quot;BR&quot;,&quot;CN&quot;,..: 7 7 7 7 7 7 7 7 7 7 ...</code></pre>
 <pre class="r"><code>summary(store)</code></pre>
 <pre><code>##    store_num         year        week          p1sales        p2sales    
 ##  101    : 156   Min.   :1   Min.   : 1.00   Min.   : 901   Min.   :1239  
-##  102    : 156   1st Qu.:1   1st Qu.:13.75   1st Qu.:1005   1st Qu.:1340  
-##  103    : 156   Median :2   Median :26.50   Median :1030   Median :1372  
+##  102    : 156   1st Qu.:1   1st Qu.:13.75   1st Qu.:1005   1st Qu.:1342  
+##  103    : 156   Median :2   Median :26.50   Median :1030   Median :1374  
 ##  104    : 156   Mean   :2   Mean   :26.50   Mean   :1060   Mean   :1442  
-##  105    : 156   3rd Qu.:3   3rd Qu.:39.25   3rd Qu.:1070   3rd Qu.:1522  
-##  106    : 156   Max.   :3   Max.   :52.00   Max.   :1351   Max.   :1868  
+##  105    : 156   3rd Qu.:3   3rd Qu.:39.25   3rd Qu.:1069   3rd Qu.:1524  
+##  106    : 156   Max.   :3   Max.   :52.00   Max.   :1354   Max.   :1848  
 ##  (Other):6864                                                            
-##     p1price         p2price          p1prom           p2prom      
-##  Min.   :10.99   Min.   : 8.99   Min.   :0.0000   Min.   :0.0000  
-##  1st Qu.:11.99   1st Qu.: 9.99   1st Qu.:0.0000   1st Qu.:0.0000  
-##  Median :12.49   Median :10.99   Median :0.0000   Median :0.0000  
-##  Mean   :12.39   Mean   :10.91   Mean   :0.1978   Mean   :0.2501  
-##  3rd Qu.:12.99   3rd Qu.:11.99   3rd Qu.:0.0000   3rd Qu.:1.0000  
-##  Max.   :13.49   Max.   :12.49   Max.   :1.0000   Max.   :1.0000  
-##                                                                   
-##  country  
-##  AU: 312  
-##  BR: 780  
-##  CN:1872  
-##  DE:1560  
-##  GB: 468  
-##  JP: 780  
-##  US:2028</code></pre>
+##     p1price         p2price          p1prom           p2prom       country  
+##  Min.   :10.99   Min.   : 8.99   Min.   :0.0000   Min.   :0.0000   AU: 312  
+##  1st Qu.:11.99   1st Qu.: 9.99   1st Qu.:0.0000   1st Qu.:0.0000   BR: 780  
+##  Median :12.49   Median :10.99   Median :0.0000   Median :0.0000   CN:1872  
+##  Mean   :12.39   Mean   :10.89   Mean   :0.1978   Mean   :0.2501   DE:1560  
+##  3rd Qu.:12.99   3rd Qu.:11.99   3rd Qu.:0.0000   3rd Qu.:1.0000   GB: 468  
+##  Max.   :13.49   Max.   :12.49   Max.   :1.0000   Max.   :1.0000   JP: 780  
+##                                                                    US:2028</code></pre>
 </div>
-<div class="section level3">
+<div id="交易和满意度数据模拟" class="section level3">
 <h3>交易和满意度数据模拟</h3>
-<div class="section level4">
+<div id="设定观察数量" class="section level4">
 <h4>设定观察数量</h4>
 <pre class="r"><code>set.seed(0017)
 
@@ -159,21 +147,21 @@ qry$credit_score &lt;- rnorm(n = n.qry, mean = 2*qry$age +620, sd = 75) #信用�
 qry$email &lt;- factor(sample(c(&quot;ja&quot;,&quot;nein&quot;),size = n.qry, replace = T, prob = c(0.75,0.25))) #生成是否留有邮箱地址的变量
 qry$distance_to_store &lt;- exp(rnorm(n = n.qry, mean = 0.2, sd = 1.5))#确保都是正数</code></pre>
 </div>
-<div class="section level4">
+<div id="销量数据模拟" class="section level4">
 <h4>销量数据模拟</h4>
 <pre class="r"><code>qry$online_visit &lt;- rnbinom(n.qry, 0.4, mu = 10 +ifelse(qry$email == &quot;ja&quot;,10,0)
                             -0.6*(qry$age- median(qry$age))) #网店访问次数，该变量符合负二项分布，我们设定留了邮箱的比没留的高10次，通过ifelse根据邮箱是否有取值；同时，也设定年轻用户访问频率更高，设定该用户年龄和中位数的差值来区别</code></pre>
-<pre><code>## Warning in rnbinom(n.qry, 0.4, mu = 10 + ifelse(qry$email == &quot;ja&quot;, 10, 0)
-## - : 产生了NA</code></pre>
+<pre><code>## Warning in rnbinom(n.qry, 0.4, mu = 10 + ifelse(qry$email == &quot;ja&quot;, 10, 0) - :
+## NAs produced</code></pre>
 <pre class="r"><code>qry$online_trans &lt;- rbinom(n.qry,size = qry$online_visit, prob = 0.4)#交易次数，设定为访问数量的40%</code></pre>
-<pre><code>## Warning in rbinom(n.qry, size = qry$online_visit, prob = 0.4): 产生了NA</code></pre>
+<pre><code>## Warning in rbinom(n.qry, size = qry$online_visit, prob = 0.4): NAs produced</code></pre>
 <pre class="r"><code>qry$online_spend &lt;- exp(rnorm(n.qry,mean = 10, sd = 0.5)) * qry$online_trans # 以rnorm生产单词消费金额，并获得总花费。
 
 qry$store_trans &lt;- rnbinom(n.qry, size = 5, mu = 3/sqrt(qry$distance_to_store))
 qry$store_spend &lt;- exp(rnorm(n.qry, mean = 15, sd = 0.8)) * qry$store_trans
 # 线下实体店的交易次数和消费者距离实体店距离相关，</code></pre>
 </div>
-<div class="section level4">
+<div id="满意度数据模拟" class="section level4">
 <h4>满意度数据模拟</h4>
 <pre class="r"><code>### 基于问卷调查的「光晕效应」，先设定一个不存在于实际问卷中的总体满意度
 stsf.overall &lt;- rnorm(n.qry, mean = 4.1, sd = 0.5)
@@ -196,7 +184,7 @@ summary(stsf)</code></pre>
 ##  Max.   :5.000   Max.   :5.000</code></pre>
 <pre class="r"><code>### 针对可能存在的问卷数据无回应而缺失的情况，模拟无回应问卷
 no_response &lt;- as.logical(rbinom(n.qry, size = 1, prob = qry$age/100)) # 假设年龄越大，回应问卷可能性越低</code></pre>
-<pre><code>## Warning in rbinom(n.qry, size = 1, prob = qry$age/100): 产生了NA</code></pre>
+<pre><code>## Warning in rbinom(n.qry, size = 1, prob = qry$age/100): NAs produced</code></pre>
 <pre class="r"><code>stsf[no_response] &lt;- NA
 
 
@@ -206,10 +194,10 @@ qry &lt;- cbind(qry,stsf)
 rm(stsf.overall,stsf.service,stsf.production,stsf)</code></pre>
 </div>
 </div>
-<div class="section level3">
+<div id="时间序列数据模拟" class="section level3">
 <h3>时间序列数据模拟</h3>
 <p>该部分本可当做独立文章来说时间序列的基本知识的，但内容有限，且多是模拟的相关内容，故而添增于此。</p>
-<div id="-random-walk-process" class="section level4">
+<div id="随机游走进程-random-walk-process模拟" class="section level4">
 <h4>随机游走进程 Random Walk process模拟</h4>
 <pre class="r"><code># seed X_0 = 0
 X &lt;- 0
@@ -224,12 +212,12 @@ for (i in 2:length(Z)){
 
 # 作图
 ts.plot(X, main = &quot;Random walk process&quot;)</code></pre>
-<p><img src="/post/2019-01-17-r实现的数据模拟_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p><img src="/post/2019-01-17-r%E5%AE%9E%E7%8E%B0%E7%9A%84%E6%95%B0%E6%8D%AE%E6%A8%A1%E6%8B%9F_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
 <pre class="r"><code># 随机游走的差值
 ts.plot(diff(X))</code></pre>
-<p><img src="/post/2019-01-17-r实现的数据模拟_files/figure-html/unnamed-chunk-7-2.png" width="672" /></p>
+<p><img src="/post/2019-01-17-r%E5%AE%9E%E7%8E%B0%E7%9A%84%E6%95%B0%E6%8D%AE%E6%A8%A1%E6%8B%9F_files/figure-html/unnamed-chunk-7-2.png" width="672" /></p>
 </div>
-<div id="-maq" class="section level4">
+<div id="移动平均-maq模拟" class="section level4">
 <h4>移动平均 MA(q)模拟</h4>
 <pre class="r"><code># 纯粹随机游走，均值 0，标准差 1.5
 Z &lt;- rnorm(100, mean = 0, sd = 1.5)
@@ -242,9 +230,9 @@ for (i in 2:length(Z)) {
 
 # 作图
 ts.plot(X, main = &quot;Moving Average or order 1 process&quot;)</code></pre>
-<p><img src="/post/2019-01-17-r实现的数据模拟_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p><img src="/post/2019-01-17-r%E5%AE%9E%E7%8E%B0%E7%9A%84%E6%95%B0%E6%8D%AE%E6%A8%A1%E6%8B%9F_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
 </div>
-<div id="ar1" class="section level4">
+<div id="ar1模拟" class="section level4">
 <h4>AR(1)模拟</h4>
 <pre class="r"><code># 初始值 alpha
 alpha = 0.5
@@ -262,9 +250,9 @@ for (i in 2:length(Z)) {
 
 # 作图
 ts.plot(X)</code></pre>
-<p><img src="/post/2019-01-17-r实现的数据模拟_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p><img src="/post/2019-01-17-r%E5%AE%9E%E7%8E%B0%E7%9A%84%E6%95%B0%E6%8D%AE%E6%A8%A1%E6%8B%9F_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
 </div>
-<div id="arma11-process-" class="section level4">
+<div id="arma11-process-模拟" class="section level4">
 <h4>ARMA(1,1) process 模拟</h4>
 <pre class="r"><code>Z &lt;- rnorm(100, mean = 0, sd = 1.5)
 
@@ -277,10 +265,10 @@ for (i in 2:length(Z)) {
 
 # 进程作图
 ts.plot(X, main = &quot;ARMA(1,1) process&quot;)</code></pre>
-<p><img src="/post/2019-01-17-r实现的数据模拟_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p><img src="/post/2019-01-17-r%E5%AE%9E%E7%8E%B0%E7%9A%84%E6%95%B0%E6%8D%AE%E6%A8%A1%E6%8B%9F_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
 </div>
 </div>
-<div class="section level3">
+<div id="总结" class="section level3">
 <h3>总结</h3>
 <ul>
 <li><p>数据框：data.frame() 和matrix()是生成空数据框的主要函数，一般而言数据框可以实现搭建，然后逐步填补，也可逐一添加，及至完成</p></li>

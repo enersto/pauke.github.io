@@ -1,7 +1,7 @@
 ---
 title: R实现的数据模拟
 author: pauke
-date: '2019-01-17'
+date: '2020-01-17'
 slug: r实现的数据模拟
 categories:
   - R

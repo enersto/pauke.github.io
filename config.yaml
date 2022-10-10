@@ -3,7 +3,7 @@ languageCode: zh-cn
 title: IFF
 theme: hugo-lithium
 googleAnalytics: 'UA-132686713-1'
-disqusShortname: 'pauke-github-io'
+disqusShortname: 'pauke-netlify-app'
 hasCJKLanguage: true 
 enableEmoji: true
 smartypantsQuotesNBSP: true
