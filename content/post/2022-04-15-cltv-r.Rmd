@@ -1,7 +1,7 @@
 ---
 title: 用户生命周期价值（CLV）计算：R的方法
 author: 'pauke'
-date: '2019-04-15'
+date: '2022-04-15'
 slug: cltv-r
 categories:
   - R
@@ -40,10 +40,10 @@ library(anytime)
 library(kableExtra)
 
 
-dt <- fread("~/Desktop/NeuerArbeit/CDNOW_master.txt")
-setnames(dt,c("id","date","numberOfBuying","amount"))
+dt <- fread("/Users/pauke/Desktop/CDNOW_sample.txt")
+setnames(dt,c("id","id_1_10","date","numberOfBuying","amount"))
 dt <-  dt[,date := anydate(date)]
-
+dt <- dt[,-c(2)]
 knitr::kable(dt[sample(.N,6)])
 
 ```
@@ -53,7 +53,7 @@ knitr::kable(dt[sample(.N,6)])
 ```{r message=FALSE, warning=FALSE}
 
 library(DescTools)
-plot(Desc(dt$date)[[1]][["freq"]][,1:2])
+plot(Desc(dt$date)[[1]][["freq"]][,2:3])
 ```
 主要的交易发生在97年1月~97年4月间。
 

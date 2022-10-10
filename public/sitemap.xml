@@ -14,22 +14,31 @@
     <loc>/post/</loc>
     <lastmod>2022-10-10T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>/tags/caret/</loc>
-    <lastmod>2021-01-31T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>/categories/</loc>
+    <lastmod>2022-04-15T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/tags/clv/</loc>
+    <lastmod>2022-04-15T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/categories/r/</loc>
+    <lastmod>2022-04-15T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/tags/</loc>
+    <lastmod>2022-04-15T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/categories/tool/</loc>
+    <lastmod>2022-04-15T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/2022/04/15/cltv-r/</loc>
+    <lastmod>2022-04-15T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/tags/caret/</loc>
     <lastmod>2021-01-31T00:00:00+00:00</lastmod>
   </url><url>
     <loc>/categories/english/</loc>
     <lastmod>2021-01-31T00:00:00+00:00</lastmod>
   </url><url>
     <loc>/tags/machine-learning/</loc>
-    <lastmod>2021-01-31T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>/categories/r/</loc>
-    <lastmod>2021-01-31T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>/tags/</loc>
     <lastmod>2021-01-31T00:00:00+00:00</lastmod>
   </url><url>
     <loc>/2021/01/31/workflow-with-caret/</loc>
@@ -46,15 +55,6 @@
   </url><url>
     <loc>/tags/%E9%9A%8F%E6%9C%BA%E6%95%B0/</loc>
     <lastmod>2020-01-17T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>/tags/clv/</loc>
-    <lastmod>2019-04-15T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>/categories/tool/</loc>
-    <lastmod>2019-04-15T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>/2019/04/15/cltv-r/</loc>
-    <lastmod>2019-04-15T00:00:00+00:00</lastmod>
   </url><url>
     <loc>/tags/credit_scorecard/</loc>
     <lastmod>2019-03-25T00:00:00+00:00</lastmod>
