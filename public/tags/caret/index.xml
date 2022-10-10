@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>caret on IFF</title>
+    <link>/tags/caret/</link>
+    <description>Recent content in caret on IFF</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Thu, 31 Jan 2019 00:00:00 +0000</lastBuildDate><atom:link href="/tags/caret/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Workflow with Caret</title>
+      <link>/2019/01/31/workflow-with-caret/</link>
+      <pubDate>Thu, 31 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/2019/01/31/workflow-with-caret/</guid>
+      <description>Foreword Structure Data Splitting Based on Outcome Based on Predictors Time Serias Data Splitting Preprocessing preProcess() Function Set Other preprocessing function Turning Numerical Recode the Categorical Variable as Numeric dummyVars() in Caret dummy_cols() in FastDummies Removing Correlated Basic Model Training Quick example Backbone of the model Subside of Model Train Resampling Options Performance Metrics Grid Search Subsampling After Trainging Quick example Variable Importance Measure Perfomance Regression Predicted Classes Class Probabilities All the packages needed in here:</description>
+    </item>
+    
+  </channel>
+</rss>

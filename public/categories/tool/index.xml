@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>tool on IFF</title>
+    <link>/categories/tool/</link>
+    <description>Recent content in tool on IFF</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Mon, 15 Apr 2019 00:00:00 +0000</lastBuildDate><atom:link href="/categories/tool/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>用户生命周期价值（CLV）计算：R的方法</title>
+      <link>/2019/04/15/cltv-r/</link>
+      <pubDate>Mon, 15 Apr 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/2019/04/15/cltv-r/</guid>
+      <description>CLV定义 数据介绍和处理 数据导入 各变量情况 模型搭建 数据准备 RFM各项指数情况 新近度 Recency 消费频次 Frequency 消费金额 Monetary CLV函数 CLV定义 客户生命周期价值</description>
+    </item>
+    
+    <item>
+      <title>Hello, Markdown</title>
+      <link>/2019/01/17/hello-markdown/</link>
+      <pubDate>Thu, 17 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/2019/01/17/hello-markdown/</guid>
+      <description># Builtin values references: - references.md - abbreviations.md - footnotes.md destination: destination.html # Meta Data title: Test Page author: - John Doe - Jane Doe # Settings overrides settings: pygments_style: github js: - https://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.7/raphael.min.js - https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js - https://cdnjs.cloudflare.com/ajax/libs/js-sequence-diagrams/1.0.6/sequence-diagram-min.js - https://cdnjs.cloudflare.com/ajax/libs/flowchart/1.6.5/flowchart.min.js - res://MarkdownPreview/js/uml.js - https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js - res://MarkdownPreview/js/math_config.js markdown_extensions: - markdown.extensions.footnotes - markdown.extensions.attr_list - markdown.extensions.def_list - markdown.extensions.tables - markdown.extensions.abbr - markdown.extensions.toc: permalink: &amp;quot;\ue157&amp;quot; - markdown.extensions.smarty - markdown.extensions.meta - markdown.extensions.admonition - markdown.extensions.codehilite: guess_lang: false - pymdownx.</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,56 @@
+baseurl: /
+languageCode: zh-cn
+title: IFF
+theme: hugo-lithium
+googleAnalytics: 'UA-132686713-1'
+disqusShortname: 'pauke-github-io'
+hasCJKLanguage: true 
+enableEmoji: true
+smartypantsQuotesNBSP: true
+pygmentsstyle      : "vs"
+pygmentscodefences : true
+ignoreFiles:
+  - \.Rmd$
+  - \.Rmarkdown$
+  - _cache$
+  - \.knit\.md$
+  - \.utf8\.md$
+permalinks:
+  post: /:year/:month/:day/:slug/
+menu:
+  main:
+    - name: About
+      url: /about/
+    - name: Telegram
+      url: https://t.me/quatsch_von_h
+params:
+  MathJaxCDN: //cdnjs.cloudflare.com/ajax/libs
+  MathJaxVersion: 2.7.5
+  description: A website built through Hugo and blogdown.
+  favicon: favicon.ico
+  highlightjsCDN: //cdnjs.cloudflare.com/ajax/libs
+  highlightjsLang:
+    - r
+    - yaml
+  highlightjsTheme: github
+  highlightjsVersion: 9.12.0
+  logo:
+    alt: Logo
+    height: 50
+    url: logo.png
+    width: 50
+markup:
+  defaultMarkdownHandler: goldmark
+  goldmark:
+    renderer:
+      unsafe: yes
+      
+params.valine:
+    enable : true
+    appId : 'yjXDgIm4adLfC65VUSshkA1W-gzGzoHsz'
+    appKey : '81KLyE7xLDCR0ExKcEib8qjv'
+    notify : false  # mail notifier , https://github.com/xCss/Valine/wiki
+    verify : false # Verification code
+    avatar : 'mm' 
+    placeholder : 'ヾﾉ≧∀≦)o来啊，快活啊!'
+    visitor : true

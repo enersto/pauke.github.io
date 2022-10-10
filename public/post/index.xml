@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on IFF</title>
+    <link>/post/</link>
+    <description>Recent content in Posts on IFF</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Mon, 15 Apr 2019 00:00:00 +0000</lastBuildDate><atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>用户生命周期价值（CLV）计算：R的方法</title>
+      <link>/2019/04/15/cltv-r/</link>
+      <pubDate>Mon, 15 Apr 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/2019/04/15/cltv-r/</guid>
+      <description>CLV定义 数据介绍和处理 数据导入 各变量情况 模型搭建 数据准备 RFM各项指数情况 新近度 Recency 消费频次 Frequency 消费金额 Monetary CLV函数 CLV定义 客户生命周期价值</description>
+    </item>
+    
+    <item>
+      <title>信用评分卡模型与刻度建立</title>
+      <link>/2019/03/25/%E4%BF%A1%E7%94%A8%E8%AF%84%E5%88%86%E5%8D%A1%E6%A8%A1%E5%9E%8B%E4%B8%8E%E5%88%BB%E5%BA%A6/</link>
+      <pubDate>Mon, 25 Mar 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/2019/03/25/%E4%BF%A1%E7%94%A8%E8%AF%84%E5%88%86%E5%8D%A1%E6%A8%A1%E5%9E%8B%E4%B8%8E%E5%88%BB%E5%BA%A6/</guid>
+      <description>数据准备 变量筛选 WOE分箱 分割建模数据集 模型建立预评估 模型建立 模型评估 评分刻度建立 以R为工具展开的信用评分卡模型讨论并不少见，一方面，逻辑回</description>
+    </item>
+    
+    <item>
+      <title>Workflow with Caret</title>
+      <link>/2019/01/31/workflow-with-caret/</link>
+      <pubDate>Thu, 31 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/2019/01/31/workflow-with-caret/</guid>
+      <description>Foreword Structure Data Splitting Based on Outcome Based on Predictors Time Serias Data Splitting Preprocessing preProcess() Function Set Other preprocessing function Turning Numerical Recode the Categorical Variable as Numeric dummyVars() in Caret dummy_cols() in FastDummies Removing Correlated Basic Model Training Quick example Backbone of the model Subside of Model Train Resampling Options Performance Metrics Grid Search Subsampling After Trainging Quick example Variable Importance Measure Perfomance Regression Predicted Classes Class Probabilities All the packages needed in here:</description>
+    </item>
+    
+    <item>
+      <title>About This Site Build: blogdown, Hugo and Theme Tanka</title>
+      <link>/2019/01/18/about-this-site-build-blogdown-hugo-and-theme-tanka/</link>
+      <pubDate>Fri, 18 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/2019/01/18/about-this-site-build-blogdown-hugo-and-theme-tanka/</guid>
+      <description>Why blogdown and Hugo My initiate site build way is by Hexo. The wreckage is still on. The theme and build process are enough satisfied, and I also got to learn things about git and github basically in the process. But when I want actually to post my article, which is based on Rmarkdown, I find blogdown, the product both comes from Yihui,Rstudio, whom My R learning process benefits superbly</description>
+    </item>
+    
+    <item>
+      <title>Hello, Markdown</title>
+      <link>/2019/01/17/hello-markdown/</link>
+      <pubDate>Thu, 17 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/2019/01/17/hello-markdown/</guid>
+      <description># Builtin values references: - references.md - abbreviations.md - footnotes.md destination: destination.html # Meta Data title: Test Page author: - John Doe - Jane Doe # Settings overrides settings: pygments_style: github js: - https://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.7/raphael.min.js - https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js - https://cdnjs.cloudflare.com/ajax/libs/js-sequence-diagrams/1.0.6/sequence-diagram-min.js - https://cdnjs.cloudflare.com/ajax/libs/flowchart/1.6.5/flowchart.min.js - res://MarkdownPreview/js/uml.js - https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js - res://MarkdownPreview/js/math_config.js markdown_extensions: - markdown.extensions.footnotes - markdown.extensions.attr_list - markdown.extensions.def_list - markdown.extensions.tables - markdown.extensions.abbr - markdown.extensions.toc: permalink: &amp;quot;\ue157&amp;quot; - markdown.extensions.smarty - markdown.extensions.meta - markdown.extensions.admonition - markdown.extensions.codehilite: guess_lang: false - pymdownx.</description>
+    </item>
+    
+    <item>
+      <title>R实现的数据模拟</title>
+      <link>/2019/01/17/r%E5%AE%9E%E7%8E%B0%E7%9A%84%E6%95%B0%E6%8D%AE%E6%A8%A1%E6%8B%9F/</link>
+      <pubDate>Thu, 17 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/2019/01/17/r%E5%AE%9E%E7%8E%B0%E7%9A%84%E6%95%B0%E6%8D%AE%E6%A8%A1%E6%8B%9F/</guid>
+      <description>数据模拟 促销与销量数据模拟 交易和满意度数据模拟 设定观察数量 销量数据模拟 满意度数据模拟 时间序列数据模拟 随机游走进程 Random Walk process模拟 移动平</description>
+    </item>
+    
+    <item>
+      <title>sf &#43; ggplot2 最简步骤实现中国地图数据展示</title>
+      <link>/2019/01/02/sf-ggplot2-%E6%9C%80%E7%AE%80%E6%AD%A5%E9%AA%A4%E5%AE%9E%E7%8E%B0%E4%B8%AD%E5%9B%BD%E5%9C%B0%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%B1%95%E7%A4%BA/</link>
+      <pubDate>Wed, 02 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/2019/01/02/sf-ggplot2-%E6%9C%80%E7%AE%80%E6%AD%A5%E9%AA%A4%E5%AE%9E%E7%8E%B0%E4%B8%AD%E5%9B%BD%E5%9C%B0%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%B1%95%E7%A4%BA/</guid>
+      <description>本文作为一个快速记录，R为工具的数据分析过程中的尝试，将最为集中的记录相关主题内容，其他延展性内容则以链接形式作为参考。 要实现的需求 以行政区</description>
+    </item>
+    
+    <item>
+      <title>Shiny app的基本制作思路</title>
+      <link>/2018/12/18/shiny-app%E7%9A%84%E5%9F%BA%E6%9C%AC%E5%88%B6%E4%BD%9C%E6%80%9D%E8%B7%AF/</link>
+      <pubDate>Tue, 18 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/2018/12/18/shiny-app%E7%9A%84%E5%9F%BA%E6%9C%AC%E5%88%B6%E4%BD%9C%E6%80%9D%E8%B7%AF/</guid>
+      <description>Shiny是基于R的实时计算服务器（serve），并通过CSS，htmlwidge，Javascript来进行拓展的web **交互界面（UI</description>
+    </item>
+    
+    <item>
+      <title>dplyr和data.table的数据操作对码表</title>
+      <link>/2018/01/29/dplyr%E5%92%8Cdata.table%E7%9A%84%E6%95%B0%E6%8D%AE%E6%93%8D%E4%BD%9C%E5%AF%B9%E7%A0%81%E8%A1%A8/</link>
+      <pubDate>Mon, 29 Jan 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/2018/01/29/dplyr%E5%92%8Cdata.table%E7%9A%84%E6%95%B0%E6%8D%AE%E6%93%8D%E4%BD%9C%E5%AF%B9%E7%A0%81%E8%A1%A8/</guid>
+      <description>缘起 作为R中两个被讨论最多的数据操作包，dplyr 和data.table因其各具特色设计哲学俘获一批忠实用户。二者在整体风格和机制上的明显区</description>
+    </item>
+    
+  </channel>
+</rss>
