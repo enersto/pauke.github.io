@@ -1,7 +1,7 @@
 ---
 title: "Workflow with Caret"
 author: "pauke"
-date: '2019-01-31'
+date: '2021-01-31'
 categories:
   - R
   - english
@@ -30,6 +30,8 @@ library(proxy)#maxDissim
 library(mlbench)#data zoo
 library(data.table)
 library(fastDummies) #for dummy variables
+library(randomForest)
+library(kernlab)
 
 options(scipen=8)
 

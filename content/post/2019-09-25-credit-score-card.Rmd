@@ -1,7 +1,7 @@
 ---
 title: 信用评分卡模型与刻度建立
 author: 'pauke'
-date: '2019-03-25'
+date: '2019-09-25'
 slug: 信用评分卡模型与刻度
 categories: ["R","汉语"]
 tags: ["credit_scorecard","glm"]

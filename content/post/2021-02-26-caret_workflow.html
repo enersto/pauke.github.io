@@ -1,7 +1,7 @@
 ---
 title: "Workflow with Caret"
 author: "pauke"
-date: '2019-01-31'
+date: '2021-01-31'
 categories:
   - R
   - english
@@ -23,41 +23,49 @@ output:
 
 <div id="TOC">
 <ul>
-<li><a href="#foreword">Foreword</a></li>
-<li><a href="#structure">Structure</a></li>
-<li><a href="#data-splitting">Data Splitting</a><ul>
-<li><a href="#based-on-outcome">Based on Outcome</a></li>
-<li><a href="#based-on-predictors">Based on Predictors</a></li>
-<li><a href="#time-serias-data-splitting">Time Serias Data Splitting</a></li>
+<li><a href="#foreword" id="toc-foreword">Foreword</a></li>
+<li><a href="#structure" id="toc-structure">Structure</a></li>
+<li><a href="#data-splitting" id="toc-data-splitting">Data Splitting</a>
+<ul>
+<li><a href="#based-on-outcome" id="toc-based-on-outcome">Based on Outcome</a></li>
+<li><a href="#based-on-predictors" id="toc-based-on-predictors">Based on Predictors</a></li>
+<li><a href="#time-serias-data-splitting" id="toc-time-serias-data-splitting">Time Serias Data Splitting</a></li>
 </ul></li>
-<li><a href="#preprocessing">Preprocessing</a><ul>
-<li><a href="#preprocess-function-set"><code>preProcess()</code> Function Set</a></li>
-<li><a href="#other-preprocessing-function">Other preprocessing function</a><ul>
-<li><a href="#turning-numerical">Turning Numerical</a><ul>
-<li><a href="#recode-the-categorical-variable-as-numeric">Recode the Categorical Variable as Numeric</a></li>
-<li><a href="#dummyvars-in-caret"><code>dummyVars()</code> in Caret</a></li>
-<li><a href="#dummy_cols-in-fastdummies"><code>dummy_cols()</code> in FastDummies</a></li>
+<li><a href="#preprocessing" id="toc-preprocessing">Preprocessing</a>
+<ul>
+<li><a href="#preprocess-function-set" id="toc-preprocess-function-set"><code>preProcess()</code> Function Set</a></li>
+<li><a href="#other-preprocessing-function" id="toc-other-preprocessing-function">Other preprocessing function</a>
+<ul>
+<li><a href="#turning-numerical" id="toc-turning-numerical">Turning Numerical</a>
+<ul>
+<li><a href="#recode-the-categorical-variable-as-numeric" id="toc-recode-the-categorical-variable-as-numeric">Recode the Categorical Variable as Numeric</a></li>
+<li><a href="#dummyvars-in-caret" id="toc-dummyvars-in-caret"><code>dummyVars()</code> in Caret</a></li>
+<li><a href="#dummy_cols-in-fastdummies" id="toc-dummy_cols-in-fastdummies"><code>dummy_cols()</code> in FastDummies</a></li>
 </ul></li>
-<li><a href="#removing-correlated">Removing Correlated</a></li>
-</ul></li>
-</ul></li>
-<li><a href="#basic-model-training">Basic Model Training</a><ul>
-<li><a href="#quick-example">Quick example</a></li>
-<li><a href="#backbone-of-the-model">Backbone of the model</a></li>
-<li><a href="#subside-of-model-train">Subside of Model Train</a><ul>
-<li><a href="#resampling-options">Resampling Options</a></li>
-<li><a href="#performance-metrics">Performance Metrics</a></li>
-<li><a href="#grid-search">Grid Search</a></li>
-<li><a href="#subsampling">Subsampling</a></li>
+<li><a href="#removing-correlated" id="toc-removing-correlated">Removing Correlated</a></li>
 </ul></li>
 </ul></li>
-<li><a href="#after-trainging">After Trainging</a><ul>
-<li><a href="#quick-example-1">Quick example</a></li>
-<li><a href="#variable-importance">Variable Importance</a></li>
-<li><a href="#measure-perfomance">Measure Perfomance</a><ul>
-<li><a href="#regression">Regression</a></li>
-<li><a href="#predicted-classes">Predicted Classes</a></li>
-<li><a href="#class-probabilities">Class Probabilities</a></li>
+<li><a href="#basic-model-training" id="toc-basic-model-training">Basic Model Training</a>
+<ul>
+<li><a href="#quick-example" id="toc-quick-example">Quick example</a></li>
+<li><a href="#backbone-of-the-model" id="toc-backbone-of-the-model">Backbone of the model</a></li>
+<li><a href="#subside-of-model-train" id="toc-subside-of-model-train">Subside of Model Train</a>
+<ul>
+<li><a href="#resampling-options" id="toc-resampling-options">Resampling Options</a></li>
+<li><a href="#performance-metrics" id="toc-performance-metrics">Performance Metrics</a></li>
+<li><a href="#grid-search" id="toc-grid-search">Grid Search</a></li>
+<li><a href="#subsampling" id="toc-subsampling">Subsampling</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#after-trainging" id="toc-after-trainging">After Trainging</a>
+<ul>
+<li><a href="#quick-example-1" id="toc-quick-example-1">Quick example</a></li>
+<li><a href="#variable-importance" id="toc-variable-importance">Variable Importance</a></li>
+<li><a href="#measure-perfomance" id="toc-measure-perfomance">Measure Perfomance</a>
+<ul>
+<li><a href="#regression" id="toc-regression">Regression</a></li>
+<li><a href="#predicted-classes" id="toc-predicted-classes">Predicted Classes</a></li>
+<li><a href="#class-probabilities" id="toc-class-probabilities">Class Probabilities</a></li>
 </ul></li>
 </ul></li>
 </ul>
@@ -72,6 +80,8 @@ library(proxy)#maxDissim
 library(mlbench)#data zoo
 library(data.table)
 library(fastDummies) #for dummy variables
+library(randomForest)
+library(kernlab)
 
 options(scipen=8)</code></pre>
 <div id="foreword" class="section level2">
@@ -117,7 +127,7 @@ options(scipen=8)</code></pre>
 </tr>
 <tr class="odd">
 <td>time serias</td>
-<td><code>trainControl(method = &quot;timeslice&quot;...)</code></td>
+<td><code>trainControl(method = "timeslice"...)</code></td>
 </tr>
 </tbody>
 </table>
@@ -234,7 +244,7 @@ points(start, pch = 16, cex = .7)
                samplePool[newSamp[i],1], 
                samplePool[newSamp[i],2], 
                pch = paste(i), col = &quot;darkred&quot;)</code></pre>
-<p><img src="/post/2019-02-26-caret_workflow_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p><img src="/post/2021-02-26-caret_workflow_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 <p>More maxDissim methods, please check this <a href="http://rismyhammer.com/ml/Pre-Processing.html">article</a>’s Splitting Based on Predictors part.</p>
 </div>
 <div id="time-serias-data-splitting" class="section level3">
@@ -258,6 +268,10 @@ plsFitTime &lt;- train(unemploy ~ pce + pop + psavert, data = economics, method 
 <h2>Preprocessing</h2>
 <p>This part is based on the conclution of your data exploration. You need to consider what situation of your data that you need to deal with before starting build your model. According to the situation of the function facing to, preprocessing function of caret can be sorted as:</p>
 <table>
+<colgroup>
+<col width="55%" />
+<col width="44%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th>situation category</th>
@@ -271,15 +285,15 @@ plsFitTime &lt;- train(unemploy ~ pce + pop + psavert, data = economics, method 
 </tr>
 <tr class="even">
 <td>unbalance</td>
-<td><code>preProcess(df,method = c(&quot;center&quot;, &quot;scale&quot;))</code>,<code>nearZeroVar()</code></td>
+<td><code>preProcess(df,method = c("center", "scale"))</code>,<code>nearZeroVar()</code></td>
 </tr>
 <tr class="odd">
 <td>missing value</td>
-<td><code>preProcess(df,method = c(&quot;center&quot;, &quot;scale&quot;)/&quot;knnImpute&quot;)</code></td>
+<td><code>preProcess(df,method = c("center", "scale")/"knnImpute")</code></td>
 </tr>
 <tr class="even">
 <td>too much predictors</td>
-<td><code>preProcess(df, method = &quot;BoxCox&quot;/&quot;pca&quot;)</code></td>
+<td><code>preProcess(df, method = "BoxCox"/"pca")</code></td>
 </tr>
 <tr class="odd">
 <td>class distance</td>
@@ -302,25 +316,25 @@ inTrain &lt;- sample(seq(along = fattyAcids), length(fattyAcids)*0.7)
 training &lt;- fattyAcids[inTrain,]
 str(training)</code></pre>
 <pre><code>## &#39;data.frame&#39;:    4 obs. of  7 variables:
-##  $ Palmitic  : num  9.8 11.5 12.2 9.7
-##  $ Stearic   : num  4.2 5.2 5 5.2
-##  $ Oleic     : num  43 35 31.1 31
-##  $ Linoleic  : num  39.2 47.2 50.5 52.7
-##  $ Linolenic : num  2.4 0.2 0.3 0.4
+##  $ Palmitic  : num  12.2 9.8 11.5 10.5
+##  $ Stearic   : num  5 4.2 5.2 5
+##  $ Oleic     : num  31.1 43 35 31.8
+##  $ Linoleic  : num  50.5 39.2 47.2 51.3
+##  $ Linolenic : num  0.3 2.4 0.2 0.4
 ##  $ Eicosanoic: num  0.4 0.4 0.4 0.4
-##  $ Eicosenoic: num  0.5 0.1 0.1 0.1</code></pre>
+##  $ Eicosenoic: num  0.1 0.5 0.1 0.1</code></pre>
 <pre class="r"><code>preProcValues &lt;- preProcess(training, method = c(&quot;center&quot;, &quot;scale&quot;))
 
 trainTransformed &lt;- predict(preProcValues, training)
 str(trainTransformed)</code></pre>
 <pre><code>## &#39;data.frame&#39;:    4 obs. of  7 variables:
-##  $ Palmitic  : num  -0.802 0.562 1.123 -0.883
-##  $ Stearic   : num  -1.47 0.63 0.21 0.63
-##  $ Oleic     : num  1.41565 -0.00444 -0.69673 -0.71448
-##  $ Linoleic  : num  -1.3862 -0.0338 0.524 0.8959
-##  $ Linolenic : num  1.495 -0.593 -0.498 -0.404
+##  $ Palmitic  : num  1.131 -1.131 0.471 -0.471
+##  $ Stearic   : num  0.338 -1.466 0.789 0.338
+##  $ Oleic     : num  -0.7563 1.4255 -0.0413 -0.6279
+##  $ Linoleic  : num  0.6243 -1.4206 0.0271 0.7691
+##  $ Linolenic : num  -0.498 1.495 -0.593 -0.404
 ##  $ Eicosanoic: num  0 0 0 0
-##  $ Eicosenoic: num  1.5 -0.5 -0.5 -0.5</code></pre>
+##  $ Eicosenoic: num  -0.5 1.5 -0.5 -0.5</code></pre>
 <p>The list of function preProcess methods:</p>
 <ul>
 <li><code>center</code>,<code>scale</code>, and <code>range</code> to normalize predictors.</li>
@@ -364,16 +378,16 @@ head(model.matrix(type ~ ., data = zoo[,c(1:4,17)]),4)</code></pre>
 ## 4           1        1            0        0        1</code></pre>
 <pre class="r"><code>dummies &lt;- dummyVars(type ~ ., data = zoo[,c(1:4,17)])
 head(predict(dummies, newdata = zoo),4)</code></pre>
-<pre><code>##   hairFALSE hairTRUE feathersFALSE feathersTRUE eggsFALSE eggsTRUE
-## 1         0        1             1            0         1        0
-## 2         0        1             1            0         1        0
-## 3         1        0             1            0         0        1
-## 4         0        1             1            0         1        0
-##   milkFALSE milkTRUE
-## 1         0        1
-## 2         0        1
-## 3         1        0
-## 4         0        1</code></pre>
+<pre><code>##   hairFALSE hairTRUE feathersFALSE feathersTRUE eggsFALSE eggsTRUE milkFALSE
+## 1         0        1             1            0         1        0         0
+## 2         0        1             1            0         1        0         0
+## 3         1        0             1            0         0        1         1
+## 4         0        1             1            0         1        0         0
+##   milkTRUE
+## 1        1
+## 2        1
+## 3        0
+## 4        1</code></pre>
 </div>
 <div id="dummy_cols-in-fastdummies" class="section level5">
 <h5><code>dummy_cols()</code> in FastDummies</h5>
@@ -384,16 +398,16 @@ Zoo$animalNames &lt;- rownames(Zoo)
 
 zooDummy &lt;- dummy_cols(Zoo[,c(1:4,17)])
 head(zooDummy,4)</code></pre>
-<pre><code>##    hair feathers  eggs  milk   type type_mammal type_fish type_bird
-## 1  TRUE    FALSE FALSE  TRUE mammal           1         0         0
-## 2  TRUE    FALSE FALSE  TRUE mammal           1         0         0
-## 3 FALSE    FALSE  TRUE FALSE   fish           0         1         0
-## 4  TRUE    FALSE FALSE  TRUE mammal           1         0         0
-##   type_mollusc.et.al type_insect type_amphibian type_reptile
-## 1                  0           0              0            0
-## 2                  0           0              0            0
-## 3                  0           0              0            0
-## 4                  0           0              0            0</code></pre>
+<pre><code>##    hair feathers  eggs  milk   type type_mammal type_bird type_reptile
+## 1  TRUE    FALSE FALSE  TRUE mammal           1         0            0
+## 2  TRUE    FALSE FALSE  TRUE mammal           1         0            0
+## 3 FALSE    FALSE  TRUE FALSE   fish           0         0            0
+## 4  TRUE    FALSE FALSE  TRUE mammal           1         0            0
+##   type_fish type_amphibian type_insect type_mollusc.et.al
+## 1         0              0           0                  0
+## 2         0              0           0                  0
+## 3         1              0           0                  0
+## 4         0              0           0                  0</code></pre>
 </div>
 </div>
 <div id="removing-correlated" class="section level4">
@@ -452,11 +466,11 @@ rf_default</code></pre>
 ## 
 ## No pre-processing
 ## Resampling: Cross-Validated (10 fold, repeated 10 times) 
-## Summary of sample sizes: 70, 70, 68, 71, 70, 69, ... 
+## Summary of sample sizes: 69, 69, 70, 70, 71, 69, ... 
 ## Resampling results:
 ## 
 ##   Accuracy   Kappa    
-##   0.9465437  0.9302012
+##   0.9332897  0.9117794
 ## 
 ## Tuning parameter &#39;mtry&#39; was held constant at a value of 4</code></pre>
 </div>
@@ -473,7 +487,7 @@ rf_default</code></pre>
 <li><p><strong>y</strong>: a numeric or factor vector of outcomes. The function determines the type of problem (classification or regression) from the type of the response given in this argument.</p></li>
 <li><p><strong>method</strong>: a character string specifying the type of model to be used.</p></li>
 </ul>
-<p><code>train(y ~ ., data = dat, method = &quot;rf&quot;)</code></p>
+<p><code>train(y ~ ., data = dat, method = "rf")</code></p>
 </div>
 <div id="subside-of-model-train" class="section level3">
 <h3>Subside of Model Train</h3>
@@ -515,12 +529,12 @@ rf_default</code></pre>
 About the tuneLength usage, this <a href="https://stackoverflow.com/questions/38859705/r-understanding-caret-traintunelength-and-svm-methods-from-kernlab">post</a> is also helpful.</p>
 <p>Or use tuneGrid argument:</p>
 <p><code>grid &lt;- expand.grid(alpha = c(0.1, 0.5, 0.9), lambda = c(0.001, 0.01))</code></p>
-<p><code>train(x = x, y = y, method = &quot;glmnet&quot;,tuneGrid = grid)</code></p>
+<p><code>train(x = x, y = y, method = "glmnet",tuneGrid = grid)</code></p>
 </div>
 <div id="subsampling" class="section level4">
 <h4>Subsampling</h4>
 <p><code>sampling</code>is an argument to fix the large class imbalance situation. More information about class imbalance situation, please check this <a href="https://www.r-bloggers.com/handling-class-imbalance-with-r-and-caret-an-introduction/">article</a></p>
-<p><code>trainControl(sampling = &quot;down&quot;)</code></p>
+<p><code>trainControl(sampling = "down")</code></p>
 </div>
 </div>
 </div>
@@ -564,33 +578,33 @@ svmFit</code></pre>
 ## Resampling results across tuning parameters:
 ## 
 ##   C     Accuracy   Kappa    
-##   0.25  0.7176957  0.5943687
-##   0.50  0.8104877  0.7349879
-##   1.00  0.8579955  0.8035367
-##   2.00  0.8776568  0.8316650
-##   4.00  0.8783515  0.8326465
+##   0.25  0.8033791  0.7291072
+##   0.50  0.8725130  0.8299315
+##   1.00  0.9025880  0.8717856
+##   2.00  0.9136055  0.8867697
+##   4.00  0.9136055  0.8867936
 ## 
-## Tuning parameter &#39;sigma&#39; was held constant at a value of 0.6214939
+## Tuning parameter &#39;sigma&#39; was held constant at a value of 0.2137931
 ## Accuracy was used to select the optimal model using the largest value.
-## The final values used for the model were sigma = 0.6214939 and C = 4.</code></pre>
+## The final values used for the model were sigma = 0.2137931 and C = 2.</code></pre>
 <pre class="r"><code>#the most optimal model 
 svmFit$finalModel</code></pre>
 <pre><code>## Support Vector Machine object of class &quot;ksvm&quot; 
 ## 
 ## SV type: C-svc  (classification) 
-##  parameter : cost C = 4 
+##  parameter : cost C = 2 
 ## 
 ## Gaussian Radial Basis kernel function. 
-##  Hyperparameter : sigma =  0.621493850140727 
+##  Hyperparameter : sigma =  0.213793062941301 
 ## 
-## Number of Support Vectors : 42 
+## Number of Support Vectors : 39 
 ## 
-## Objective Function Value : -8.1084 -2.3739 -3.5996 -4.6413 -4.047 -2.2094 -2.0987 -2.9949 -2.8532 -3.309 -1.9504 -1.9688 -1.8899 -2.0968 -1.424 -2.5877 -3.0436 -1.7919 -2.8221 -1.8403 -1.8965 
+## Objective Function Value : -5.7809 -1.6014 -2.1199 -5.2534 -2.3047 -2.4316 -1.5526 -1.8299 -2.2143 -2.213 -1.9607 -1.4568 -1.3839 -1.5647 -1.1803 -1.6429 -2.2554 -1.4717 -1.9653 -2.3025 -1.5782 
 ## Training error : 0</code></pre>
 <pre class="r"><code>#variable importance
 svmImp &lt;- varImp(svmFit, scale = FALSE)
 plot(svmImp)</code></pre>
-<p><img src="/post/2019-02-26-caret_workflow_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p><img src="/post/2021-02-26-caret_workflow_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
 <pre class="r"><code>#model result measure
 svmType &lt;- predict(svmFit, newdata = testing)
 confusionMatrix(data = svmType, testing$oilType)</code></pre>
@@ -598,8 +612,8 @@ confusionMatrix(data = svmType, testing$oilType)</code></pre>
 ## 
 ##            Reference
 ## Prediction  pumpkin sunflower peanut olive soybean rapeseed corn
-##   pumpkin         9         0      0     0       0        0    0
-##   sunflower       0         6      0     0       0        0    0
+##   pumpkin         8         0      0     0       0        0    0
+##   sunflower       1         6      0     0       0        0    0
 ##   peanut          0         0      0     0       0        0    0
 ##   olive           0         0      0     1       0        0    0
 ##   soybean         0         0      0     0       2        0    0
@@ -607,44 +621,36 @@ confusionMatrix(data = svmType, testing$oilType)</code></pre>
 ##   corn            0         0      0     0       0        0    0
 ## 
 ## Overall Statistics
-##                                       
-##                Accuracy : 1           
-##                  95% CI : (0.8316, 1) 
-##     No Information Rate : 0.45        
-##     P-Value [Acc &gt; NIR] : 0.0000001159
-##                                       
-##                   Kappa : 1           
-##  Mcnemar&#39;s Test P-Value : NA          
+##                                           
+##                Accuracy : 0.95            
+##                  95% CI : (0.7513, 0.9987)
+##     No Information Rate : 0.45            
+##     P-Value [Acc &gt; NIR] : 0.00000295      
+##                                           
+##                   Kappa : 0.9278          
+##                                           
+##  Mcnemar&#39;s Test P-Value : NA              
 ## 
 ## Statistics by Class:
 ## 
-##                      Class: pumpkin Class: sunflower Class: peanut
-## Sensitivity                    1.00              1.0            NA
-## Specificity                    1.00              1.0             1
-## Pos Pred Value                 1.00              1.0            NA
-## Neg Pred Value                 1.00              1.0            NA
-## Prevalence                     0.45              0.3             0
-## Detection Rate                 0.45              0.3             0
-## Detection Prevalence           0.45              0.3             0
-## Balanced Accuracy              1.00              1.0            NA
-##                      Class: olive Class: soybean Class: rapeseed
-## Sensitivity                  1.00            1.0             1.0
-## Specificity                  1.00            1.0             1.0
-## Pos Pred Value               1.00            1.0             1.0
-## Neg Pred Value               1.00            1.0             1.0
-## Prevalence                   0.05            0.1             0.1
-## Detection Rate               0.05            0.1             0.1
-## Detection Prevalence         0.05            0.1             0.1
-## Balanced Accuracy            1.00            1.0             1.0
-##                      Class: corn
-## Sensitivity                   NA
-## Specificity                    1
-## Pos Pred Value                NA
-## Neg Pred Value                NA
-## Prevalence                     0
-## Detection Rate                 0
-## Detection Prevalence           0
-## Balanced Accuracy             NA</code></pre>
+##                      Class: pumpkin Class: sunflower Class: peanut Class: olive
+## Sensitivity                  0.8889           1.0000            NA         1.00
+## Specificity                  1.0000           0.9286             1         1.00
+## Pos Pred Value               1.0000           0.8571            NA         1.00
+## Neg Pred Value               0.9167           1.0000            NA         1.00
+## Prevalence                   0.4500           0.3000             0         0.05
+## Detection Rate               0.4000           0.3000             0         0.05
+## Detection Prevalence         0.4000           0.3500             0         0.05
+## Balanced Accuracy            0.9444           0.9643            NA         1.00
+##                      Class: soybean Class: rapeseed Class: corn
+## Sensitivity                     1.0             1.0          NA
+## Specificity                     1.0             1.0           1
+## Pos Pred Value                  1.0             1.0          NA
+## Neg Pred Value                  1.0             1.0          NA
+## Prevalence                      0.1             0.1           0
+## Detection Rate                  0.1             0.1           0
+## Detection Prevalence            0.1             0.1           0
+## Balanced Accuracy               1.0             1.0          NA</code></pre>
 </div>
 <div id="variable-importance" class="section level3">
 <h3>Variable Importance</h3>
@@ -689,12 +695,12 @@ lm_fit</code></pre>
 ## Resampling results:
 ## 
 ##   RMSE      Rsquared   MAE     
-##   4.284876  0.7778135  2.955764
+##   4.374098  0.7724562  2.963927
 ## 
 ## Tuning parameter &#39;intercept&#39; was held constant at a value of TRUE</code></pre>
 <pre class="r"><code>postResample(pred = bh_pred, obs = bh_te$medv)</code></pre>
 <pre><code>##      RMSE  Rsquared       MAE 
-## 4.4412987 0.7781877 3.0926842</code></pre>
+## 4.0927043 0.8234427 2.8163731</code></pre>
 </div>
 <div id="predicted-classes" class="section level4">
 <h4>Predicted Classes</h4>
