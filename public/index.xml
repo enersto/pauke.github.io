@@ -6,7 +6,7 @@
     <description>Recent content on IFF</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Mon, 15 Apr 2019 00:00:00 +0000</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 10 Oct 2022 00:00:00 +0000</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>About</title>
       <link>/about/</link>
@@ -14,6 +14,15 @@
       
       <guid>/about/</guid>
       <description>This site is hosted by Pauke Huang, and the site title “IFF” is the abbreviation of “Initiative, Freiheit, Fortschritt | Initiative, Liberty, Progress”(yep, I got inspired fromLiberté, Égal</description>
+    </item>
+    
+    <item>
+      <title>new page trying</title>
+      <link>/2022/10/10/new-page-trying/</link>
+      <pubDate>Mon, 10 Oct 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/2022/10/10/new-page-trying/</guid>
+      <description>After 4 years pausing,the time rebuilding this little site is coming.</description>
     </item>
     
     <item>
