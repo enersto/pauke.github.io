@@ -6,16 +6,7 @@
     <description>Recent content in Posts on IFF</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Mon, 10 Oct 2022 00:00:00 +0000</lastBuildDate><atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>new page trying</title>
-      <link>/2022/10/10/new-page-trying/</link>
-      <pubDate>Mon, 10 Oct 2022 00:00:00 +0000</pubDate>
-      
-      <guid>/2022/10/10/new-page-trying/</guid>
-      <description>After 4 years pausing,the time rebuilding this little site is coming.</description>
-    </item>
-    
+    <lastBuildDate>Fri, 15 Apr 2022 00:00:00 +0000</lastBuildDate><atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>用户生命周期价值（CLV）计算：R的方法</title>
       <link>/2022/04/15/cltv-r/</link>
