@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>poi on IFF</title>
+    <link>/tags/poi/</link>
+    <description>Recent content in poi on IFF</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Fri, 14 Oct 2022 00:00:00 +0000</lastBuildDate><atom:link href="/tags/poi/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>广佛生活便利程度街镇分布情况——基于POI数据的街镇格栅分析 （一）</title>
+      <link>/2022/10/14/guangfo-convenience-exploration-with-poi-data/</link>
+      <pubDate>Fri, 14 Oct 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/2022/10/14/guangfo-convenience-exploration-with-poi-data/</guid>
+      <description>缘起 某个偶然机会，收集到了一波广州的POI数据 ，当时粗浅的探查后，颇觉有趣。再结合到早前在sf的一些探索，自认可以进一步来熟练sf方面的技能</description>
+    </item>
+    
+  </channel>
+</rss>

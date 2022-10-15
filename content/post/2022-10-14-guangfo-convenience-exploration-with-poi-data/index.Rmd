@@ -1,0 +1,588 @@
+---
+title: "广佛生活便利程度街镇分布情况——基于POI数据的街镇格栅分析 （一）"
+author: pauke
+date: '2022-10-14'
+slug: guangfo-convenience-exploration-with-poi-data
+categories: []
+tags:
+  - sf
+  - spitial_data
+  - poi
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = TRUE,
+	message = FALSE,
+	warning =FALSE
+)
+```
+
+## 缘起
+
+某个偶然机会，收集到了一波广州的[POI数据](https://youwuqiong.top/405807.html) ，当时粗浅的探查后，颇觉有趣。再结合到早前在[sf的一些探索](https://pauke.netlify.app/2019/01/02/sf-ggplot2-%E6%9C%80%E7%AE%80%E6%AD%A5%E9%AA%A4%E5%AE%9E%E7%8E%B0%E4%B8%AD%E5%9B%BD%E5%9C%B0%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%B1%95%E7%A4%BA/ )，自认可以进一步来熟练sf方面的技能，故而开始琢磨基于这批数据来做一个小研究。
+
+## 破题
+
+关于这批POI数据具体情况会在后面详细展开，此处按下不表。
+
+开始时候拿到的只是广州相关的数据，但关于当前行政区划广州范围内的相关研究已经汗牛充栋，其中的集大成者就有诸如[中国城市社会地图集系列·广州社会地图集](https://book.douban.com/subject/35504174/)（以下略作：社会地图集）这类非常详尽且专业的社会经济地理的研究。该书是2021年出版，恰好错过了七普的数据，不得不说是该书一大遗憾。到了2022年这个坐拥时利的时间点，则完全可以用起七普数据来做整个研究的基础。与此同时，借鉴社会地图集的思路框架，利用几乎同期（2020年）的POI数据，构成 **本文的整体思路框架**，同时也是对于社会地图集的更新补充。
+
+另一方面，从[这篇文章](https://zhuanlan.zhihu.com/p/75172305)
+
+![珠三角建成区变化情况](/Users/pauke/Documents/GitHub/pauke.github.io/content/post/2022-10-14-guangfo-convenience-exploration-with-poi-data/index_files/delta.webp){width=50% height=50%}
+
+和针对广佛建成区的探查，则明确了广州和佛山的建成区连片是一个显著的整体：
+
+![建成区与广佛区划轮廓](/Users/pauke/Documents/GitHub/pauke.github.io/content/post/2022-10-14-guangfo-convenience-exploration-with-poi-data/index_files/bulding.png){width=150% height=150%}
+
+由此可以看出，只是局限在广州市行政区划范围内的思路，已经不适应当前广佛高度一体化情况。为此，不如将广州和佛山视为一个整体，来从POI数据的角度，探究这种一体化程度是否只是局限在建成区的连片。所以，**本文的边界范围**则是为广州市和佛山市行政区划合并的区域。 
+
+poi数据均是基于单个地理点位的数据值，只有结合一定的汇总单位，才能发挥出这种点位数据的价值。而为了最细致的展示poi数据的分布密度情况，则取当前初步数据搜寻中，可以发现的最小行政区划单位——街道乡镇为**本文的最小颗粒度**。
+
+## 归集
+
+除了一开始获得的广州poi数据，基于在破题中的思路，整体的数据收集还需要从以下几个方面补充：
+
+- poi数据需要补充佛山部分；
+- 以街道乡镇为单位的人口和基本信息数据；
+
+### poi数据源
+
+佛山的poi数据在[开始提及的数据源](https://youwuqiong.top/405807.html)可以同样获取，甚为便利。
+
+### 人口源
+
+不得不说，作为一线的广州在数据公开方面还是不错的水平，在 [市统计局官网](http://tjj.gz.gov.cn/stats_newtjyw/zyxz/tjnjdzzz/content/post_7875471.html)的统计年鉴中，即可获取年度和七普的相关数据。
+
+与此同时，佛山则是直白的展示了「佛山联邦」这个称号的含义，其市级政府机关层面均无街道乡镇层级数据，不得不借助广撒网方式，逐个区寻找：
+
+- [禅城区普查公告](http://www.chancheng.gov.cn/gkmlpt/content/4/4834/mpost_4834176.html#47)
+- [南海区普查公告](https://3g.163.com/dy/article/GBD61OUC055004XG.html?spss=adap_pc)
+- [顺德区普查公告](https://api.foshanplus.com/foshan/api/news/detail/599615.html)
+- [高明区普查公告](http://www.gaoming.gov.cn/attachment/0/186/186739/4842112.pdf)
+- [三水区普查公告](http://www.ss.gov.cn/attachment/0/186/186768/4842298.pdf)
+
+街道乡镇的面积则是来源于[此处](http://xzqh.info/lt/read.php?tid=157248)。
+
+
+## 准备
+
+本文依赖的包：
+
+```{r message=FALSE, warning=FALSE}
+library(knitr)
+library(ggplot2)
+library(data.table)
+library(sf)
+library(openxlsx)
+library(dplyr)
+library(RColorBrewer)
+library(DescTools)
+library(leaflet)
+library(sp)
+
+options(scipen=8)
+
+```
+
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+t1<- read.xlsx("/Users/pauke/Downloads/矢量数据/街道层级人口.xlsx")
+gz_t <- read_sf("/Users/pauke/Downloads/矢量数据/行政区划/乡镇街道/广东省_乡镇边界.shp",options = "ENCODING=GBK")
+
+poi_ms = read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/广州地铁站.shp")
+poi_bs = read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/广州公交站.shp")
+poi_pk = read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/广州公园.shp")
+poi_bb = read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/广州写字楼.shp")
+poi_hp = read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/广州医院.shp")
+poi_ml = read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/广州商场.shp")
+poi_ed = read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/广州学校.shp")
+poi_ls = read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/广州小区.shp")
+poi_sp = read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/广州超市.shp")
+poi_ht = read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/广州酒店.shp")
+poi_bk = read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/广州银行.shp")
+poi_rs = read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/广州餐饮.shp")
+poi_mk = read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/广州菜市场.shp")
+
+poi_ms_fs =read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/佛山/地铁站.shp")
+poi_bs_fs =read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/佛山/公交站.shp")
+poi_pk_fs =read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/佛山/公园.shp")
+poi_bb_fs =read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/佛山/写字楼.shp")
+poi_hp_fs =read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/佛山/医院.shp")
+poi_ml_fs =read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/佛山/商场.shp")
+poi_ed_fs =read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/佛山/学校.shp")
+poi_ls_fs =read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/佛山/住宅.shp")
+poi_sp_fs =read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/佛山/购物.shp")
+poi_ht_fs =read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/佛山/酒店.shp")
+poi_bk_fs =read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/佛山/银行.shp")
+poi_rs_fs =read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/佛山/餐饮.shp")
+```
+
+
+```{r}
+
+```
+
+
+### 数据处理
+
+首先是对基础数据的列示:
+基于第七次和第六次人口普查的常住人口数据：
+```{r}
+knitr::kable(t1[sample(nrow(t1),10),])
+```
+
+广州和佛山sf数据：
+```{r}
+knitr::kable(gz_t[sample(nrow(gz_t),10),])
+```
+
+基于人口和街道乡镇面积的一些数据整理：
+```{r}
+t1 <- setDT(t1)[,densities:= n7th/area][,change:=
+                                          (n7th-n6th)/n6th][,change_cut:=
+                                                              cut(change,c(-Inf,-0.1,0,0.1,
+                                                                        0.2,0.5,1,2,7,Inf),right = F)]
+t1 <- t1[,n7th_s := n7th/10000]
+gz_t <- gz_t[substr(gz_t$code,1,4) %in% c('4401','4406'),]
+gz_t <- left_join(gz_t,t1,by =c("Name"= "town"))
+```
+
+根据人口密度>=6000和人口数量>=40万的条件，取一个广佛核心区域的并集，用以聚焦核心城区
+```{r}
+gz_t <- setDT(gz_t)[densities >= 6000,core := T][n7th>= 400000,core := T]
+
+gz_t <- st_as_sf(gz_t)
+gz_t <- st_transform(gz_t,4326)
+```
+
+整理后的数据样例：
+```{r}
+knitr::kable(gz_t[sample(nrow(gz_t),5),])
+```
+
+
+## 基本情况
+
+### 人口数量
+
+广佛各个街道乡镇的人口情况：
+
+
+```{r base_population,fig.height=8, fig.width=10, warning=FALSE,  dpi= 200}
+
+ggplot()+ geom_sf(data = gz_t,aes(fill= n7th_s,geometry = geometry))+
+  scale_fill_distiller(palette='Spectral')+
+  geom_sf_text(data = gz_t[gz_t$n7th_s >= 20,],aes(label = Name),
+               family='Songti SC',size = 3)+
+  theme(text = element_text(family='Songti SC'),         
+        axis.title.x=element_blank(),          
+        axis.title.y=element_blank())
+```
+
+广佛核心区的人口数量情况
+```{r base_population_fc,fig.height=8.5, fig.width=10, warning=FALSE,  dpi= 200}
+
+ggplot()+ geom_sf(data = gz_t[gz_t$core== T,],aes(fill= n7th_s,geometry = geometry))+
+  scale_fill_distiller(palette='Spectral')+
+  geom_sf_text(data = gz_t[gz_t$core== T & gz_t$n7th_s >= 20,],aes(label = Name),
+               family='Songti SC',size = 3)+
+  theme(text = element_text(family='Songti SC'),         
+        axis.title.x=element_blank(),          
+        axis.title.y=element_blank())
+```
+
+### 人口密度
+整体区域内的人口密度情况：
+```{r base_densities, fig.height=8, fig.width=10, warning=FALSE, dpi=100}
+ggplot()+ geom_sf(data = gz_t,aes(fill= densities,geometry = geometry))+
+  scale_fill_distiller(palette='Spectral')+
+  geom_sf_text(data = gz_t[gz_t$densities >= 50000,],aes(label = Name),
+               family='Songti SC',size = 3)+
+  theme(text = element_text(family='Songti SC'),         
+        axis.title.x=element_blank(),          
+        axis.title.y=element_blank())
+
+```
+
+广佛核心区的人口密度情况
+```{r base_densities_fc, fig.height=8, fig.width=10, warning=FALSE, dpi=100}
+
+ggplot()+ geom_sf(data = gz_t[gz_t$core== T,],aes(fill= densities,geometry = geometry))+
+  scale_fill_distiller(palette='Spectral')+
+  geom_sf_text(data = gz_t[gz_t$n7th >= 400000,],aes(label = Name),
+               family='Songti SC',size = 3)+
+  theme(text = element_text(family='Songti SC'),         
+        axis.title.x=element_blank(),          
+        axis.title.y=element_blank())
+
+```
+
+### 人口十年变化率
+根据广佛各个街道乡镇七普和六普的常住人口变化率，来列示10年间各自的发展情况。
+（图中空缺的部分是由于该乡镇为2010年六普后新增的街道乡镇，无六普可对比的人口数据）
+```{r base_change, fig.height=8, fig.width=10, warning=FALSE, dpi=100}
+
+ggplot()+ geom_sf(data = gz_t,aes(fill= change_cut,geometry = geometry))+
+  scale_fill_brewer(palette="YlOrRd")+
+  geom_sf_text(data = gz_t[gz_t$change >= 1,],aes(label = Name),
+               family='Songti SC',size = 3)+
+  theme(text = element_text(family='Songti SC'),         
+        axis.title.x=element_blank(),          
+        axis.title.y=element_blank())
+```
+广佛核心区的人口密度情况
+```{r base_change_fc, fig.height=8, fig.width=10, warning=FALSE, dpi=100}
+
+ggplot()+ geom_sf(data = gz_t[gz_t$core== T,],aes(fill= change_cut,geometry = geometry))+
+  scale_fill_brewer(palette="YlOrRd")+
+  geom_sf_text(data = gz_t[gz_t$core== T & gz_t$change >= 1,],aes(label = Name),
+               family='Songti SC',size = 3)+
+  theme(text = element_text(family='Songti SC'),
+        axis.title.x=element_blank(), 
+        axis.title.y=element_blank())
+```
+
+
+
+## 分项
+
+本次获取的poi数据主要分为以下几个类别：
+
+- 地铁站
+- 公交站
+- 公园
+- 写字楼
+- 医院
+- 商场
+- 学校
+- 小区
+- 超市
+- 酒店
+- 银行
+- 餐饮
+- 菜市场
+
+围绕poi数据基于点的特征和生活便利这一本文母题（写字楼、小区、酒店排除），再结合前期的数据质量探查（餐饮排除），本文选取以下几个方面来做详细的展开：
+
+- 地铁站
+- 公交站
+- 菜市场
+- 超市
+- 公园
+- 医院
+- 商场
+- 学校
+- 银行
+
+限于精力，第一部分讨论以下部分：
+
+- 地铁站
+- 公交站
+- 菜市场
+- 超市
+
+### 公交车站分布情况
+
+#### POI数据的处理逻辑
+
+先以公交车站POI做一个本文对该数据处理思路的示例，后续各个板块如无特殊情况，就直接给出对应结论。
+
+- 1）检查该类型下的分类是否有显著区别，本部分主要是确认是否有进一步分类或筛选分析的必要；
+
+```{r bs_data_explore,fig.height=8, fig.width=10, warning=FALSE,  dpi= 200}
+
+poi_bs <- st_transform(poi_bs,4326)
+poi_bs_fs <- st_transform(poi_bs_fs,4326)
+
+poi_bs <- rbind(poi_bs[,c("cityname","lat","lon","name", "address" ,"type1","type2","type3","geometry")],
+                poi_bs_fs[,c("cityname","lat","lon","name", "address" ,"type1","type2","type3","geometry")])
+insc_bs <- st_join(gz_t[,c("Name","layer1","layer2","geometry")],poi_bs)
+insc_bs_ag <- setDT(insc_bs)[!is.na(name),][,.(cnt= length(name)),by = c("Name","layer1","layer2","type1","type2","type3")]
+insc_bs_ag_1 <- insc_bs_ag[,.(cnt= sum(cnt)),by = c("Name")]
+gz_t_bs_1 <- left_join(gz_t,insc_bs_ag_1,by =c("Name"))
+unique(poi_bs$type1)
+```
+
+
+- 2）检查该数据集的点在不同的分组（街道乡镇）是否有显著区别，本部分主要是确认进行全域的投射列示是否有分析的意义和数据的偏倚情况；
+
+```{r bs_point,fig.height=8, fig.width=10, warning=FALSE,  dpi= 200}
+ggplot()+ geom_sf(data = gz_t_bs_1,aes(geometry = geometry))+
+  geom_sf(data = poi_bs,aes(geometry = geometry),size = 0.5, color = "red")
+
+```
+从该部分的POI数据的列示来看，公交车站数据的类型相对单一，且各个乡镇间的数量差值相对较小，是较为均质化的POI数据，可以不经过分类筛选，直接投射在各个街道乡镇，来看各自的情况。
+
+```{r bs_data_arrange}
+
+gz_t_bs_2 <- setDT(gz_t_bs_1)[,per_cnt := cnt/n7th*10000]
+gz_t_bs_2 <- st_as_sf(gz_t_bs_2)
+```
+
+计算出各个街道乡镇的公交车站数量后，再以万人人均作为单位，来投射分布情况：
+
+```{r bs_final,fig.height=8, fig.width=10, warning=FALSE,  dpi= 200}
+ggplot()+ geom_sf(data = gz_t_bs_2,aes(fill= per_cnt,geometry = geometry))+
+  scale_fill_distiller(palette='Spectral')+
+  geom_sf_text(data = gz_t_bs_2[gz_t_bs_2$per_cnt >= 15,],aes(label = Name),
+               family='Songti SC',size = 3)+
+  theme(text = element_text(family='Songti SC'),         
+        axis.title.x=element_blank(),         
+        axis.title.y=element_blank())
+
+```
+
+### 地铁车站
+
+地铁车站POI数据的情况是：
+```{r ms_point,fig.height=8, fig.width=10, warning=FALSE,  dpi= 200}
+poi_ms <- st_transform(poi_ms,4326)
+poi_ms_fs <- st_transform(poi_ms_fs,4326)
+
+poi_ms <- rbind(poi_ms[,c("cityname","lat","lon","name", "address" ,"type1","type2","type3","geometry")],
+                poi_ms_fs[,c("cityname","lat","lon","name", "address" ,"type1","type2","type3","geometry")])
+
+insc_ms <- st_join(gz_t[,c("Name","layer1","layer2","geometry")],poi_ms)
+
+insc_ms_ag <- setDT(insc_ms)[!is.na(name),][,.(cnt= length(name)),by = c("Name","layer1","layer2","type1","type2","type3")]
+
+insc_ms_ag_1 <- insc_ms_ag[,.(cnt= sum(cnt)),by = c("Name")]
+
+gz_t_ms_1 <- left_join(gz_t,insc_ms_ag_1,by =c("Name"))
+gz_t_ms_2 <- setDT(gz_t_ms_1)[,per_cnt := cnt/n7th*10000]
+gz_t_ms_2 <- st_as_sf(gz_t_ms_2)
+
+ggplot()+ geom_sf(data = gz_t_ms_1,aes(geometry = geometry))+
+  geom_sf(data = poi_ms,aes(geometry = geometry))
+
+```
+
+
+- 集中在核心区域，边缘乡镇都没有对应地铁站点分布；
+- 各个街道乡镇间的数量区别相对较小，数量多和数量少的组间方差不大；
+
+
+```{r ms,fig.height=8, fig.width=10, warning=FALSE,  dpi= 200}
+
+ggplot()+ geom_sf(data = gz_t_ms_2[gz_t_ms_2$core== T,],aes(fill= per_cnt,geometry = geometry))+
+  scale_fill_distiller(palette='Spectral')+
+  geom_sf_text(data = gz_t_ms_2[gz_t_ms_2$per_cnt >= 1,],aes(label = Name),
+               family='Songti SC',size = 3)+
+  theme(text = element_text(family='Songti SC'),         
+        axis.title.x=element_blank(),          
+        axis.title.y=element_blank())
+
+```
+
+
+### 购物市场/超市
+
+本部分合并且整理了原有数据的「超市」和「菜市场」两个部分的数据。经过前期探查发现，该poi数据的原有分类十分芜杂，需要进行进一步的清洗整理。
+
+#### 分类整理
+
+```{r mk_data_explore,fig.height=8, fig.width=10, warning=FALSE,  dpi= 200}
+
+poi_sp <- st_transform(poi_sp,4326)
+poi_mk <- st_transform(poi_mk,4326)
+poi_sp_fs <- st_transform(poi_sp_fs,4326)
+
+
+poi_sp <- rbind(poi_sp[,c("cityname","lat","lon","name", "address" ,"type1","type2","type3","geometry")],
+                poi_mk[,c("cityname","lat","lon","name", "address" ,"type1","type2","type3","geometry")],
+                poi_sp_fs[,c("cityname","lat","lon","name", "address" ,"type1","type2","type3","geometry")])
+knitr::kable(head(Desc(poi_sp$type2)[[1]][["freq"]],15))
+
+```
+poi数据分类存在很多重叠和冗余的分类结果，且部分分类是各类的大杂烩，缺乏进一步分析的意义。具体而言，其综合市场、购物相关场所等分类下包含了诸多超市和便利店；购物相关场所这个分类缺乏进一步指向意义；整体类别归集程度相对较低，top3仅能归集到九成的数据。为此，该部分的整理从以下几个方面入手：
+
+```{r mk_data_clean,fig.height=8, fig.width=10, warning=FALSE,  dpi= 200}
+
+insc_sp <- st_join(gz_t[,c("Name","layer1","layer2","geometry")],poi_sp)
+insc_sp <- setDT(insc_sp)[,cate:= type2 ]
+
+##提取出所有便利店
+pat <- "7-|71|便利店|便利"
+insc_sp <- insc_sp[grep(pat,name, perl = TRUE) ,cate:= "便民商店/便利店"]
+
+##构建一个新的分类生鲜超市
+pat <- "钱大妈|水超市|蔬|果|生鲜|兴盛优选|肉|菜"
+insc_sp <- insc_sp[grep(pat,name, perl = TRUE) ,cate:= "生鲜超市"]
+
+##进一步归拢和集中超市相关的数据
+pat <- "便利超市"
+insc_sp <- insc_sp[grep(pat,name, perl = TRUE) ,cate:= "超级市场"]
+
+pat <- "超市|永旺"
+insc_sp <- insc_sp[type2 %in% c("购物相关场所","商场") &grep(pat,name, perl = TRUE) ,cate:= "超级市场"]
+
+##进一步归拢和集中其他分类
+insc_sp <- insc_sp[type2 %in% c("家居建材市场","个人用品/化妆品店") ,cate:= "五金/日杂"]
+
+knitr::kable(head(Desc(insc_sp$cate)[[1]][["freq"]],15))
+```
+经过处理后，top6的分类已经可以覆盖995成的数据，舍弃其余分类，专注top6部分数据：
+
+```{r mk_data_format,fig.height=8, fig.width=10, warning=FALSE,  dpi= 200}
+category <- head(Desc(insc_sp$cate)[[1]][["freq"]],6)$level
+insc_sp_ag <- insc_sp[!is.na(name),][cate %in% category][,.(cnt= length(name)),
+                                                         by = c("Name","layer1","layer2","cate")]
+insc_sp_ag_1 <- insc_sp_ag[,.(cnt= sum(cnt)),by = c("Name")]
+```
+
+
+先整体性的看广佛全域的购物类设施的万人密度情况：
+
+```{r mk,fig.height=8, fig.width=10, warning=FALSE,  dpi= 200}
+gz_t_sp_1 <- left_join(gz_t,insc_sp_ag_1,by =c("Name"))
+gz_t_sp_2 <- setDT(gz_t_sp_1)[,per_cnt := cnt/n7th*10000]
+gz_t_sp_2 <- st_as_sf(gz_t_sp_2)
+
+ggplot()+ geom_sf(data = gz_t_sp_2,aes(fill= per_cnt,geometry = geometry))+
+  scale_fill_distiller(palette='Spectral')+
+  geom_sf_text(data = gz_t_sp_2[gz_t_sp_1$per_cnt >= 20,],aes(label = Name),
+               family='Songti SC',size = 3)+
+  theme(text = element_text(family='Songti SC'),         
+        axis.title.x=element_blank(),          
+        axis.title.y=element_blank())
+
+
+```
+- 除了越秀核心区外，还有从化和高明的几个街道乡镇密度相对出乎意料。
+
+核心区的购物类设施的万人密度情况：
+
+```{r mk_fc,fig.height=8, fig.width=10, warning=FALSE,  dpi= 200}
+
+ggplot()+ geom_sf(data = gz_t_sp_2[gz_t_ms_2$core== T,],aes(fill= per_cnt,geometry = geometry))+
+  scale_fill_distiller(palette='Spectral')+
+  geom_sf_text(data = gz_t_sp_2[gz_t_ms_2$core== T & gz_t_sp_1$per_cnt >= 12,],aes(label = Name),
+               family='Songti SC',size = 3)+
+  theme(text = element_text(family='Songti SC'),         
+        axis.title.x=element_blank(),          
+        axis.title.y=element_blank())
+
+```
+- 核心区域内，仍然高度密集与越秀、荔湾这类老城。
+
+##### 便利店分布
+
+广佛全域的便利店的万人密度情况：
+
+```{r mk_cs,fig.height=8, fig.width=10, warning=FALSE,  dpi= 200}
+insc_sp_ag_cs <- insc_sp_ag[cate =="便民商店/便利店",.(cnt= sum(cnt)),by = c("Name")]
+gz_t_sp_cs_1 <- left_join(gz_t,insc_sp_ag_cs,by =c("Name"))
+gz_t_sp_cs_2 <- setDT(gz_t_sp_cs_1)[,per_cnt := cnt/n7th*10000]
+gz_t_sp_cs_2 <- st_as_sf(gz_t_sp_cs_2)
+
+ggplot()+ geom_sf(data = gz_t_sp_cs_2,aes(fill= per_cnt,geometry = geometry))+
+  scale_fill_distiller(palette='Spectral')+
+  geom_sf_text(data = gz_t_sp_cs_2[gz_t_sp_1$per_cnt >= 20,],aes(label = Name),
+               family='Songti SC',size = 3)+
+  theme(text = element_text(family='Songti SC'),         
+        axis.title.x=element_blank(),          
+        axis.title.y=element_blank())
+```
+
+- 与购物类设施整体基本一致。
+
+核心区域的便利店密度情况：
+```{r mk_cs_fc,fig.height=8, fig.width=10, warning=FALSE,  dpi= 200}
+
+ggplot()+ geom_sf(data = gz_t_sp_cs_2[gz_t_sp_cs_2$core== T,],aes(fill= per_cnt,geometry = geometry))+
+  scale_fill_distiller(palette='Spectral')+
+  geom_sf_text(data = gz_t_sp_cs_2[gz_t_sp_cs_2$core== T & gz_t_sp_cs_2$per_cnt >= 8,],aes(label = Name),
+               family='Songti SC',size = 3)+
+  theme(text = element_text(family='Songti SC'),         
+        axis.title.x=element_blank(),          
+        axis.title.y=element_blank())
+
+```
+- 便利店显著集中在了城市区域，乡镇部分的密度比整体低了不少。
+
+##### 超市分布
+
+广佛全域的便利店的万人密度情况：
+
+```{r mk_sp,fig.height=8, fig.width=10, warning=FALSE,  dpi= 200}
+insc_sp_ag_sp <- insc_sp_ag[cate =="超级市场",.(cnt= sum(cnt)),by = c("Name")]
+gz_t_sp_sp_1 <- left_join(gz_t,insc_sp_ag_sp,by =c("Name"))
+gz_t_sp_sp_2 <- setDT(gz_t_sp_sp_1)[,per_cnt := cnt/n7th*10000]
+gz_t_sp_sp_2 <- st_as_sf(gz_t_sp_sp_2)
+
+ggplot()+ geom_sf(data = gz_t_sp_sp_2,aes(fill= per_cnt,geometry = geometry))+
+  scale_fill_distiller(palette='Spectral')+
+  geom_sf_text(data = gz_t_sp_sp_2[gz_t_sp_sp_2$per_cnt >= 20,],aes(label = Name),
+               family='Songti SC',size = 3)+
+  theme(text = element_text(family='Songti SC'),         
+        axis.title.x=element_blank(),          
+        axis.title.y=element_blank())
+```
+
+核心区域的超市密度情况：
+
+```{r mk_sp_fc,fig.height=8, fig.width=10, warning=FALSE,  dpi= 200}
+
+ggplot()+ geom_sf(data = gz_t_sp_sp_2[gz_t_sp_sp_2$core== T,],aes(fill= per_cnt,geometry = geometry))+
+  scale_fill_distiller(palette='Spectral')+
+  geom_sf_text(data = gz_t_sp_sp_2[gz_t_sp_sp_2$core== T & gz_t_sp_sp_2$per_cnt >= 4,],aes(label = Name),
+               family='Songti SC',size = 3)+
+  theme(text = element_text(family='Songti SC'),         
+        axis.title.x=element_blank(),          
+        axis.title.y=element_blank())
+
+```
+
+- 超市的分布在城市和城镇间的差距则明显小于便利店。
+
+##### 生鲜超市分布
+
+广佛全域的便利店的万人密度情况：
+
+```{r mk_fm,fig.height=8, fig.width=10, warning=FALSE,  dpi= 200}
+insc_sp_ag_fm <- insc_sp_ag[cate =="生鲜超市",.(cnt= sum(cnt)),by = c("Name")]
+gz_t_sp_fm_1 <- left_join(gz_t,insc_sp_ag_fm,by =c("Name"))
+gz_t_sp_fm_2 <- setDT(gz_t_sp_fm_1)[,per_cnt := cnt/n7th*10000]
+gz_t_sp_fm_2 <- st_as_sf(gz_t_sp_fm_2)
+
+ggplot()+ geom_sf(data = gz_t_sp_fm_2,aes(fill= per_cnt,geometry = geometry))+
+  scale_fill_distiller(palette='Spectral')+
+  geom_sf_text(data = gz_t_sp_fm_2[gz_t_sp_fm_2$per_cnt >= 3,],aes(label = Name),
+               family='Songti SC',size = 3)+
+  theme(text = element_text(family='Songti SC'),         
+        axis.title.x=element_blank(),          
+        axis.title.y=element_blank())
+```
+
+- 生鲜超市出现了个别区域有相对较大值，部分区域则还没有类似业态的情况，有待后续考察。
+
+核心区域的便利店密度情况：
+```{r mk_fm_fc,fig.height=8, fig.width=10, warning=FALSE,  dpi= 200}
+
+ggplot()+ geom_sf(data = gz_t_sp_fm_2[gz_t_sp_fm_2$core== T,],aes(fill= per_cnt,geometry = geometry))+
+  scale_fill_distiller(palette='Spectral')+
+  geom_sf_text(data = gz_t_sp_fm_2[gz_t_sp_fm_2$core== T & gz_t_sp_fm_2$per_cnt >= 2,],aes(label = Name),
+               family='Songti SC',size = 3)+
+  theme(text = element_text(family='Songti SC'),         
+        axis.title.x=element_blank(),          
+        axis.title.y=element_blank())
+
+```
+- 便利店显著集中在了城市区域，乡镇部分的密度比整体低了不少。
+
+
+## 未完待续
+
+为精力所限，先行推发以上部分的内容，但不意味着这个小课题的结束，随后我还会：
+
+- 展开继续列示各个poi分项的情况：
+  * 公园
+  * 医院
+  * 商场
+  * 学校
+  * 银行
+- 汇拢各个部分的结论，试着建设一个基于以上内容的指标模型
+

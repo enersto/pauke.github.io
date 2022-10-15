@@ -1,0 +1,1025 @@
+---
+title: "广佛生活便利程度街镇分布情况——基于POI数据的街镇格栅分析 （一）"
+author: pauke
+date: '2022-10-14'
+slug: guangfo-convenience-exploration-with-poi-data
+categories: []
+tags:
+  - sf
+  - spitial_data
+  - poi
+---
+
+
+
+<div id="缘起" class="section level2">
+<h2>缘起</h2>
+<p>某个偶然机会，收集到了一波广州的<a href="https://youwuqiong.top/405807.html">POI数据</a> ，当时粗浅的探查后，颇觉有趣。再结合到早前在<a href="https://pauke.netlify.app/2019/01/02/sf-ggplot2-%E6%9C%80%E7%AE%80%E6%AD%A5%E9%AA%A4%E5%AE%9E%E7%8E%B0%E4%B8%AD%E5%9B%BD%E5%9C%B0%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%B1%95%E7%A4%BA/">sf的一些探索</a>，自认可以进一步来熟练sf方面的技能，故而开始琢磨基于这批数据来做一个小研究。</p>
+</div>
+<div id="破题" class="section level2">
+<h2>破题</h2>
+<p>关于这批POI数据具体情况会在后面详细展开，此处按下不表。</p>
+<p>开始时候拿到的只是广州相关的数据，但关于当前行政区划广州范围内的相关研究已经汗牛充栋，其中的集大成者就有诸如<a href="https://book.douban.com/subject/35504174/">中国城市社会地图集系列·广州社会地图集</a>（以下略作：社会地图集）这类非常详尽且专业的社会经济地理的研究。该书是2021年出版，恰好错过了七普的数据，不得不说是该书一大遗憾。到了2022年这个坐拥时利的时间点，则完全可以用起七普数据来做整个研究的基础。与此同时，借鉴社会地图集的思路框架，利用几乎同期（2020年）的POI数据，构成 <strong>本文的整体思路框架</strong>，同时也是对于社会地图集的更新补充。</p>
+<p>另一方面，从<a href="https://zhuanlan.zhihu.com/p/75172305">这篇文章</a></p>
+<div class="figure">
+<img src="{{< blogdown/postref >}}index_files/delta.webp" style="width:50.0%;height:50.0%" alt="" />
+<p class="caption">珠三角建成区变化情况</p>
+</div>
+<p>和针对广佛建成区的探查，则明确了广州和佛山的建成区连片是一个显著的整体：</p>
+<div class="figure">
+<img src="{{< blogdown/postref >}}index_files/bulding.png" style="width:150.0%;height:150.0%" alt="" />
+<p class="caption">建成区与广佛区划轮廓</p>
+</div>
+<p>由此可以看出，只是局限在广州市行政区划范围内的思路，已经不适应当前广佛高度一体化情况。为此，不如将广州和佛山视为一个整体，来从POI数据的角度，探究这种一体化程度是否只是局限在建成区的连片。所以，<strong>本文的边界范围</strong>则是为广州市和佛山市行政区划合并的区域。</p>
+<p>poi数据均是基于单个地理点位的数据值，只有结合一定的汇总单位，才能发挥出这种点位数据的价值。而为了最细致的展示poi数据的分布密度情况，则取当前初步数据搜寻中，可以发现的最小行政区划单位——街道乡镇为<strong>本文的最小颗粒度</strong>。</p>
+</div>
+<div id="归集" class="section level2">
+<h2>归集</h2>
+<p>除了一开始获得的广州poi数据，基于在破题中的思路，整体的数据收集还需要从以下几个方面补充：</p>
+<ul>
+<li>poi数据需要补充佛山部分；</li>
+<li>以街道乡镇为单位的人口和基本信息数据；</li>
+</ul>
+<div id="poi数据源" class="section level3">
+<h3>poi数据源</h3>
+<p>佛山的poi数据在<a href="https://youwuqiong.top/405807.html">开始提及的数据源</a>可以同样获取，甚为便利。</p>
+</div>
+<div id="人口源" class="section level3">
+<h3>人口源</h3>
+<p>不得不说，作为一线的广州在数据公开方面还是不错的水平，在 <a href="http://tjj.gz.gov.cn/stats_newtjyw/zyxz/tjnjdzzz/content/post_7875471.html">市统计局官网</a>的统计年鉴中，即可获取年度和七普的相关数据。</p>
+<p>与此同时，佛山则是直白的展示了「佛山联邦」这个称号的含义，其市级政府机关层面均无街道乡镇层级数据，不得不借助广撒网方式，逐个区寻找：</p>
+<ul>
+<li><a href="http://www.chancheng.gov.cn/gkmlpt/content/4/4834/mpost_4834176.html#47">禅城区普查公告</a></li>
+<li><a href="https://3g.163.com/dy/article/GBD61OUC055004XG.html?spss=adap_pc">南海区普查公告</a></li>
+<li><a href="https://api.foshanplus.com/foshan/api/news/detail/599615.html">顺德区普查公告</a></li>
+<li><a href="http://www.gaoming.gov.cn/attachment/0/186/186739/4842112.pdf">高明区普查公告</a></li>
+<li><a href="http://www.ss.gov.cn/attachment/0/186/186768/4842298.pdf">三水区普查公告</a></li>
+</ul>
+<p>街道乡镇的面积则是来源于<a href="http://xzqh.info/lt/read.php?tid=157248">此处</a>。</p>
+</div>
+</div>
+<div id="准备" class="section level2">
+<h2>准备</h2>
+<p>本文依赖的包：</p>
+<pre class="r"><code>library(knitr)
+library(ggplot2)
+library(data.table)
+library(sf)
+library(openxlsx)
+library(dplyr)
+library(RColorBrewer)
+library(DescTools)
+library(leaflet)
+library(sp)
+
+options(scipen=8)</code></pre>
+<div id="数据处理" class="section level3">
+<h3>数据处理</h3>
+<p>首先是对基础数据的列示:
+基于第七次和第六次人口普查的常住人口数据：</p>
+<pre class="r"><code>knitr::kable(t1[sample(nrow(t1),10),])</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="left">town</th>
+<th align="left">layer1</th>
+<th align="left">layer2</th>
+<th align="right">area</th>
+<th align="right">n7th</th>
+<th align="right">n6th</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">28</td>
+<td align="left">人民街道</td>
+<td align="left">广州市</td>
+<td align="left">越秀区</td>
+<td align="right">0.80</td>
+<td align="right">50260</td>
+<td align="right">28989</td>
+</tr>
+<tr class="even">
+<td align="left">81</td>
+<td align="left">松洲街道</td>
+<td align="left">广州市</td>
+<td align="left">白云区</td>
+<td align="right">9.51</td>
+<td align="right">152484</td>
+<td align="right">106274</td>
+</tr>
+<tr class="odd">
+<td align="left">93</td>
+<td align="left">金沙街道</td>
+<td align="left">广州市</td>
+<td align="left">白云区</td>
+<td align="right">8.37</td>
+<td align="right">152317</td>
+<td align="right">52657</td>
+</tr>
+<tr class="even">
+<td align="left">29</td>
+<td align="left">东山街道</td>
+<td align="left">广州市</td>
+<td align="left">越秀区</td>
+<td align="right">2.78</td>
+<td align="right">79295</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">188</td>
+<td align="left">九江镇</td>
+<td align="left">佛山市</td>
+<td align="left">南海区</td>
+<td align="right">95.24</td>
+<td align="right">218345</td>
+<td align="right">170179</td>
+</tr>
+<tr class="even">
+<td align="left">132</td>
+<td align="left">新造镇</td>
+<td align="left">广州市</td>
+<td align="left">番禺区</td>
+<td align="right">13.90</td>
+<td align="right">45818</td>
+<td align="right">27248</td>
+</tr>
+<tr class="odd">
+<td align="left">146</td>
+<td align="left">狮岭镇</td>
+<td align="left">广州市</td>
+<td align="left">花都区</td>
+<td align="right">158.77</td>
+<td align="right">298297</td>
+<td align="right">203254</td>
+</tr>
+<tr class="even">
+<td align="left">30</td>
+<td align="left">农林街道</td>
+<td align="left">广州市</td>
+<td align="left">越秀区</td>
+<td align="right">1.08</td>
+<td align="right">41801</td>
+<td align="right">50152</td>
+</tr>
+<tr class="odd">
+<td align="left">173</td>
+<td align="left">正果镇</td>
+<td align="left">广州市</td>
+<td align="left">增城区</td>
+<td align="right">235.65</td>
+<td align="right">35574</td>
+<td align="right">40387</td>
+</tr>
+<tr class="even">
+<td align="left">50</td>
+<td align="left">沙园街道</td>
+<td align="left">广州市</td>
+<td align="left">海珠区</td>
+<td align="right">1.48</td>
+<td align="right">73210</td>
+<td align="right">67322</td>
+</tr>
+</tbody>
+</table>
+<p>广州和佛山sf数据：</p>
+<pre class="r"><code>knitr::kable(gz_t[sample(nrow(gz_t),10),])</code></pre>
+<table>
+<colgroup>
+<col width="26%" />
+<col width="10%" />
+<col width="6%" />
+<col width="14%" />
+<col width="6%" />
+<col width="34%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">gml_id</th>
+<th align="left">Name</th>
+<th align="left">layer</th>
+<th align="left">code</th>
+<th align="right">grade</th>
+<th align="left">geometry</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">layer_township_pg.15628</td>
+<td align="left">彭寨镇</td>
+<td align="left">乡镇</td>
+<td align="left">441624108000</td>
+<td align="right">4</td>
+<td align="left">MULTIPOLYGON (((115.0374 24…</td>
+</tr>
+<tr class="even">
+<td align="left">layer_township_pg.14956</td>
+<td align="left">华洲街道</td>
+<td align="left">乡镇</td>
+<td align="left">440105017000</td>
+<td align="right">4</td>
+<td align="left">MULTIPOLYGON (((113.3611 23…</td>
+</tr>
+<tr class="odd">
+<td align="left">layer_township_pg.15763</td>
+<td align="left">坂田街道</td>
+<td align="left">乡镇</td>
+<td align="left">440307013000</td>
+<td align="right">4</td>
+<td align="left">MULTIPOLYGON (((114.0762 22…</td>
+</tr>
+<tr class="even">
+<td align="left">layer_township_pg.15595</td>
+<td align="left">古劳镇</td>
+<td align="left">乡镇</td>
+<td align="left">440784103000</td>
+<td align="right">4</td>
+<td align="left">MULTIPOLYGON (((112.9717 22…</td>
+</tr>
+<tr class="odd">
+<td align="left">layer_township_pg.14999</td>
+<td align="left">石井街道</td>
+<td align="left">乡镇</td>
+<td align="left">440111014000</td>
+<td align="right">4</td>
+<td align="left">MULTIPOLYGON (((113.227 23….</td>
+</tr>
+<tr class="even">
+<td align="left">layer_township_pg.15495</td>
+<td align="left">红岭林场</td>
+<td align="left">乡镇</td>
+<td align="left">441581456000</td>
+<td align="right">4</td>
+<td align="left">MULTIPOLYGON (((115.5326 23…</td>
+</tr>
+<tr class="odd">
+<td align="left">layer_township_pg.15700</td>
+<td align="left">公明街道</td>
+<td align="left">乡镇</td>
+<td align="left">440311002000</td>
+<td align="right">4</td>
+<td align="left">MULTIPOLYGON (((113.9088 22…</td>
+</tr>
+<tr class="even">
+<td align="left">layer_township_pg.15833</td>
+<td align="left">福堂镇</td>
+<td align="left">乡镇</td>
+<td align="left">441825108000</td>
+<td align="right">4</td>
+<td align="left">MULTIPOLYGON (((112.1128 24…</td>
+</tr>
+<tr class="odd">
+<td align="left">layer_township_pg.16253</td>
+<td align="left">新华农场</td>
+<td align="left">乡镇</td>
+<td align="left">440904453000</td>
+<td align="right">4</td>
+<td align="left">MULTIPOLYGON (((111.3444 21…</td>
+</tr>
+<tr class="even">
+<td align="left">layer_township_pg.14892</td>
+<td align="left">云勇林场</td>
+<td align="left">乡镇</td>
+<td align="left">440608401000</td>
+<td align="right">4</td>
+<td align="left">MULTIPOLYGON (((112.6993 22…</td>
+</tr>
+</tbody>
+</table>
+<p>基于人口和街道乡镇面积的一些数据整理：</p>
+<pre class="r"><code>t1 &lt;- setDT(t1)[,densities:= n7th/area][,change:=
+                                          (n7th-n6th)/n6th][,change_cut:=
+                                                              cut(change,c(-Inf,-0.1,0,0.1,
+                                                                        0.2,0.5,1,2,7,Inf),right = F)]
+t1 &lt;- t1[,n7th_s := n7th/10000]
+gz_t &lt;- gz_t[substr(gz_t$code,1,4) %in% c(&#39;4401&#39;,&#39;4406&#39;),]
+gz_t &lt;- left_join(gz_t,t1,by =c(&quot;Name&quot;= &quot;town&quot;))</code></pre>
+<p>根据人口密度&gt;=6000和人口数量&gt;=40万的条件，取一个广佛核心区域的并集，用以聚焦核心城区</p>
+<pre class="r"><code>gz_t &lt;- setDT(gz_t)[densities &gt;= 6000,core := T][n7th&gt;= 400000,core := T]
+
+gz_t &lt;- st_as_sf(gz_t)
+gz_t &lt;- st_transform(gz_t,4326)</code></pre>
+<p>整理后的数据样例：</p>
+<pre class="r"><code>knitr::kable(gz_t[sample(nrow(gz_t),5),])</code></pre>
+<table>
+<colgroup>
+<col width="14%" />
+<col width="5%" />
+<col width="3%" />
+<col width="7%" />
+<col width="3%" />
+<col width="4%" />
+<col width="4%" />
+<col width="4%" />
+<col width="4%" />
+<col width="4%" />
+<col width="6%" />
+<col width="6%" />
+<col width="7%" />
+<col width="4%" />
+<col width="2%" />
+<col width="18%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">gml_id</th>
+<th align="left">Name</th>
+<th align="left">layer</th>
+<th align="left">code</th>
+<th align="right">grade</th>
+<th align="left">layer1</th>
+<th align="left">layer2</th>
+<th align="right">area</th>
+<th align="right">n7th</th>
+<th align="right">n6th</th>
+<th align="right">densities</th>
+<th align="right">change</th>
+<th align="left">change_cut</th>
+<th align="right">n7th_s</th>
+<th align="left">core</th>
+<th align="left">geometry</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">layer_township_pg.14930</td>
+<td align="left">天园街道</td>
+<td align="left">乡镇</td>
+<td align="left">440106012000</td>
+<td align="right">4</td>
+<td align="left">广州市</td>
+<td align="left">天河区</td>
+<td align="right">4.02</td>
+<td align="right">92655</td>
+<td align="right">54769</td>
+<td align="right">23048.5075</td>
+<td align="right">0.6917417</td>
+<td align="left">[0.5,1)</td>
+<td align="right">9.2655</td>
+<td align="left">TRUE</td>
+<td align="left">MULTIPOLYGON (((113.3654 23…</td>
+</tr>
+<tr class="even">
+<td align="left">layer_township_pg.14906</td>
+<td align="left">街口街道</td>
+<td align="left">乡镇</td>
+<td align="left">440117001000</td>
+<td align="right">4</td>
+<td align="left">广州市</td>
+<td align="left">从化区</td>
+<td align="right">23.01</td>
+<td align="right">97039</td>
+<td align="right">96846</td>
+<td align="right">4217.2534</td>
+<td align="right">0.0019929</td>
+<td align="left">[0,0.1)</td>
+<td align="right">9.7039</td>
+<td align="left">NA</td>
+<td align="left">MULTIPOLYGON (((113.5541 23…</td>
+</tr>
+<tr class="odd">
+<td align="left">layer_township_pg.14970</td>
+<td align="left">南村镇</td>
+<td align="left">乡镇</td>
+<td align="left">440113102000</td>
+<td align="right">4</td>
+<td align="left">广州市</td>
+<td align="left">番禺区</td>
+<td align="right">44.74</td>
+<td align="right">341703</td>
+<td align="right">129076</td>
+<td align="right">7637.5279</td>
+<td align="right">1.6473008</td>
+<td align="left">[1,2)</td>
+<td align="right">34.1703</td>
+<td align="left">TRUE</td>
+<td align="left">MULTIPOLYGON (((113.3851 22…</td>
+</tr>
+<tr class="even">
+<td align="left">layer_township_pg.14993</td>
+<td align="left">太和镇</td>
+<td align="left">乡镇</td>
+<td align="left">440111107000</td>
+<td align="right">4</td>
+<td align="left">广州市</td>
+<td align="left">白云区</td>
+<td align="right">153.58</td>
+<td align="right">131793</td>
+<td align="right">208589</td>
+<td align="right">858.1391</td>
+<td align="right">-0.3681690</td>
+<td align="left">[-Inf,-0.1)</td>
+<td align="right">13.1793</td>
+<td align="left">NA</td>
+<td align="left">MULTIPOLYGON (((113.3789 23…</td>
+</tr>
+<tr class="odd">
+<td align="left">layer_township_pg.14960</td>
+<td align="left">素社街道</td>
+<td align="left">乡镇</td>
+<td align="left">440105006000</td>
+<td align="right">4</td>
+<td align="left">广州市</td>
+<td align="left">海珠区</td>
+<td align="right">1.12</td>
+<td align="right">68871</td>
+<td align="right">67103</td>
+<td align="right">61491.9643</td>
+<td align="right">0.0263476</td>
+<td align="left">[0,0.1)</td>
+<td align="right">6.8871</td>
+<td align="left">TRUE</td>
+<td align="left">MULTIPOLYGON (((113.2843 23…</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="基本情况" class="section level2">
+<h2>基本情况</h2>
+<div id="人口数量" class="section level3">
+<h3>人口数量</h3>
+<p>广佛各个街道乡镇的人口情况：</p>
+<pre class="r"><code>ggplot()+ geom_sf(data = gz_t,aes(fill= n7th_s,geometry = geometry))+
+  scale_fill_distiller(palette=&#39;Spectral&#39;)+
+  geom_sf_text(data = gz_t[gz_t$n7th_s &gt;= 20,],aes(label = Name),
+               family=&#39;Songti SC&#39;,size = 3)+
+  theme(text = element_text(family=&#39;Songti SC&#39;),         
+        axis.title.x=element_blank(),          
+        axis.title.y=element_blank())</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/base_population-1.png" width="2000" /></p>
+<p>广佛核心区的人口数量情况</p>
+<pre class="r"><code>ggplot()+ geom_sf(data = gz_t[gz_t$core== T,],aes(fill= n7th_s,geometry = geometry))+
+  scale_fill_distiller(palette=&#39;Spectral&#39;)+
+  geom_sf_text(data = gz_t[gz_t$core== T &amp; gz_t$n7th_s &gt;= 20,],aes(label = Name),
+               family=&#39;Songti SC&#39;,size = 3)+
+  theme(text = element_text(family=&#39;Songti SC&#39;),         
+        axis.title.x=element_blank(),          
+        axis.title.y=element_blank())</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/base_population_fc-1.png" width="2000" /></p>
+</div>
+<div id="人口密度" class="section level3">
+<h3>人口密度</h3>
+<p>整体区域内的人口密度情况：</p>
+<pre class="r"><code>ggplot()+ geom_sf(data = gz_t,aes(fill= densities,geometry = geometry))+
+  scale_fill_distiller(palette=&#39;Spectral&#39;)+
+  geom_sf_text(data = gz_t[gz_t$densities &gt;= 50000,],aes(label = Name),
+               family=&#39;Songti SC&#39;,size = 3)+
+  theme(text = element_text(family=&#39;Songti SC&#39;),         
+        axis.title.x=element_blank(),          
+        axis.title.y=element_blank())</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/base_densities-1.png" width="1000" /></p>
+<p>广佛核心区的人口密度情况</p>
+<pre class="r"><code>ggplot()+ geom_sf(data = gz_t[gz_t$core== T,],aes(fill= densities,geometry = geometry))+
+  scale_fill_distiller(palette=&#39;Spectral&#39;)+
+  geom_sf_text(data = gz_t[gz_t$n7th &gt;= 400000,],aes(label = Name),
+               family=&#39;Songti SC&#39;,size = 3)+
+  theme(text = element_text(family=&#39;Songti SC&#39;),         
+        axis.title.x=element_blank(),          
+        axis.title.y=element_blank())</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/base_densities_fc-1.png" width="1000" /></p>
+</div>
+<div id="人口十年变化率" class="section level3">
+<h3>人口十年变化率</h3>
+<p>根据广佛各个街道乡镇七普和六普的常住人口变化率，来列示10年间各自的发展情况。
+（图中空缺的部分是由于该乡镇为2010年六普后新增的街道乡镇，无六普可对比的人口数据）</p>
+<pre class="r"><code>ggplot()+ geom_sf(data = gz_t,aes(fill= change_cut,geometry = geometry))+
+  scale_fill_brewer(palette=&quot;YlOrRd&quot;)+
+  geom_sf_text(data = gz_t[gz_t$change &gt;= 1,],aes(label = Name),
+               family=&#39;Songti SC&#39;,size = 3)+
+  theme(text = element_text(family=&#39;Songti SC&#39;),         
+        axis.title.x=element_blank(),          
+        axis.title.y=element_blank())</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/base_change-1.png" width="1000" />
+广佛核心区的人口密度情况</p>
+<pre class="r"><code>ggplot()+ geom_sf(data = gz_t[gz_t$core== T,],aes(fill= change_cut,geometry = geometry))+
+  scale_fill_brewer(palette=&quot;YlOrRd&quot;)+
+  geom_sf_text(data = gz_t[gz_t$core== T &amp; gz_t$change &gt;= 1,],aes(label = Name),
+               family=&#39;Songti SC&#39;,size = 3)+
+  theme(text = element_text(family=&#39;Songti SC&#39;),
+        axis.title.x=element_blank(), 
+        axis.title.y=element_blank())</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/base_change_fc-1.png" width="1000" /></p>
+</div>
+</div>
+<div id="分项" class="section level2">
+<h2>分项</h2>
+<p>本次获取的poi数据主要分为以下几个类别：</p>
+<ul>
+<li>地铁站</li>
+<li>公交站</li>
+<li>公园</li>
+<li>写字楼</li>
+<li>医院</li>
+<li>商场</li>
+<li>学校</li>
+<li>小区</li>
+<li>超市</li>
+<li>酒店</li>
+<li>银行</li>
+<li>餐饮</li>
+<li>菜市场</li>
+</ul>
+<p>围绕poi数据基于点的特征和生活便利这一本文母题（写字楼、小区、酒店排除），再结合前期的数据质量探查（餐饮排除），本文选取以下几个方面来做详细的展开：</p>
+<ul>
+<li>地铁站</li>
+<li>公交站</li>
+<li>菜市场</li>
+<li>超市</li>
+<li>公园</li>
+<li>医院</li>
+<li>商场</li>
+<li>学校</li>
+<li>银行</li>
+</ul>
+<p>限于精力，第一部分讨论以下部分：</p>
+<ul>
+<li>地铁站</li>
+<li>公交站</li>
+<li>菜市场</li>
+<li>超市</li>
+</ul>
+<div id="公交车站分布情况" class="section level3">
+<h3>公交车站分布情况</h3>
+<div id="poi数据的处理逻辑" class="section level4">
+<h4>POI数据的处理逻辑</h4>
+<p>先以公交车站POI做一个本文对该数据处理思路的示例，后续各个板块如无特殊情况，就直接给出对应结论。</p>
+<ul>
+<li>1）检查该类型下的分类是否有显著区别，本部分主要是确认是否有进一步分类或筛选分析的必要；</li>
+</ul>
+<pre class="r"><code>poi_bs &lt;- st_transform(poi_bs,4326)
+poi_bs_fs &lt;- st_transform(poi_bs_fs,4326)
+
+poi_bs &lt;- rbind(poi_bs[,c(&quot;cityname&quot;,&quot;lat&quot;,&quot;lon&quot;,&quot;name&quot;, &quot;address&quot; ,&quot;type1&quot;,&quot;type2&quot;,&quot;type3&quot;,&quot;geometry&quot;)],
+                poi_bs_fs[,c(&quot;cityname&quot;,&quot;lat&quot;,&quot;lon&quot;,&quot;name&quot;, &quot;address&quot; ,&quot;type1&quot;,&quot;type2&quot;,&quot;type3&quot;,&quot;geometry&quot;)])
+insc_bs &lt;- st_join(gz_t[,c(&quot;Name&quot;,&quot;layer1&quot;,&quot;layer2&quot;,&quot;geometry&quot;)],poi_bs)
+insc_bs_ag &lt;- setDT(insc_bs)[!is.na(name),][,.(cnt= length(name)),by = c(&quot;Name&quot;,&quot;layer1&quot;,&quot;layer2&quot;,&quot;type1&quot;,&quot;type2&quot;,&quot;type3&quot;)]
+insc_bs_ag_1 &lt;- insc_bs_ag[,.(cnt= sum(cnt)),by = c(&quot;Name&quot;)]
+gz_t_bs_1 &lt;- left_join(gz_t,insc_bs_ag_1,by =c(&quot;Name&quot;))
+unique(poi_bs$type1)</code></pre>
+<pre><code>## [1] &quot;交通设施服务&quot;</code></pre>
+<ul>
+<li>2）检查该数据集的点在不同的分组（街道乡镇）是否有显著区别，本部分主要是确认进行全域的投射列示是否有分析的意义和数据的偏倚情况；</li>
+</ul>
+<pre class="r"><code>ggplot()+ geom_sf(data = gz_t_bs_1,aes(geometry = geometry))+
+  geom_sf(data = poi_bs,aes(geometry = geometry),size = 0.5, color = &quot;red&quot;)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/bs_point-1.png" width="2000" />
+从该部分的POI数据的列示来看，公交车站数据的类型相对单一，且各个乡镇间的数量差值相对较小，是较为均质化的POI数据，可以不经过分类筛选，直接投射在各个街道乡镇，来看各自的情况。</p>
+<pre class="r"><code>gz_t_bs_2 &lt;- setDT(gz_t_bs_1)[,per_cnt := cnt/n7th*10000]
+gz_t_bs_2 &lt;- st_as_sf(gz_t_bs_2)</code></pre>
+<p>计算出各个街道乡镇的公交车站数量后，再以万人人均作为单位，来投射分布情况：</p>
+<pre class="r"><code>ggplot()+ geom_sf(data = gz_t_bs_2,aes(fill= per_cnt,geometry = geometry))+
+  scale_fill_distiller(palette=&#39;Spectral&#39;)+
+  geom_sf_text(data = gz_t_bs_2[gz_t_bs_2$per_cnt &gt;= 15,],aes(label = Name),
+               family=&#39;Songti SC&#39;,size = 3)+
+  theme(text = element_text(family=&#39;Songti SC&#39;),         
+        axis.title.x=element_blank(),         
+        axis.title.y=element_blank())</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/bs_final-1.png" width="2000" /></p>
+</div>
+</div>
+<div id="地铁车站" class="section level3">
+<h3>地铁车站</h3>
+<p>地铁车站POI数据的情况是：</p>
+<pre class="r"><code>poi_ms &lt;- st_transform(poi_ms,4326)
+poi_ms_fs &lt;- st_transform(poi_ms_fs,4326)
+
+poi_ms &lt;- rbind(poi_ms[,c(&quot;cityname&quot;,&quot;lat&quot;,&quot;lon&quot;,&quot;name&quot;, &quot;address&quot; ,&quot;type1&quot;,&quot;type2&quot;,&quot;type3&quot;,&quot;geometry&quot;)],
+                poi_ms_fs[,c(&quot;cityname&quot;,&quot;lat&quot;,&quot;lon&quot;,&quot;name&quot;, &quot;address&quot; ,&quot;type1&quot;,&quot;type2&quot;,&quot;type3&quot;,&quot;geometry&quot;)])
+
+insc_ms &lt;- st_join(gz_t[,c(&quot;Name&quot;,&quot;layer1&quot;,&quot;layer2&quot;,&quot;geometry&quot;)],poi_ms)
+
+insc_ms_ag &lt;- setDT(insc_ms)[!is.na(name),][,.(cnt= length(name)),by = c(&quot;Name&quot;,&quot;layer1&quot;,&quot;layer2&quot;,&quot;type1&quot;,&quot;type2&quot;,&quot;type3&quot;)]
+
+insc_ms_ag_1 &lt;- insc_ms_ag[,.(cnt= sum(cnt)),by = c(&quot;Name&quot;)]
+
+gz_t_ms_1 &lt;- left_join(gz_t,insc_ms_ag_1,by =c(&quot;Name&quot;))
+gz_t_ms_2 &lt;- setDT(gz_t_ms_1)[,per_cnt := cnt/n7th*10000]
+gz_t_ms_2 &lt;- st_as_sf(gz_t_ms_2)
+
+ggplot()+ geom_sf(data = gz_t_ms_1,aes(geometry = geometry))+
+  geom_sf(data = poi_ms,aes(geometry = geometry))</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/ms_point-1.png" width="2000" /></p>
+<ul>
+<li>集中在核心区域，边缘乡镇都没有对应地铁站点分布；</li>
+<li>各个街道乡镇间的数量区别相对较小，数量多和数量少的组间方差不大；</li>
+</ul>
+<pre class="r"><code>ggplot()+ geom_sf(data = gz_t_ms_2[gz_t_ms_2$core== T,],aes(fill= per_cnt,geometry = geometry))+
+  scale_fill_distiller(palette=&#39;Spectral&#39;)+
+  geom_sf_text(data = gz_t_ms_2[gz_t_ms_2$per_cnt &gt;= 1,],aes(label = Name),
+               family=&#39;Songti SC&#39;,size = 3)+
+  theme(text = element_text(family=&#39;Songti SC&#39;),         
+        axis.title.x=element_blank(),          
+        axis.title.y=element_blank())</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/ms-1.png" width="2000" /></p>
+</div>
+<div id="购物市场超市" class="section level3">
+<h3>购物市场/超市</h3>
+<p>本部分合并且整理了原有数据的「超市」和「菜市场」两个部分的数据。经过前期探查发现，该poi数据的原有分类十分芜杂，需要进行进一步的清洗整理。</p>
+<div id="分类整理" class="section level4">
+<h4>分类整理</h4>
+<pre class="r"><code>poi_sp &lt;- st_transform(poi_sp,4326)
+poi_mk &lt;- st_transform(poi_mk,4326)
+poi_sp_fs &lt;- st_transform(poi_sp_fs,4326)
+
+
+poi_sp &lt;- rbind(poi_sp[,c(&quot;cityname&quot;,&quot;lat&quot;,&quot;lon&quot;,&quot;name&quot;, &quot;address&quot; ,&quot;type1&quot;,&quot;type2&quot;,&quot;type3&quot;,&quot;geometry&quot;)],
+                poi_mk[,c(&quot;cityname&quot;,&quot;lat&quot;,&quot;lon&quot;,&quot;name&quot;, &quot;address&quot; ,&quot;type1&quot;,&quot;type2&quot;,&quot;type3&quot;,&quot;geometry&quot;)],
+                poi_sp_fs[,c(&quot;cityname&quot;,&quot;lat&quot;,&quot;lon&quot;,&quot;name&quot;, &quot;address&quot; ,&quot;type1&quot;,&quot;type2&quot;,&quot;type3&quot;,&quot;geometry&quot;)])
+knitr::kable(head(Desc(poi_sp$type2)[[1]][[&quot;freq&quot;]],15))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">level</th>
+<th align="right">freq</th>
+<th align="right">perc</th>
+<th align="right">cumfreq</th>
+<th align="right">cumperc</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">便民商店/便利店</td>
+<td align="right">10545</td>
+<td align="right">0.5104313</td>
+<td align="right">10545</td>
+<td align="right">0.5104313</td>
+</tr>
+<tr class="even">
+<td align="left">综合市场</td>
+<td align="right">3970</td>
+<td align="right">0.1921681</td>
+<td align="right">14515</td>
+<td align="right">0.7025994</td>
+</tr>
+<tr class="odd">
+<td align="left">超级市场</td>
+<td align="right">2586</td>
+<td align="right">0.1251755</td>
+<td align="right">17101</td>
+<td align="right">0.8277748</td>
+</tr>
+<tr class="even">
+<td align="left">购物相关场所</td>
+<td align="right">2427</td>
+<td align="right">0.1174791</td>
+<td align="right">19528</td>
+<td align="right">0.9452539</td>
+</tr>
+<tr class="odd">
+<td align="left">专卖店</td>
+<td align="right">768</td>
+<td align="right">0.0371751</td>
+<td align="right">20296</td>
+<td align="right">0.9824290</td>
+</tr>
+<tr class="even">
+<td align="left">餐饮相关场所</td>
+<td align="right">126</td>
+<td align="right">0.0060990</td>
+<td align="right">20422</td>
+<td align="right">0.9885280</td>
+</tr>
+<tr class="odd">
+<td align="left">商场</td>
+<td align="right">40</td>
+<td align="right">0.0019362</td>
+<td align="right">20462</td>
+<td align="right">0.9904642</td>
+</tr>
+<tr class="even">
+<td align="left">家居建材市场</td>
+<td align="right">34</td>
+<td align="right">0.0016458</td>
+<td align="right">20496</td>
+<td align="right">0.9921100</td>
+</tr>
+<tr class="odd">
+<td align="left">中餐厅</td>
+<td align="right">29</td>
+<td align="right">0.0014037</td>
+<td align="right">20525</td>
+<td align="right">0.9935137</td>
+</tr>
+<tr class="even">
+<td align="left">快餐厅</td>
+<td align="right">23</td>
+<td align="right">0.0011133</td>
+<td align="right">20548</td>
+<td align="right">0.9946270</td>
+</tr>
+<tr class="odd">
+<td align="left">个人用品/化妆品店</td>
+<td align="right">16</td>
+<td align="right">0.0007745</td>
+<td align="right">20564</td>
+<td align="right">0.9954015</td>
+</tr>
+<tr class="even">
+<td align="left">服装鞋帽皮具店</td>
+<td align="right">16</td>
+<td align="right">0.0007745</td>
+<td align="right">20580</td>
+<td align="right">0.9961760</td>
+</tr>
+<tr class="odd">
+<td align="left">生活服务场所</td>
+<td align="right">12</td>
+<td align="right">0.0005809</td>
+<td align="right">20592</td>
+<td align="right">0.9967569</td>
+</tr>
+<tr class="even">
+<td align="left">公司</td>
+<td align="right">11</td>
+<td align="right">0.0005325</td>
+<td align="right">20603</td>
+<td align="right">0.9972893</td>
+</tr>
+<tr class="odd">
+<td align="left">家电电子卖场</td>
+<td align="right">9</td>
+<td align="right">0.0004356</td>
+<td align="right">20612</td>
+<td align="right">0.9977250</td>
+</tr>
+</tbody>
+</table>
+<p>poi数据分类存在很多重叠和冗余的分类结果，且部分分类是各类的大杂烩，缺乏进一步分析的意义。具体而言，其综合市场、购物相关场所等分类下包含了诸多超市和便利店；购物相关场所这个分类缺乏进一步指向意义；整体类别归集程度相对较低，top3仅能归集到九成的数据。为此，该部分的整理从以下几个方面入手：</p>
+<pre class="r"><code>insc_sp &lt;- st_join(gz_t[,c(&quot;Name&quot;,&quot;layer1&quot;,&quot;layer2&quot;,&quot;geometry&quot;)],poi_sp)
+insc_sp &lt;- setDT(insc_sp)[,cate:= type2 ]
+
+##提取出所有便利店
+pat &lt;- &quot;7-|71|便利店|便利&quot;
+insc_sp &lt;- insc_sp[grep(pat,name, perl = TRUE) ,cate:= &quot;便民商店/便利店&quot;]
+
+##构建一个新的分类生鲜超市
+pat &lt;- &quot;钱大妈|水超市|蔬|果|生鲜|兴盛优选|肉|菜&quot;
+insc_sp &lt;- insc_sp[grep(pat,name, perl = TRUE) ,cate:= &quot;生鲜超市&quot;]
+
+##进一步归拢和集中超市相关的数据
+pat &lt;- &quot;便利超市&quot;
+insc_sp &lt;- insc_sp[grep(pat,name, perl = TRUE) ,cate:= &quot;超级市场&quot;]
+
+pat &lt;- &quot;超市|永旺&quot;
+insc_sp &lt;- insc_sp[type2 %in% c(&quot;购物相关场所&quot;,&quot;商场&quot;) &amp;grep(pat,name, perl = TRUE) ,cate:= &quot;超级市场&quot;]
+
+##进一步归拢和集中其他分类
+insc_sp &lt;- insc_sp[type2 %in% c(&quot;家居建材市场&quot;,&quot;个人用品/化妆品店&quot;) ,cate:= &quot;五金/日杂&quot;]
+
+knitr::kable(head(Desc(insc_sp$cate)[[1]][[&quot;freq&quot;]],15))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">level</th>
+<th align="right">freq</th>
+<th align="right">perc</th>
+<th align="right">cumfreq</th>
+<th align="right">cumperc</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">便民商店/便利店</td>
+<td align="right">10366</td>
+<td align="right">0.5017182</td>
+<td align="right">10366</td>
+<td align="right">0.5017182</td>
+</tr>
+<tr class="even">
+<td align="left">超级市场</td>
+<td align="right">4675</td>
+<td align="right">0.2262717</td>
+<td align="right">15041</td>
+<td align="right">0.7279899</td>
+</tr>
+<tr class="odd">
+<td align="left">生鲜超市</td>
+<td align="right">3745</td>
+<td align="right">0.1812594</td>
+<td align="right">18786</td>
+<td align="right">0.9092493</td>
+</tr>
+<tr class="even">
+<td align="left">综合市场</td>
+<td align="right">1618</td>
+<td align="right">0.0783118</td>
+<td align="right">20404</td>
+<td align="right">0.9875611</td>
+</tr>
+<tr class="odd">
+<td align="left">专卖店</td>
+<td align="right">121</td>
+<td align="right">0.0058564</td>
+<td align="right">20525</td>
+<td align="right">0.9934175</td>
+</tr>
+<tr class="even">
+<td align="left">五金/日杂</td>
+<td align="right">50</td>
+<td align="right">0.0024200</td>
+<td align="right">20575</td>
+<td align="right">0.9958376</td>
+</tr>
+<tr class="odd">
+<td align="left">服装鞋帽皮具店</td>
+<td align="right">14</td>
+<td align="right">0.0006776</td>
+<td align="right">20589</td>
+<td align="right">0.9965152</td>
+</tr>
+<tr class="even">
+<td align="left">餐饮相关场所</td>
+<td align="right">13</td>
+<td align="right">0.0006292</td>
+<td align="right">20602</td>
+<td align="right">0.9971444</td>
+</tr>
+<tr class="odd">
+<td align="left">中餐厅</td>
+<td align="right">10</td>
+<td align="right">0.0004840</td>
+<td align="right">20612</td>
+<td align="right">0.9976284</td>
+</tr>
+<tr class="even">
+<td align="left">公司</td>
+<td align="right">8</td>
+<td align="right">0.0003872</td>
+<td align="right">20620</td>
+<td align="right">0.9980156</td>
+</tr>
+<tr class="odd">
+<td align="left">家电电子卖场</td>
+<td align="right">5</td>
+<td align="right">0.0002420</td>
+<td align="right">20625</td>
+<td align="right">0.9982576</td>
+</tr>
+<tr class="even">
+<td align="left">特色商业街</td>
+<td align="right">5</td>
+<td align="right">0.0002420</td>
+<td align="right">20630</td>
+<td align="right">0.9984996</td>
+</tr>
+<tr class="odd">
+<td align="left">快餐厅</td>
+<td align="right">4</td>
+<td align="right">0.0001936</td>
+<td align="right">20634</td>
+<td align="right">0.9986932</td>
+</tr>
+<tr class="even">
+<td align="left">物流速递</td>
+<td align="right">3</td>
+<td align="right">0.0001452</td>
+<td align="right">20637</td>
+<td align="right">0.9988384</td>
+</tr>
+<tr class="odd">
+<td align="left">生活服务场所</td>
+<td align="right">3</td>
+<td align="right">0.0001452</td>
+<td align="right">20640</td>
+<td align="right">0.9989836</td>
+</tr>
+</tbody>
+</table>
+<p>经过处理后，top6的分类已经可以覆盖995成的数据，舍弃其余分类，专注top6部分数据：</p>
+<pre class="r"><code>category &lt;- head(Desc(insc_sp$cate)[[1]][[&quot;freq&quot;]],6)$level
+insc_sp_ag &lt;- insc_sp[!is.na(name),][cate %in% category][,.(cnt= length(name)),
+                                                         by = c(&quot;Name&quot;,&quot;layer1&quot;,&quot;layer2&quot;,&quot;cate&quot;)]
+insc_sp_ag_1 &lt;- insc_sp_ag[,.(cnt= sum(cnt)),by = c(&quot;Name&quot;)]</code></pre>
+<p>先整体性的看广佛全域的购物类设施的万人密度情况：</p>
+<pre class="r"><code>gz_t_sp_1 &lt;- left_join(gz_t,insc_sp_ag_1,by =c(&quot;Name&quot;))
+gz_t_sp_2 &lt;- setDT(gz_t_sp_1)[,per_cnt := cnt/n7th*10000]
+gz_t_sp_2 &lt;- st_as_sf(gz_t_sp_2)
+
+ggplot()+ geom_sf(data = gz_t_sp_2,aes(fill= per_cnt,geometry = geometry))+
+  scale_fill_distiller(palette=&#39;Spectral&#39;)+
+  geom_sf_text(data = gz_t_sp_2[gz_t_sp_1$per_cnt &gt;= 20,],aes(label = Name),
+               family=&#39;Songti SC&#39;,size = 3)+
+  theme(text = element_text(family=&#39;Songti SC&#39;),         
+        axis.title.x=element_blank(),          
+        axis.title.y=element_blank())</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/mk-1.png" width="2000" />
+- 除了越秀核心区外，还有从化和高明的几个街道乡镇密度相对出乎意料。</p>
+<p>核心区的购物类设施的万人密度情况：</p>
+<pre class="r"><code>ggplot()+ geom_sf(data = gz_t_sp_2[gz_t_ms_2$core== T,],aes(fill= per_cnt,geometry = geometry))+
+  scale_fill_distiller(palette=&#39;Spectral&#39;)+
+  geom_sf_text(data = gz_t_sp_2[gz_t_ms_2$core== T &amp; gz_t_sp_1$per_cnt &gt;= 12,],aes(label = Name),
+               family=&#39;Songti SC&#39;,size = 3)+
+  theme(text = element_text(family=&#39;Songti SC&#39;),         
+        axis.title.x=element_blank(),          
+        axis.title.y=element_blank())</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/mk_fc-1.png" width="2000" />
+- 核心区域内，仍然高度密集与越秀、荔湾这类老城。</p>
+<div id="便利店分布" class="section level5">
+<h5>便利店分布</h5>
+<p>广佛全域的便利店的万人密度情况：</p>
+<pre class="r"><code>insc_sp_ag_cs &lt;- insc_sp_ag[cate ==&quot;便民商店/便利店&quot;,.(cnt= sum(cnt)),by = c(&quot;Name&quot;)]
+gz_t_sp_cs_1 &lt;- left_join(gz_t,insc_sp_ag_cs,by =c(&quot;Name&quot;))
+gz_t_sp_cs_2 &lt;- setDT(gz_t_sp_cs_1)[,per_cnt := cnt/n7th*10000]
+gz_t_sp_cs_2 &lt;- st_as_sf(gz_t_sp_cs_2)
+
+ggplot()+ geom_sf(data = gz_t_sp_cs_2,aes(fill= per_cnt,geometry = geometry))+
+  scale_fill_distiller(palette=&#39;Spectral&#39;)+
+  geom_sf_text(data = gz_t_sp_cs_2[gz_t_sp_1$per_cnt &gt;= 20,],aes(label = Name),
+               family=&#39;Songti SC&#39;,size = 3)+
+  theme(text = element_text(family=&#39;Songti SC&#39;),         
+        axis.title.x=element_blank(),          
+        axis.title.y=element_blank())</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/mk_cs-1.png" width="2000" /></p>
+<ul>
+<li>与购物类设施整体基本一致。</li>
+</ul>
+<p>核心区域的便利店密度情况：</p>
+<pre class="r"><code>ggplot()+ geom_sf(data = gz_t_sp_cs_2[gz_t_sp_cs_2$core== T,],aes(fill= per_cnt,geometry = geometry))+
+  scale_fill_distiller(palette=&#39;Spectral&#39;)+
+  geom_sf_text(data = gz_t_sp_cs_2[gz_t_sp_cs_2$core== T &amp; gz_t_sp_cs_2$per_cnt &gt;= 8,],aes(label = Name),
+               family=&#39;Songti SC&#39;,size = 3)+
+  theme(text = element_text(family=&#39;Songti SC&#39;),         
+        axis.title.x=element_blank(),          
+        axis.title.y=element_blank())</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/mk_cs_fc-1.png" width="2000" />
+- 便利店显著集中在了城市区域，乡镇部分的密度比整体低了不少。</p>
+</div>
+<div id="超市分布" class="section level5">
+<h5>超市分布</h5>
+<p>广佛全域的便利店的万人密度情况：</p>
+<pre class="r"><code>insc_sp_ag_sp &lt;- insc_sp_ag[cate ==&quot;超级市场&quot;,.(cnt= sum(cnt)),by = c(&quot;Name&quot;)]
+gz_t_sp_sp_1 &lt;- left_join(gz_t,insc_sp_ag_sp,by =c(&quot;Name&quot;))
+gz_t_sp_sp_2 &lt;- setDT(gz_t_sp_sp_1)[,per_cnt := cnt/n7th*10000]
+gz_t_sp_sp_2 &lt;- st_as_sf(gz_t_sp_sp_2)
+
+ggplot()+ geom_sf(data = gz_t_sp_sp_2,aes(fill= per_cnt,geometry = geometry))+
+  scale_fill_distiller(palette=&#39;Spectral&#39;)+
+  geom_sf_text(data = gz_t_sp_sp_2[gz_t_sp_sp_2$per_cnt &gt;= 20,],aes(label = Name),
+               family=&#39;Songti SC&#39;,size = 3)+
+  theme(text = element_text(family=&#39;Songti SC&#39;),         
+        axis.title.x=element_blank(),          
+        axis.title.y=element_blank())</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/mk_sp-1.png" width="2000" /></p>
+<p>核心区域的超市密度情况：</p>
+<pre class="r"><code>ggplot()+ geom_sf(data = gz_t_sp_sp_2[gz_t_sp_sp_2$core== T,],aes(fill= per_cnt,geometry = geometry))+
+  scale_fill_distiller(palette=&#39;Spectral&#39;)+
+  geom_sf_text(data = gz_t_sp_sp_2[gz_t_sp_sp_2$core== T &amp; gz_t_sp_sp_2$per_cnt &gt;= 4,],aes(label = Name),
+               family=&#39;Songti SC&#39;,size = 3)+
+  theme(text = element_text(family=&#39;Songti SC&#39;),         
+        axis.title.x=element_blank(),          
+        axis.title.y=element_blank())</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/mk_sp_fc-1.png" width="2000" /></p>
+<ul>
+<li>超市的分布在城市和城镇间的差距则明显小于便利店。</li>
+</ul>
+</div>
+<div id="生鲜超市分布" class="section level5">
+<h5>生鲜超市分布</h5>
+<p>广佛全域的便利店的万人密度情况：</p>
+<pre class="r"><code>insc_sp_ag_fm &lt;- insc_sp_ag[cate ==&quot;生鲜超市&quot;,.(cnt= sum(cnt)),by = c(&quot;Name&quot;)]
+gz_t_sp_fm_1 &lt;- left_join(gz_t,insc_sp_ag_fm,by =c(&quot;Name&quot;))
+gz_t_sp_fm_2 &lt;- setDT(gz_t_sp_fm_1)[,per_cnt := cnt/n7th*10000]
+gz_t_sp_fm_2 &lt;- st_as_sf(gz_t_sp_fm_2)
+
+ggplot()+ geom_sf(data = gz_t_sp_fm_2,aes(fill= per_cnt,geometry = geometry))+
+  scale_fill_distiller(palette=&#39;Spectral&#39;)+
+  geom_sf_text(data = gz_t_sp_fm_2[gz_t_sp_fm_2$per_cnt &gt;= 3,],aes(label = Name),
+               family=&#39;Songti SC&#39;,size = 3)+
+  theme(text = element_text(family=&#39;Songti SC&#39;),         
+        axis.title.x=element_blank(),          
+        axis.title.y=element_blank())</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/mk_fm-1.png" width="2000" /></p>
+<ul>
+<li>生鲜超市出现了个别区域有相对较大值，部分区域则还没有类似业态的情况，有待后续考察。</li>
+</ul>
+<p>核心区域的便利店密度情况：</p>
+<pre class="r"><code>ggplot()+ geom_sf(data = gz_t_sp_fm_2[gz_t_sp_fm_2$core== T,],aes(fill= per_cnt,geometry = geometry))+
+  scale_fill_distiller(palette=&#39;Spectral&#39;)+
+  geom_sf_text(data = gz_t_sp_fm_2[gz_t_sp_fm_2$core== T &amp; gz_t_sp_fm_2$per_cnt &gt;= 2,],aes(label = Name),
+               family=&#39;Songti SC&#39;,size = 3)+
+  theme(text = element_text(family=&#39;Songti SC&#39;),         
+        axis.title.x=element_blank(),          
+        axis.title.y=element_blank())</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/mk_fm_fc-1.png" width="2000" />
+- 便利店显著集中在了城市区域，乡镇部分的密度比整体低了不少。</p>
+</div>
+</div>
+</div>
+</div>
+<div id="未完待续" class="section level2">
+<h2>未完待续</h2>
+<p>为精力所限，先行推发以上部分的内容，但不意味着这个小课题的结束，随后我还会：</p>
+<ul>
+<li>展开继续列示各个poi分项的情况：
+<ul>
+<li>公园</li>
+<li>医院</li>
+<li>商场</li>
+<li>学校</li>
+<li>银行</li>
+</ul></li>
+<li>汇拢各个部分的结论，试着建设一个基于以上内容的指标模型</li>
+</ul>
+</div>

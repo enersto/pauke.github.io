@@ -1,0 +1,237 @@
+---
+title: "广佛二"
+output: html_document
+date: "2022-10-15"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r message=FALSE, warning=FALSE}
+library(knitr)
+library(caret)
+##library(geoviz)
+library(ggplot2)
+library(data.table)
+library(sf)
+library(openxlsx)
+library(dplyr)
+library(RColorBrewer)
+library(DescTools)
+##library(tmap)
+library(leaflet)
+library(sp)
+
+options(scipen=8)
+
+```
+
+###ml
+```{r ml,fig.height=8, fig.width=10, warning=FALSE,  dpi= 200}
+
+
+names(poi_ml)
+names(poi_ml_fs)
+poi_ml <- st_transform(poi_ml,4326)
+poi_ml_fs <- st_transform(poi_ml_fs,4326)
+
+poi_ml <- rbind(poi_ml[,c("cityname","lat","lon","name", "address" ,"type1","type2","type3","geometry")],
+                poi_ml_fs[,c("cityname","lat","lon","name", "address" ,"type1","type2","type3","geometry")])
+
+insc_ml <- st_join(gz_t[,c("Name","layer1","layer2","geometry")],poi_ml)
+#insc_ml <- st_intersection(gz_t[,c("Name","layer1","layer2","geometry")],poi_ml, model = "open")
+
+insc_ml_ag <- setDT(insc_ml)[!is.na(name),][,.(cnt= length(name)),by = c("Name","layer1","layer2","type1","type2","type3")]
+
+insc_ml_ag_1 <- insc_ml_ag[,.(cnt= sum(cnt)),by = c("Name")]
+
+gz_t_ml_1 <- left_join(gz_t,insc_ml_ag_1,by =c("Name"))
+gz_t_ml_2 <- setDT(gz_t_ml_1)[,pre_cnt := cnt/n7th*10000]
+gz_t_ml_2 <- st_as_sf(gz_t_ml_2)
+
+ggplot()+ geom_sf(data = gz_t_ml_2,aes(fill= cnt,geometry = geometry))+
+  scale_fill_distiller(palette='Spectral')+
+  geom_sf_text(data = gz_t_ml_2[gz_t_ml_2$pre_cnt >= 2,],aes(label = Name),
+               family='Songti SC',size = 3)+
+  theme(text = element_text(family='Songti SC'),         axis.title.x=element_blank(),          axis.title.y=element_blank())
+
+ggplot()+ geom_sf(data = gz_t_ml_1,aes(geometry = geometry))+
+  geom_sf(data = poi_ml,aes(geometry = geometry))
+
+
+
+
+```
+
+
+
+###bk
+```{r bk,fig.height=8, fig.width=10, warning=FALSE,  dpi= 200}
+
+poi_bk <- st_transform(poi_bk,4326)
+poi_bk_fs <- st_transform(poi_bk_fs,4326)
+
+poi_bk <- rbind(poi_bk[,c("cityname","lat","lon","name", "address" ,"type1","type2","type3","geometry")],
+                poi_bk_fs[,c("cityname","lat","lon","name", "address" ,"type1","type2","type3","geometry")])
+
+insc_bk <- st_join(gz_t[,c("Name","layer1","layer2","geometry")],poi_bk)
+#insc_bk <- st_intersection(gz_t[,c("Name","layer1","layer2","geometry")],poi_bk, model = "open")
+
+insc_bk_ag <- setDT(insc_bk)[!is.na(name),][,.(cnt= length(name)),by = c("Name","layer1","layer2","type1","type2","type3")]
+
+insc_bk_ag_1 <- insc_bk_ag[,.(cnt= sum(cnt)),by = c("Name")]
+
+gz_t_bk_1 <- left_join(gz_t,insc_bk_ag_1,by =c("Name"))
+gz_t_bk_2 <- setDT(gz_t_bk_1)[,pre_cnt := cnt/n7th*10000]
+gz_t_bk_2 <- st_as_sf(gz_t_bk_2)
+
+ggplot()+ geom_sf(data = gz_t_bk_2,aes(fill= pre_cnt,geometry = geometry))+
+  scale_fill_distiller(palette='Spectral')+
+  geom_sf_text(data = gz_t_bk_2[gz_t_bk_2$pre_cnt >= 10,],aes(label = Name),
+               family='Songti SC',size = 3)+
+  theme(text = element_text(family='Songti SC'),         axis.title.x=element_blank(),          axis.title.y=element_blank())
+
+ggplot()+ geom_sf(data = gz_t_bk_1,aes(geometry = geometry))+
+  geom_sf(data = poi_bk,aes(geometry = geometry))
+
+
+```
+
+###pk
+```{r pk,fig.height=8, fig.width=10, warning=FALSE,  dpi= 200}
+
+poi_pk <- st_transform(poi_pk,4326)
+poi_pk_fs <- st_transform(poi_pk_fs,4326)
+
+poi_pk <- rbind(poi_pk[,c("cityname","lat","lon","name", "address" ,"type1","type2","type3","geometry")],
+                poi_pk_fs[,c("cityname","lat","lon","name", "address" ,"type1","type2","type3","geometry")])
+
+insc_pk <- st_join(gz_t[,c("Name","layer1","layer2","geometry")],poi_pk)
+#insc_pk <- st_intersection(gz_t[,c("Name","layer1","layer2","geometry")],poi_pk, model = "open")
+
+insc_pk_ag <- setDT(insc_pk)[!is.na(name),][,.(cnt= length(name)),by = c("Name","layer1","layer2","type1","type2","type3")]
+
+insc_pk_ag_1 <- insc_pk_ag[,.(cnt= sum(cnt)),by = c("Name")]
+
+gz_t_pk_1 <- left_join(gz_t,insc_pk_ag_1,by =c("Name"))
+gz_t_pk_2 <- setDT(gz_t_pk_1)[,pre_cnt := cnt/n7th*10000]
+gz_t_pk_2 <- st_as_sf(gz_t_pk_2)
+
+ggplot()+ geom_sf(data = gz_t_pk_2,aes(fill= pre_cnt,geometry = geometry))+
+  scale_fill_distiller(palette='Spectral')+
+  geom_sf_text(data = gz_t_pk_2[gz_t_pk_2$pre_cnt >= 1,],aes(label = Name),
+               family='Songti SC',size = 2.5)+
+  theme(text = element_text(family='Songti SC'),         axis.title.x=element_blank(),          axis.title.y=element_blank())
+
+ggplot()+ geom_sf(data = gz_t_pk_1,aes(geometry = geometry))+
+  geom_sf(data = poi_pk,aes(geometry = geometry))
+
+
+```
+
+```{r hp,fig.height=8, fig.width=10, warning=FALSE,  dpi= 200}
+
+poi_hp <- st_transform(poi_hp,4326)
+poi_hp_fs <- st_transform(poi_hp_fs,4326)
+
+poi_hp <- rbind(poi_hp[,c("cityname","lat","lon","name", "address" ,"type1","type2","type3","geometry")],
+                poi_hp_fs[,c("cityname","lat","lon","name", "address" ,"type1","type2","type3","geometry")])
+
+insc_hp <- st_join(gz_t[,c("Name","layer1","layer2","geometry")],poi_hp)
+#insc_hp <- st_intersection(gz_t[,c("Name","layer1","layer2","geometry")],poi_hp, model = "open")
+
+insc_hp_ag <- setDT(insc_hp)[!is.na(name),][,.(cnt= length(name)),by = c("Name","layer1","layer2","type1","type2","type3")]
+
+insc_hp_ag_1 <- insc_hp_ag[,.(cnt= sum(cnt)),by = c("Name")]
+
+gz_t_hp_1 <- left_join(gz_t,insc_hp_ag_1,by =c("Name"))
+gz_t_hp_2 <- setDT(gz_t_hp_1)[,pre_cnt := cnt/n7th*10000]
+gz_t_hp_2 <- st_as_sf(gz_t_hp_2)
+
+ggplot()+ geom_sf(data = gz_t_hp_2,aes(fill= pre_cnt,geometry = geometry))+
+  scale_fill_distiller(palette='Spectral')+
+  geom_sf_text(data = gz_t_hp_2[gz_t_hp_2$pre_cnt >= 1,],aes(label = Name),
+               family='Songti SC',size = 2.5)+
+  theme(text = element_text(family='Songti SC'),         axis.title.x=element_blank(),          axis.title.y=element_blank())
+
+ggplot()+ geom_sf(data = gz_t_hp_1,aes(geometry = geometry))+
+  geom_sf(data = poi_hp,aes(geometry = geometry))
+
+
+```
+
+###ed
+```{r ed,fig.height=8, fig.width=10, warning=FALSE,  dpi= 200}
+
+poi_ed <- st_transform(poi_ed,4326)
+poi_ed_fs <- st_transform(poi_ed_fs,4326)
+
+poi_ed <- rbind(poi_ed[,c("cityname","lat","lon","name", "address" ,"type1","type2","type3","geometry")],
+                poi_ed_fs[,c("cityname","lat","lon","name", "address" ,"type1","type2","type3","geometry")])
+
+insc_ed <- st_join(gz_t[,c("Name","layer1","layer2","geometry")],poi_ed)
+#insc_ed <- st_intersection(gz_t[,c("Name","layer1","layer2","geometry")],poi_ed, model = "open")
+
+insc_ed_ag <- setDT(insc_ed)[!is.na(name),][,.(cnt= length(name)),by = c("Name","layer1","layer2","type1","type2","type3")]
+
+insc_ed_ag_1 <- insc_ed_ag[,.(cnt= sum(cnt)),by = c("Name")]
+
+gz_t_ed_1 <- left_join(gz_t,insc_ed_ag_1,by =c("Name"))
+gz_t_ed_2 <- setDT(gz_t_ed_1)[,pre_cnt := cnt/n7th*10000]
+gz_t_ed_2 <- st_as_sf(gz_t_ed_2)
+
+ggplot()+ geom_sf(data = gz_t_ed_2,aes(fill= pre_cnt,geometry = geometry))+
+  scale_fill_distiller(palette='Spectral')+
+  geom_sf_text(data = gz_t_ed_2[gz_t_ed_2$pre_cnt >= 1,],aes(label = Name),
+               family='Songti SC',size = 2.5)+
+  theme(text = element_text(family='Songti SC'),         axis.title.x=element_blank(),          axis.title.y=element_blank())
+
+ggplot()+ geom_sf(data = gz_t_ed_1,aes(geometry = geometry))+
+  geom_sf(data = poi_ed,aes(geometry = geometry))
+
+
+```
+
+###rs
+
+```{r rs,fig.height=8, fig.width=10, warning=FALSE,  dpi= 200}
+
+
+poi_rs <- st_transform(poi_rs,4326)
+poi_rs_fs <- st_transform(poi_rs_fs,4326)
+
+poi_rs <- rbind(poi_rs[,c("cityname","lat","lon","name", "address" ,"type1","type2","type3","geometry")],
+                poi_rs_fs[,c("cityname","lat","lon","name", "address" ,"type1","type2","type3","geometry")])
+
+insc_rs <- st_join(gz_t[,c("Name","layer1","layer2","geometry")],poi_rs)
+#insc_rs <- st_intersection(gz_t[,c("Name","layer1","layer2","geometry")],poi_rs, model = "open")
+
+
+
+
+insc_rs_ag <- setDT(insc_rs)[!is.na(name),][,.(cnt= length(name)),by = c("Name","layer1","layer2","type1","type2","type3")]
+
+insc_rs_ag_1 <- insc_rs_ag[,.(cnt= sum(cnt)),by = c("Name")]
+
+gz_t_rs_1 <- left_join(gz_t,insc_rs_ag_1,by =c("Name"))
+
+
+
+
+
+
+ggplot()+ geom_sf(data = gz_t_rs_1,aes(fill= cnt,geometry = geometry))+
+  scale_fill_distiller(palette='Spectral')+
+  geom_sf_text(data = gz_t_rs_1[gz_t_rs_1$cnt >= 200,],aes(label = Name),
+               family='Songti SC',size = 3)+
+  theme(text = element_text(family='Songti SC'),         axis.title.x=element_blank(),          axis.title.y=element_blank())
+
+
+ggplot()+ geom_sf(data = gz_t_rs_1,aes(geometry = geometry))+
+  geom_sf(data = poi_rs,aes(geometry = geometry))
+
+
+  theme(text = element_text(family='Songti SC'),         axis.title.x=element_blank(),          axis.title.y=element_blank())
+
+```

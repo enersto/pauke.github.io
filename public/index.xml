@@ -6,7 +6,7 @@
     <description>Recent content on IFF</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Fri, 15 Apr 2022 00:00:00 +0000</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 14 Oct 2022 00:00:00 +0000</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>About</title>
       <link>/about/</link>
@@ -14,6 +14,15 @@
       
       <guid>/about/</guid>
       <description>This site is hosted by Pauke Huang, and the site title “IFF” is the abbreviation of “Initiative, Freiheit, Fortschritt | Initiative, Liberty, Progress”(yep, I got inspired fromLiberté, Égal</description>
+    </item>
+    
+    <item>
+      <title>广佛生活便利程度街镇分布情况——基于POI数据的街镇格栅分析 （一）</title>
+      <link>/2022/10/14/guangfo-convenience-exploration-with-poi-data/</link>
+      <pubDate>Fri, 14 Oct 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/2022/10/14/guangfo-convenience-exploration-with-poi-data/</guid>
+      <description>缘起 某个偶然机会，收集到了一波广州的POI数据 ，当时粗浅的探查后，颇觉有趣。再结合到早前在sf的一些探索，自认可以进一步来熟练sf方面的技能</description>
     </item>
     
     <item>
