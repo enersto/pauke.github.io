@@ -171,7 +171,7 @@ knitr::kable(gz_t[sample(nrow(gz_t),5),])
 广佛各个街道乡镇的人口情况：
 
 
-```{r base_population,fig.height=8, fig.width=10, warning=FALSE,  dpi= 200}
+```{r base_population,fig.height=8, fig.width=10, warning=FALSE, dpi= 100}
 
 ggplot()+ geom_sf(data = gz_t,aes(fill= n7th_s,geometry = geometry))+
   scale_fill_distiller(palette='Spectral')+
@@ -183,7 +183,7 @@ ggplot()+ geom_sf(data = gz_t,aes(fill= n7th_s,geometry = geometry))+
 ```
 
 广佛核心区的人口数量情况
-```{r base_population_fc,fig.height=8.5, fig.width=10, warning=FALSE,  dpi= 200}
+```{r base_population_fc,fig.height=8.5, fig.width=10, warning=FALSE, dpi= 100}
 
 ggplot()+ geom_sf(data = gz_t[gz_t$core== T,],aes(fill= n7th_s,geometry = geometry))+
   scale_fill_distiller(palette='Spectral')+
@@ -292,7 +292,7 @@ ggplot()+ geom_sf(data = gz_t[gz_t$core== T,],aes(fill= change_cut,geometry = ge
 
 - 1）检查该类型下的分类是否有显著区别，本部分主要是确认是否有进一步分类或筛选分析的必要；
 
-```{r bs_data_explore,fig.height=8, fig.width=10, warning=FALSE,  dpi= 200}
+```{r bs_data_explore,fig.height=8, fig.width=10, warning=FALSE, dpi= 100}
 
 poi_bs <- st_transform(poi_bs,4326)
 poi_bs_fs <- st_transform(poi_bs_fs,4326)
@@ -309,7 +309,7 @@ unique(poi_bs$type1)
 
 - 2）检查该数据集的点在不同的分组（街道乡镇）是否有显著区别，本部分主要是确认进行全域的投射列示是否有分析的意义和数据的偏倚情况；
 
-```{r bs_point,fig.height=8, fig.width=10, warning=FALSE,  dpi= 200}
+```{r bs_point,fig.height=8, fig.width=10, warning=FALSE, dpi= 100}
 ggplot()+ geom_sf(data = gz_t_bs_1,aes(geometry = geometry))+
   geom_sf(data = poi_bs,aes(geometry = geometry),size = 0.5, color = "red")
 
@@ -324,7 +324,7 @@ gz_t_bs_2 <- st_as_sf(gz_t_bs_2)
 
 计算出各个街道乡镇的公交车站数量后，再以万人人均作为单位，来投射分布情况：
 
-```{r bs_final,fig.height=8, fig.width=10, warning=FALSE,  dpi= 200}
+```{r bs_final,fig.height=8, fig.width=10, warning=FALSE, dpi= 100}
 ggplot()+ geom_sf(data = gz_t_bs_2,aes(fill= per_cnt,geometry = geometry))+
   scale_fill_distiller(palette='Spectral')+
   geom_sf_text(data = gz_t_bs_2[gz_t_bs_2$per_cnt >= 15,],aes(label = Name),
@@ -338,7 +338,7 @@ ggplot()+ geom_sf(data = gz_t_bs_2,aes(fill= per_cnt,geometry = geometry))+
 ### 地铁车站
 
 地铁车站POI数据的情况是：
-```{r ms_point,fig.height=8, fig.width=10, warning=FALSE,  dpi= 200}
+```{r ms_point,fig.height=8, fig.width=10, warning=FALSE, dpi= 100}
 poi_ms <- st_transform(poi_ms,4326)
 poi_ms_fs <- st_transform(poi_ms_fs,4326)
 
@@ -365,7 +365,7 @@ ggplot()+ geom_sf(data = gz_t_ms_1,aes(geometry = geometry))+
 - 各个街道乡镇间的数量区别相对较小，数量多和数量少的组间方差不大；
 
 
-```{r ms,fig.height=8, fig.width=10, warning=FALSE,  dpi= 200}
+```{r ms,fig.height=8, fig.width=10, warning=FALSE, dpi= 100}
 
 ggplot()+ geom_sf(data = gz_t_ms_2[gz_t_ms_2$core== T,],aes(fill= per_cnt,geometry = geometry))+
   scale_fill_distiller(palette='Spectral')+
@@ -384,7 +384,7 @@ ggplot()+ geom_sf(data = gz_t_ms_2[gz_t_ms_2$core== T,],aes(fill= per_cnt,geomet
 
 #### 分类整理
 
-```{r mk_data_explore,fig.height=8, fig.width=10, warning=FALSE,  dpi= 200}
+```{r mk_data_explore,fig.height=8, fig.width=10, warning=FALSE, dpi= 100}
 
 poi_sp <- st_transform(poi_sp,4326)
 poi_mk <- st_transform(poi_mk,4326)
@@ -399,7 +399,7 @@ knitr::kable(head(Desc(poi_sp$type2)[[1]][["freq"]],15))
 ```
 poi数据分类存在很多重叠和冗余的分类结果，且部分分类是各类的大杂烩，缺乏进一步分析的意义。具体而言，其综合市场、购物相关场所等分类下包含了诸多超市和便利店；购物相关场所这个分类缺乏进一步指向意义；整体类别归集程度相对较低，top3仅能归集到九成的数据。为此，该部分的整理从以下几个方面入手：
 
-```{r mk_data_clean,fig.height=8, fig.width=10, warning=FALSE,  dpi= 200}
+```{r mk_data_clean,fig.height=8, fig.width=10, warning=FALSE, dpi= 100}
 
 insc_sp <- st_join(gz_t[,c("Name","layer1","layer2","geometry")],poi_sp)
 insc_sp <- setDT(insc_sp)[,cate:= type2 ]
@@ -426,7 +426,7 @@ knitr::kable(head(Desc(insc_sp$cate)[[1]][["freq"]],15))
 ```
 经过处理后，top6的分类已经可以覆盖995成的数据，舍弃其余分类，专注top6部分数据：
 
-```{r mk_data_format,fig.height=8, fig.width=10, warning=FALSE,  dpi= 200}
+```{r mk_data_format,fig.height=8, fig.width=10, warning=FALSE, dpi= 100}
 category <- head(Desc(insc_sp$cate)[[1]][["freq"]],6)$level
 insc_sp_ag <- insc_sp[!is.na(name),][cate %in% category][,.(cnt= length(name)),
                                                          by = c("Name","layer1","layer2","cate")]
@@ -436,7 +436,7 @@ insc_sp_ag_1 <- insc_sp_ag[,.(cnt= sum(cnt)),by = c("Name")]
 
 先整体性的看广佛全域的购物类设施的万人密度情况：
 
-```{r mk,fig.height=8, fig.width=10, warning=FALSE,  dpi= 200}
+```{r mk,fig.height=8, fig.width=10, warning=FALSE, dpi= 100}
 gz_t_sp_1 <- left_join(gz_t,insc_sp_ag_1,by =c("Name"))
 gz_t_sp_2 <- setDT(gz_t_sp_1)[,per_cnt := cnt/n7th*10000]
 gz_t_sp_2 <- st_as_sf(gz_t_sp_2)
@@ -455,7 +455,7 @@ ggplot()+ geom_sf(data = gz_t_sp_2,aes(fill= per_cnt,geometry = geometry))+
 
 核心区的购物类设施的万人密度情况：
 
-```{r mk_fc,fig.height=8, fig.width=10, warning=FALSE,  dpi= 200}
+```{r mk_fc,fig.height=8, fig.width=10, warning=FALSE, dpi= 100}
 
 ggplot()+ geom_sf(data = gz_t_sp_2[gz_t_ms_2$core== T,],aes(fill= per_cnt,geometry = geometry))+
   scale_fill_distiller(palette='Spectral')+
@@ -472,7 +472,7 @@ ggplot()+ geom_sf(data = gz_t_sp_2[gz_t_ms_2$core== T,],aes(fill= per_cnt,geomet
 
 广佛全域的便利店的万人密度情况：
 
-```{r mk_cs,fig.height=8, fig.width=10, warning=FALSE,  dpi= 200}
+```{r mk_cs,fig.height=8, fig.width=10, warning=FALSE, dpi= 100}
 insc_sp_ag_cs <- insc_sp_ag[cate =="便民商店/便利店",.(cnt= sum(cnt)),by = c("Name")]
 gz_t_sp_cs_1 <- left_join(gz_t,insc_sp_ag_cs,by =c("Name"))
 gz_t_sp_cs_2 <- setDT(gz_t_sp_cs_1)[,per_cnt := cnt/n7th*10000]
@@ -490,7 +490,7 @@ ggplot()+ geom_sf(data = gz_t_sp_cs_2,aes(fill= per_cnt,geometry = geometry))+
 - 与购物类设施整体基本一致。
 
 核心区域的便利店密度情况：
-```{r mk_cs_fc,fig.height=8, fig.width=10, warning=FALSE,  dpi= 200}
+```{r mk_cs_fc,fig.height=8, fig.width=10, warning=FALSE, dpi= 100}
 
 ggplot()+ geom_sf(data = gz_t_sp_cs_2[gz_t_sp_cs_2$core== T,],aes(fill= per_cnt,geometry = geometry))+
   scale_fill_distiller(palette='Spectral')+
@@ -507,7 +507,7 @@ ggplot()+ geom_sf(data = gz_t_sp_cs_2[gz_t_sp_cs_2$core== T,],aes(fill= per_cnt,
 
 广佛全域的便利店的万人密度情况：
 
-```{r mk_sp,fig.height=8, fig.width=10, warning=FALSE,  dpi= 200}
+```{r mk_sp,fig.height=8, fig.width=10, warning=FALSE, dpi= 100}
 insc_sp_ag_sp <- insc_sp_ag[cate =="超级市场",.(cnt= sum(cnt)),by = c("Name")]
 gz_t_sp_sp_1 <- left_join(gz_t,insc_sp_ag_sp,by =c("Name"))
 gz_t_sp_sp_2 <- setDT(gz_t_sp_sp_1)[,per_cnt := cnt/n7th*10000]
@@ -524,7 +524,7 @@ ggplot()+ geom_sf(data = gz_t_sp_sp_2,aes(fill= per_cnt,geometry = geometry))+
 
 核心区域的超市密度情况：
 
-```{r mk_sp_fc,fig.height=8, fig.width=10, warning=FALSE,  dpi= 200}
+```{r mk_sp_fc,fig.height=8, fig.width=10, warning=FALSE, dpi= 100}
 
 ggplot()+ geom_sf(data = gz_t_sp_sp_2[gz_t_sp_sp_2$core== T,],aes(fill= per_cnt,geometry = geometry))+
   scale_fill_distiller(palette='Spectral')+
@@ -542,7 +542,7 @@ ggplot()+ geom_sf(data = gz_t_sp_sp_2[gz_t_sp_sp_2$core== T,],aes(fill= per_cnt,
 
 广佛全域的便利店的万人密度情况：
 
-```{r mk_fm,fig.height=8, fig.width=10, warning=FALSE,  dpi= 200}
+```{r mk_fm,fig.height=8, fig.width=10, warning=FALSE, dpi= 100}
 insc_sp_ag_fm <- insc_sp_ag[cate =="生鲜超市",.(cnt= sum(cnt)),by = c("Name")]
 gz_t_sp_fm_1 <- left_join(gz_t,insc_sp_ag_fm,by =c("Name"))
 gz_t_sp_fm_2 <- setDT(gz_t_sp_fm_1)[,per_cnt := cnt/n7th*10000]
@@ -560,7 +560,7 @@ ggplot()+ geom_sf(data = gz_t_sp_fm_2,aes(fill= per_cnt,geometry = geometry))+
 - 生鲜超市出现了个别区域有相对较大值，部分区域则还没有类似业态的情况，有待后续考察。
 
 核心区域的便利店密度情况：
-```{r mk_fm_fc,fig.height=8, fig.width=10, warning=FALSE,  dpi= 200}
+```{r mk_fm_fc,fig.height=8, fig.width=10, warning=FALSE, dpi= 100}
 
 ggplot()+ geom_sf(data = gz_t_sp_fm_2[gz_t_sp_fm_2$core== T,],aes(fill= per_cnt,geometry = geometry))+
   scale_fill_distiller(palette='Spectral')+
