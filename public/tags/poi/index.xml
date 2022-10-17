@@ -6,14 +6,23 @@
     <description>Recent content in poi on IFF</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Fri, 14 Oct 2022 00:00:00 +0000</lastBuildDate><atom:link href="/tags/poi/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 17 Oct 2022 00:00:00 +0000</lastBuildDate><atom:link href="/tags/poi/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>广佛生活便利程度街镇分布情况——基于POI数据的街镇格栅分析 （一）</title>
+      <title>广佛生活便利程度街镇分布情况——基于POI数据的格栅分析 （二）</title>
+      <link>/2022/10/17/guangfo-convenience-exploration-with-poi-data/</link>
+      <pubDate>Mon, 17 Oct 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/2022/10/17/guangfo-convenience-exploration-with-poi-data/</guid>
+      <description>商场 分类整理 商场全类 购物中心 银行 全域 核心区 公园 全域 核心区 医院 整体医疗设施分布 三甲医院分布 教育 分类整理 全域 核心区 政府服务机构 筛选 全域 核心区 餐饮</description>
+    </item>
+    
+    <item>
+      <title>广佛生活便利程度街镇分布情况——基于POI数据的格栅分析 （一）</title>
       <link>/2022/10/14/guangfo-convenience-exploration-with-poi-data/</link>
       <pubDate>Fri, 14 Oct 2022 00:00:00 +0000</pubDate>
       
       <guid>/2022/10/14/guangfo-convenience-exploration-with-poi-data/</guid>
-      <description>缘起 某个偶然机会，收集到了一波广州的POI数据 ，当时粗浅的探查后，颇觉有趣。再结合到早前在sf的一些探索，自认可以进一步来熟练sf方面的技能</description>
+      <description>缘起 破题 归集 poi数据源 人口数据源 准备 数据处理 基本情况 人口数量 人口密度 人口十年变化率 分项列示 公交车站分布情况 POI数据的处理逻辑 地铁车站 超市</description>
     </item>
     
   </channel>

@@ -15,7 +15,28 @@ edge <- read_sf("/Users/pauke/Downloads/矢量数据/建成区/广州.shp",optio
 gz_t <- st_transform(gz_t,4326)
 edge <- st_transform(edge,4326)
 
+
+names(insc_ed)
+insc_ed_a <- insc_ed[,-12]
+insc_ed_b <- insc_ed[,c("Name","geometry")]
+
+insc_ed_a <- unique(insc_ed_a)
+poi_ed <- unique(poi_ed)
+
+insc_ed_a <-  left_join()
+
+
+
 Desc(Name ~ type2,insc_sp)
+
+ggplot()+ geom_sf(data = gz_t_ml_2,aes(fill= pre_cnt,geometry = geometry))+
+  scale_fill_distiller(palette='Spectral')+
+  geom_sf_text(data = gz_t_ml_2[gz_t_ml_2$pre_cnt >= 3,],aes(label = Name),
+               family='Songti SC',size = 3,color = "ghostwhite")+
+  theme(text = element_text(family='Songti SC'),         
+        axis.title.x=element_blank(),          
+        axis.title.y=element_blank())
+
 
 
 edge_mt <- st_cast(edge,"MULTIPOLYGON")

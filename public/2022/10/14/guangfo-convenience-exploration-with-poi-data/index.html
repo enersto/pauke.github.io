@@ -6,8 +6,8 @@
 <meta name="generator" content="Hugo 0.104.3" />
 
 
-<title>广佛生活便利程度街镇分布情况——基于POI数据的街镇格栅分析 （一） - IFF</title>
-<meta property="og:title" content="广佛生活便利程度街镇分布情况——基于POI数据的街镇格栅分析 （一） - IFF">
+<title>广佛生活便利程度街镇分布情况——基于POI数据的格栅分析 （一） - IFF</title>
+<meta property="og:title" content="广佛生活便利程度街镇分布情况——基于POI数据的格栅分析 （一） - IFF">
 
 
   <link href='/favicon.ico' rel='icon' type='image/x-icon'/>
@@ -65,7 +65,7 @@
     <span class="article-duration">9 min read</span>
     
 
-    <h1 class="article-title">广佛生活便利程度街镇分布情况——基于POI数据的街镇格栅分析 （一）</h1>
+    <h1 class="article-title">广佛生活便利程度街镇分布情况——基于POI数据的格栅分析 （一）</h1>
 
     
     <span class="article-date">2022-10-14</span>
@@ -74,6 +74,45 @@
     <div class="article-content">
       
 
+<div id="TOC">
+<ul>
+<li><a href="#缘起" id="toc-缘起">缘起</a></li>
+<li><a href="#破题" id="toc-破题">破题</a></li>
+<li><a href="#归集" id="toc-归集">归集</a>
+<ul>
+<li><a href="#poi数据源" id="toc-poi数据源">poi数据源</a></li>
+<li><a href="#人口数据源" id="toc-人口数据源">人口数据源</a></li>
+</ul></li>
+<li><a href="#准备" id="toc-准备">准备</a>
+<ul>
+<li><a href="#数据处理" id="toc-数据处理">数据处理</a></li>
+</ul></li>
+<li><a href="#基本情况" id="toc-基本情况">基本情况</a>
+<ul>
+<li><a href="#人口数量" id="toc-人口数量">人口数量</a></li>
+<li><a href="#人口密度" id="toc-人口密度">人口密度</a></li>
+<li><a href="#人口十年变化率" id="toc-人口十年变化率">人口十年变化率</a></li>
+</ul></li>
+<li><a href="#分项列示" id="toc-分项列示">分项列示</a>
+<ul>
+<li><a href="#公交车站分布情况" id="toc-公交车站分布情况">公交车站分布情况</a>
+<ul>
+<li><a href="#poi数据的处理逻辑" id="toc-poi数据的处理逻辑">POI数据的处理逻辑</a></li>
+</ul></li>
+<li><a href="#地铁车站" id="toc-地铁车站">地铁车站</a></li>
+<li><a href="#超市" id="toc-超市">超市</a>
+<ul>
+<li><a href="#分类整理" id="toc-分类整理">分类整理</a>
+<ul>
+<li><a href="#便利店分布" id="toc-便利店分布">便利店分布</a></li>
+<li><a href="#超市分布" id="toc-超市分布">超市分布</a></li>
+<li><a href="#生鲜超市分布" id="toc-生鲜超市分布">生鲜超市分布</a></li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li><a href="#未完待续" id="toc-未完待续">未完待续</a></li>
+</ul>
+</div>
 
 <div id="缘起" class="section level2">
 <h2>缘起</h2>
@@ -107,8 +146,8 @@
 <h3>poi数据源</h3>
 <p>佛山的poi数据在<a href="https://youwuqiong.top/405807.html">开始提及的数据源</a>可以同样获取，甚为便利。</p>
 </div>
-<div id="人口源" class="section level3">
-<h3>人口源</h3>
+<div id="人口数据源" class="section level3">
+<h3>人口数据源</h3>
 <p>不得不说，作为一线的广州在数据公开方面还是不错的水平，在 <a href="http://tjj.gz.gov.cn/stats_newtjyw/zyxz/tjnjdzzz/content/post_7875471.html">市统计局官网</a>的统计年鉴中，即可获取年度和七普的相关数据。</p>
 <p>与此同时，佛山则是直白的展示了「佛山联邦」这个称号的含义，其市级政府机关层面均无街道乡镇层级数据，不得不借助广撒网方式，逐个区寻找：</p>
 <ul>
@@ -155,58 +194,22 @@ options(scipen=8)</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">140</td>
-<td align="left">新雅街道</td>
+<td align="left">61</td>
+<td align="left">车陂街道</td>
 <td align="left">广州市</td>
-<td align="left">花都区</td>
-<td align="right">32.98</td>
-<td align="right">171899</td>
-<td align="right">20520</td>
+<td align="left">天河区</td>
+<td align="right">5.09</td>
+<td align="right">172529</td>
+<td align="right">102787</td>
 </tr>
 <tr class="even">
-<td align="left">206</td>
-<td align="left">伦教街道</td>
-<td align="left">佛山市</td>
-<td align="left">顺德区</td>
-<td align="right">59.30</td>
-<td align="right">233180</td>
-<td align="right">184479</td>
-</tr>
-<tr class="odd">
-<td align="left">172</td>
-<td align="left">中新镇</td>
+<td align="left">37</td>
+<td align="left">大东街道</td>
 <td align="left">广州市</td>
-<td align="left">增城区</td>
-<td align="right">229.11</td>
-<td align="right">110327</td>
-<td align="right">78293</td>
-</tr>
-<tr class="even">
-<td align="left">202</td>
-<td align="left">均安镇</td>
-<td align="left">佛山市</td>
-<td align="left">顺德区</td>
-<td align="right">79.45</td>
-<td align="right">163369</td>
-<td align="right">141736</td>
-</tr>
-<tr class="odd">
-<td align="left">12</td>
-<td align="left">站前街道</td>
-<td align="left">广州市</td>
-<td align="left">荔湾区</td>
-<td align="right">0.81</td>
-<td align="right">34872</td>
-<td align="right">26099</td>
-</tr>
-<tr class="even">
-<td align="left">101</td>
-<td align="left">太和镇</td>
-<td align="left">广州市</td>
-<td align="left">白云区</td>
-<td align="right">153.58</td>
-<td align="right">131793</td>
-<td align="right">208589</td>
+<td align="left">越秀区</td>
+<td align="right">0.99</td>
+<td align="right">71083</td>
+<td align="right">83491</td>
 </tr>
 <tr class="odd">
 <td align="left">50</td>
@@ -218,31 +221,67 @@ options(scipen=8)</code></pre>
 <td align="right">67322</td>
 </tr>
 <tr class="even">
-<td align="left">180</td>
-<td align="left">祖庙街道</td>
-<td align="left">佛山市</td>
-<td align="left">禅城区</td>
-<td align="right">18.47</td>
-<td align="right">426745</td>
-<td align="right">416800</td>
+<td align="left">70</td>
+<td align="left">猎德街道</td>
+<td align="left">广州市</td>
+<td align="left">天河区</td>
+<td align="right">2.73</td>
+<td align="right">50063</td>
+<td align="right">22522</td>
 </tr>
 <tr class="odd">
-<td align="left">52</td>
-<td align="left">凤阳街道</td>
+<td align="left">105</td>
+<td align="left">红山街道</td>
 <td align="left">广州市</td>
-<td align="left">海珠区</td>
-<td align="right">4.55</td>
-<td align="right">164070</td>
-<td align="right">162641</td>
+<td align="left">黄埔区</td>
+<td align="right">7.21</td>
+<td align="right">45888</td>
+<td align="right">41815</td>
 </tr>
 <tr class="even">
-<td align="left">190</td>
-<td align="left">狮山镇</td>
+<td align="left">3</td>
+<td align="left">华林街道</td>
+<td align="left">广州市</td>
+<td align="left">荔湾区</td>
+<td align="right">0.68</td>
+<td align="right">48265</td>
+<td align="right">43292</td>
+</tr>
+<tr class="odd">
+<td align="left">141</td>
+<td align="left">梯面镇</td>
+<td align="left">广州市</td>
+<td align="left">花都区</td>
+<td align="right">91.30</td>
+<td align="right">11180</td>
+<td align="right">9516</td>
+</tr>
+<tr class="even">
+<td align="left">184</td>
+<td align="left">杨和镇</td>
 <td align="left">佛山市</td>
-<td align="left">南海区</td>
-<td align="right">255.96</td>
-<td align="right">955297</td>
-<td align="right">610514</td>
+<td align="left">高明区</td>
+<td align="right">228.33</td>
+<td align="right">54772</td>
+<td align="right">53224</td>
+</tr>
+<tr class="odd">
+<td align="left">167</td>
+<td align="left">永宁街道</td>
+<td align="left">广州市</td>
+<td align="left">增城区</td>
+<td align="right">49.00</td>
+<td align="right">154015</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">135</td>
+<td align="left">沙湾镇</td>
+<td align="left">广州市</td>
+<td align="left">番禺区</td>
+<td align="right">37.50</td>
+<td align="right">132355</td>
+<td align="right">88695</td>
 </tr>
 </tbody>
 </table>
@@ -250,12 +289,12 @@ options(scipen=8)</code></pre>
 <pre class="r"><code>knitr::kable(gz_t[sample(nrow(gz_t),10),])</code></pre>
 <table>
 <colgroup>
-<col width="24%" />
-<col width="17%" />
+<col width="26%" />
+<col width="12%" />
 <col width="6%" />
-<col width="13%" />
+<col width="14%" />
 <col width="6%" />
-<col width="31%" />
+<col width="34%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -269,84 +308,84 @@ options(scipen=8)</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">layer_township_pg.15844</td>
-<td align="left">西江镇</td>
+<td align="left">layer_township_pg.15904</td>
+<td align="left">新民镇</td>
 <td align="left">乡镇</td>
-<td align="left">441882118000</td>
+<td align="left">440881102000</td>
 <td align="right">4</td>
-<td align="left">MULTIPOLYGON (((112.5222 24…</td>
+<td align="left">MULTIPOLYGON (((110.2017 21…</td>
 </tr>
 <tr class="even">
-<td align="left">layer_township_pg.15938</td>
-<td align="left">港门镇</td>
+<td align="left">layer_township_pg.15843</td>
+<td align="left">瑶安瑶族乡</td>
 <td align="left">乡镇</td>
-<td align="left">440823112000</td>
+<td align="left">441882200000</td>
 <td align="right">4</td>
-<td align="left">MULTIPOLYGON (((109.7924 21…</td>
+<td align="left">MULTIPOLYGON (((112.4465 25…</td>
 </tr>
 <tr class="odd">
-<td align="left">layer_township_pg.15553</td>
-<td align="left">大槐镇</td>
+<td align="left">layer_township_pg.15522</td>
+<td align="left">水步镇</td>
 <td align="left">乡镇</td>
-<td align="left">440785108000</td>
+<td align="left">440781101000</td>
 <td align="right">4</td>
-<td align="left">MULTIPOLYGON (((112.2405 22…</td>
+<td align="left">MULTIPOLYGON (((112.7477 22…</td>
 </tr>
 <tr class="even">
-<td align="left">layer_township_pg.15499</td>
-<td align="left">湖东林场</td>
+<td align="left">layer_township_pg.15574</td>
+<td align="left">江南街道</td>
 <td align="left">乡镇</td>
-<td align="left">441581454000</td>
+<td align="left">440704001000</td>
 <td align="right">4</td>
-<td align="left">MULTIPOLYGON (((115.9993 22…</td>
+<td align="left">MULTIPOLYGON (((113.0916 22…</td>
 </tr>
 <tr class="odd">
-<td align="left">layer_township_pg.16139</td>
-<td align="left">高良镇</td>
+<td align="left">layer_township_pg.14828</td>
+<td align="left">双东镇街道</td>
 <td align="left">乡镇</td>
-<td align="left">441226106000</td>
+<td align="left">445381004000</td>
 <td align="right">4</td>
-<td align="left">MULTIPOLYGON (((111.9284 23…</td>
+<td align="left">MULTIPOLYGON (((111.6052 22…</td>
 </tr>
 <tr class="even">
-<td align="left">layer_township_pg.15134</td>
-<td align="left">大亚湾澳头办事处</td>
+<td align="left">layer_township_pg.14730</td>
+<td align="left">东莞生态园</td>
 <td align="left">乡镇</td>
-<td align="left">441303006000</td>
+<td align="left">441900403000</td>
 <td align="right">4</td>
-<td align="left">MULTIPOLYGON (((114.6353 22…</td>
+<td align="left">MULTIPOLYGON (((113.9272 23…</td>
 </tr>
 <tr class="odd">
-<td align="left">layer_township_pg.14906</td>
-<td align="left">街口街道</td>
+<td align="left">layer_township_pg.16150</td>
+<td align="left">岗坪镇</td>
 <td align="left">乡镇</td>
-<td align="left">440117001000</td>
+<td align="left">441224109000</td>
 <td align="right">4</td>
-<td align="left">MULTIPOLYGON (((113.5541 23…</td>
+<td align="left">MULTIPOLYGON (((111.9863 24…</td>
 </tr>
 <tr class="even">
-<td align="left">layer_township_pg.32405</td>
-<td align="left">莽山瑶族乡</td>
+<td align="left">layer_township_pg.16185</td>
+<td align="left">南岸街道</td>
 <td align="left">乡镇</td>
-<td align="left">431022205000</td>
+<td align="left">441204001000</td>
 <td align="right">4</td>
-<td align="left">MULTIPOLYGON (((112.9976 24…</td>
+<td align="left">MULTIPOLYGON (((112.3814 22…</td>
 </tr>
 <tr class="odd">
-<td align="left">layer_township_pg.16210</td>
-<td align="left">池洞镇</td>
+<td align="left">layer_township_pg.31474</td>
+<td align="left">浆洞瑶族乡</td>
 <td align="left">乡镇</td>
-<td align="left">440983106000</td>
+<td align="left">431127202000</td>
 <td align="right">4</td>
-<td align="left">MULTIPOLYGON (((110.9792 22…</td>
+<td align="left">MULTIPOLYGON (((112.3107 25…</td>
 </tr>
 <tr class="even">
-<td align="left">layer_township_pg.15326</td>
-<td align="left">洲瑞林场</td>
+<td align="left">layer_township_pg.14782</td>
+<td align="left">神湾镇</td>
 <td align="left">乡镇</td>
-<td align="left">441422401000</td>
+<td align="left">442000117000</td>
 <td align="right">4</td>
-<td align="left">MULTIPOLYGON (((116.5211 24…</td>
+<td align="left">MULTIPOLYGON (((113.3588 22…</td>
 </tr>
 </tbody>
 </table>
@@ -365,20 +404,20 @@ gz_t &lt;- st_as_sf(gz_t)
 gz_t &lt;- st_transform(gz_t,4326)</code></pre>
 <p>整理后的数据样例：</p>
 <pre class="r"><code>knitr::kable(gz_t[sample(nrow(gz_t),5),])</code></pre>
-<table style="width:100%;">
+<table>
 <colgroup>
 <col width="14%" />
-<col width="6%" />
+<col width="7%" />
 <col width="3%" />
 <col width="7%" />
 <col width="3%" />
 <col width="4%" />
 <col width="4%" />
+<col width="4%" />
 <col width="3%" />
-<col width="4%" />
-<col width="4%" />
-<col width="5%" />
+<col width="3%" />
 <col width="6%" />
+<col width="5%" />
 <col width="6%" />
 <col width="4%" />
 <col width="2%" />
@@ -406,94 +445,94 @@ gz_t &lt;- st_transform(gz_t,4326)</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">layer_township_pg.15062</td>
-<td align="left">萝岗街道</td>
+<td align="left">layer_township_pg.14867</td>
+<td align="left">省女子劳教所</td>
 <td align="left">乡镇</td>
-<td align="left">440112012000</td>
+<td align="left">440607402000</td>
 <td align="right">4</td>
-<td align="left">广州市</td>
-<td align="left">黄埔区</td>
-<td align="right">75.21</td>
-<td align="right">84956</td>
-<td align="right">45717</td>
-<td align="right">1129.584</td>
-<td align="right">0.8583022</td>
-<td align="left">[0.5,1)</td>
-<td align="right">8.4956</td>
 <td align="left">NA</td>
-<td align="left">MULTIPOLYGON (((113.511 23….</td>
+<td align="left">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="left">NA</td>
+<td align="right">NA</td>
+<td align="left">NA</td>
+<td align="left">MULTIPOLYGON (((112.8866 23…</td>
 </tr>
 <tr class="even">
-<td align="left">layer_township_pg.15041</td>
-<td align="left">黄花岗街道</td>
+<td align="left">layer_township_pg.14918</td>
+<td align="left">小楼镇</td>
 <td align="left">乡镇</td>
-<td align="left">440104014000</td>
+<td align="left">440118106000</td>
 <td align="right">4</td>
 <td align="left">广州市</td>
-<td align="left">越秀区</td>
-<td align="right">3.22</td>
-<td align="right">93745</td>
-<td align="right">99569</td>
-<td align="right">29113.354</td>
-<td align="right">-0.0584921</td>
-<td align="left">[-0.1,0)</td>
-<td align="right">9.3745</td>
-<td align="left">TRUE</td>
-<td align="left">MULTIPOLYGON (((113.3098 23…</td>
+<td align="left">增城区</td>
+<td align="right">135.24</td>
+<td align="right">36098</td>
+<td align="right">33725</td>
+<td align="right">266.9181</td>
+<td align="right">0.0703632</td>
+<td align="left">[0,0.1)</td>
+<td align="right">3.6098</td>
+<td align="left">NA</td>
+<td align="left">MULTIPOLYGON (((113.7505 23…</td>
 </tr>
 <tr class="odd">
-<td align="left">layer_township_pg.15043</td>
-<td align="left">大塘街道</td>
+<td align="left">layer_township_pg.14931</td>
+<td align="left">黄村街道</td>
 <td align="left">乡镇</td>
-<td align="left">440104017000</td>
+<td align="left">440106016000</td>
 <td align="right">4</td>
 <td align="left">广州市</td>
-<td align="left">越秀区</td>
-<td align="right">1.90</td>
-<td align="right">44351</td>
-<td align="right">46124</td>
-<td align="right">23342.632</td>
-<td align="right">-0.0384399</td>
-<td align="left">[-0.1,0)</td>
-<td align="right">4.4351</td>
+<td align="left">天河区</td>
+<td align="right">6.37</td>
+<td align="right">86879</td>
+<td align="right">29501</td>
+<td align="right">13638.7755</td>
+<td align="right">1.9449510</td>
+<td align="left">[1,2)</td>
+<td align="right">8.6879</td>
 <td align="left">TRUE</td>
-<td align="left">MULTIPOLYGON (((113.2704 23…</td>
+<td align="left">MULTIPOLYGON (((113.4077 23…</td>
 </tr>
 <tr class="even">
-<td align="left">layer_township_pg.14897</td>
-<td align="left">佛山监狱</td>
+<td align="left">layer_township_pg.14921</td>
+<td align="left">派潭镇</td>
 <td align="left">乡镇</td>
-<td align="left">440608403000</td>
+<td align="left">440118105000</td>
 <td align="right">4</td>
+<td align="left">广州市</td>
+<td align="left">增城区</td>
+<td align="right">289.64</td>
+<td align="right">63178</td>
+<td align="right">58337</td>
+<td align="right">218.1259</td>
+<td align="right">0.0829834</td>
+<td align="left">[0,0.1)</td>
+<td align="right">6.3178</td>
 <td align="left">NA</td>
-<td align="left">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="left">NA</td>
-<td align="right">NA</td>
-<td align="left">NA</td>
-<td align="left">MULTIPOLYGON (((112.8422 22…</td>
+<td align="left">MULTIPOLYGON (((113.7532 23…</td>
 </tr>
 <tr class="odd">
-<td align="left">layer_township_pg.14878</td>
-<td align="left">张槎街道</td>
+<td align="left">layer_township_pg.14898</td>
+<td align="left">对川茶场</td>
 <td align="left">乡镇</td>
-<td align="left">440604011000</td>
+<td align="left">440608402000</td>
 <td align="right">4</td>
-<td align="left">佛山市</td>
-<td align="left">禅城区</td>
-<td align="right">31.28</td>
-<td align="right">296895</td>
-<td align="right">241149</td>
-<td align="right">9491.528</td>
-<td align="right">0.2311683</td>
-<td align="left">[0.2,0.5)</td>
-<td align="right">29.6895</td>
-<td align="left">TRUE</td>
-<td align="left">MULTIPOLYGON (((113.0571 23…</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="left">NA</td>
+<td align="right">NA</td>
+<td align="left">NA</td>
+<td align="left">MULTIPOLYGON (((112.7529 22…</td>
 </tr>
 </tbody>
 </table>
@@ -566,8 +605,8 @@ gz_t &lt;- st_transform(gz_t,4326)</code></pre>
 <p><img src="/2022/10/14/guangfo-convenience-exploration-with-poi-data/index_files/figure-html/base_change_fc-1.png" width="1000" /></p>
 </div>
 </div>
-<div id="分项" class="section level2">
-<h2>分项</h2>
+<div id="分项列示" class="section level2">
+<h2>分项列示</h2>
 <p>本次获取的poi数据主要分为以下几个类别：</p>
 <ul>
 <li>地铁站</li>
@@ -583,6 +622,7 @@ gz_t &lt;- st_transform(gz_t,4326)</code></pre>
 <li>银行</li>
 <li>餐饮</li>
 <li>菜市场</li>
+<li>政府机构</li>
 </ul>
 <p>围绕poi数据基于点的特征和生活便利这一本文母题（写字楼、小区、酒店排除），再结合前期的数据质量探查（餐饮排除），本文选取以下几个方面来做详细的展开：</p>
 <ul>
@@ -595,6 +635,7 @@ gz_t &lt;- st_transform(gz_t,4326)</code></pre>
 <li>商场</li>
 <li>学校</li>
 <li>银行</li>
+<li>政府服务窗口</li>
 </ul>
 <p>限于精力，第一部分讨论以下部分：</p>
 <ul>
@@ -652,9 +693,7 @@ poi_ms &lt;- rbind(poi_ms[,c(&quot;cityname&quot;,&quot;lat&quot;,&quot;lon&quot
                 poi_ms_fs[,c(&quot;cityname&quot;,&quot;lat&quot;,&quot;lon&quot;,&quot;name&quot;, &quot;address&quot; ,&quot;type1&quot;,&quot;type2&quot;,&quot;type3&quot;,&quot;geometry&quot;)])
 
 insc_ms &lt;- st_join(gz_t[,c(&quot;Name&quot;,&quot;layer1&quot;,&quot;layer2&quot;,&quot;geometry&quot;)],poi_ms)
-
 insc_ms_ag &lt;- setDT(insc_ms)[!is.na(name),][,.(cnt= length(name)),by = c(&quot;Name&quot;,&quot;layer1&quot;,&quot;layer2&quot;,&quot;type1&quot;,&quot;type2&quot;,&quot;type3&quot;)]
-
 insc_ms_ag_1 &lt;- insc_ms_ag[,.(cnt= sum(cnt)),by = c(&quot;Name&quot;)]
 
 gz_t_ms_1 &lt;- left_join(gz_t,insc_ms_ag_1,by =c(&quot;Name&quot;))
@@ -662,7 +701,7 @@ gz_t_ms_2 &lt;- setDT(gz_t_ms_1)[,per_cnt := cnt/n7th*10000]
 gz_t_ms_2 &lt;- st_as_sf(gz_t_ms_2)
 
 ggplot()+ geom_sf(data = gz_t_ms_1,aes(geometry = geometry))+
-  geom_sf(data = poi_ms,aes(geometry = geometry))</code></pre>
+  geom_sf(data = poi_ms,aes(geometry = geometry),size = 0.5, color = &quot;red&quot;)</code></pre>
 <p><img src="/2022/10/14/guangfo-convenience-exploration-with-poi-data/index_files/figure-html/ms_point-1.png" width="1000" /></p>
 <ul>
 <li>集中在核心区域，边缘乡镇都没有对应地铁站点分布；</li>
@@ -677,8 +716,8 @@ ggplot()+ geom_sf(data = gz_t_ms_1,aes(geometry = geometry))+
         axis.title.y=element_blank())</code></pre>
 <p><img src="/2022/10/14/guangfo-convenience-exploration-with-poi-data/index_files/figure-html/ms-1.png" width="1000" /></p>
 </div>
-<div id="购物市场超市" class="section level3">
-<h3>购物市场/超市</h3>
+<div id="超市" class="section level3">
+<h3>超市</h3>
 <p>本部分合并且整理了原有数据的「超市」和「菜市场」两个部分的数据。经过前期探查发现，该poi数据的原有分类十分芜杂，需要进行进一步的清洗整理。</p>
 <div id="分类整理" class="section level4">
 <h4>分类整理</h4>
@@ -690,6 +729,8 @@ poi_sp_fs &lt;- st_transform(poi_sp_fs,4326)
 poi_sp &lt;- rbind(poi_sp[,c(&quot;cityname&quot;,&quot;lat&quot;,&quot;lon&quot;,&quot;name&quot;, &quot;address&quot; ,&quot;type1&quot;,&quot;type2&quot;,&quot;type3&quot;,&quot;geometry&quot;)],
                 poi_mk[,c(&quot;cityname&quot;,&quot;lat&quot;,&quot;lon&quot;,&quot;name&quot;, &quot;address&quot; ,&quot;type1&quot;,&quot;type2&quot;,&quot;type3&quot;,&quot;geometry&quot;)],
                 poi_sp_fs[,c(&quot;cityname&quot;,&quot;lat&quot;,&quot;lon&quot;,&quot;name&quot;, &quot;address&quot; ,&quot;type1&quot;,&quot;type2&quot;,&quot;type3&quot;,&quot;geometry&quot;)])
+poi_sp &lt;- unique(poi_sp)
+
 knitr::kable(head(Desc(poi_sp$type2)[[1]][[&quot;freq&quot;]],15))</code></pre>
 <table>
 <thead>
@@ -704,108 +745,108 @@ knitr::kable(head(Desc(poi_sp$type2)[[1]][[&quot;freq&quot;]],15))</code></pre>
 <tbody>
 <tr class="odd">
 <td align="left">便民商店/便利店</td>
-<td align="right">10545</td>
-<td align="right">0.5104313</td>
-<td align="right">10545</td>
-<td align="right">0.5104313</td>
+<td align="right">10503</td>
+<td align="right">0.5103747</td>
+<td align="right">10503</td>
+<td align="right">0.5103747</td>
 </tr>
 <tr class="even">
 <td align="left">综合市场</td>
-<td align="right">3970</td>
-<td align="right">0.1921681</td>
-<td align="right">14515</td>
-<td align="right">0.7025994</td>
+<td align="right">3953</td>
+<td align="right">0.1920890</td>
+<td align="right">14456</td>
+<td align="right">0.7024637</td>
 </tr>
 <tr class="odd">
 <td align="left">超级市场</td>
-<td align="right">2586</td>
-<td align="right">0.1251755</td>
-<td align="right">17101</td>
-<td align="right">0.8277748</td>
+<td align="right">2574</td>
+<td align="right">0.1250790</td>
+<td align="right">17030</td>
+<td align="right">0.8275426</td>
 </tr>
 <tr class="even">
 <td align="left">购物相关场所</td>
-<td align="right">2427</td>
-<td align="right">0.1174791</td>
-<td align="right">19528</td>
-<td align="right">0.9452539</td>
+<td align="right">2423</td>
+<td align="right">0.1177414</td>
+<td align="right">19453</td>
+<td align="right">0.9452840</td>
 </tr>
 <tr class="odd">
 <td align="left">专卖店</td>
-<td align="right">768</td>
-<td align="right">0.0371751</td>
-<td align="right">20296</td>
-<td align="right">0.9824290</td>
+<td align="right">767</td>
+<td align="right">0.0372710</td>
+<td align="right">20220</td>
+<td align="right">0.9825550</td>
 </tr>
 <tr class="even">
 <td align="left">餐饮相关场所</td>
-<td align="right">126</td>
-<td align="right">0.0060990</td>
-<td align="right">20422</td>
-<td align="right">0.9885280</td>
+<td align="right">124</td>
+<td align="right">0.0060256</td>
+<td align="right">20344</td>
+<td align="right">0.9885806</td>
 </tr>
 <tr class="odd">
 <td align="left">商场</td>
 <td align="right">40</td>
-<td align="right">0.0019362</td>
-<td align="right">20462</td>
-<td align="right">0.9904642</td>
+<td align="right">0.0019437</td>
+<td align="right">20384</td>
+<td align="right">0.9905243</td>
 </tr>
 <tr class="even">
 <td align="left">家居建材市场</td>
 <td align="right">34</td>
-<td align="right">0.0016458</td>
-<td align="right">20496</td>
-<td align="right">0.9921100</td>
+<td align="right">0.0016522</td>
+<td align="right">20418</td>
+<td align="right">0.9921765</td>
 </tr>
 <tr class="odd">
 <td align="left">中餐厅</td>
-<td align="right">29</td>
-<td align="right">0.0014037</td>
-<td align="right">20525</td>
-<td align="right">0.9935137</td>
+<td align="right">27</td>
+<td align="right">0.0013120</td>
+<td align="right">20445</td>
+<td align="right">0.9934885</td>
 </tr>
 <tr class="even">
 <td align="left">快餐厅</td>
 <td align="right">23</td>
-<td align="right">0.0011133</td>
-<td align="right">20548</td>
-<td align="right">0.9946270</td>
+<td align="right">0.0011176</td>
+<td align="right">20468</td>
+<td align="right">0.9946062</td>
 </tr>
 <tr class="odd">
 <td align="left">个人用品/化妆品店</td>
 <td align="right">16</td>
-<td align="right">0.0007745</td>
-<td align="right">20564</td>
-<td align="right">0.9954015</td>
+<td align="right">0.0007775</td>
+<td align="right">20484</td>
+<td align="right">0.9953836</td>
 </tr>
 <tr class="even">
 <td align="left">服装鞋帽皮具店</td>
 <td align="right">16</td>
-<td align="right">0.0007745</td>
-<td align="right">20580</td>
-<td align="right">0.9961760</td>
+<td align="right">0.0007775</td>
+<td align="right">20500</td>
+<td align="right">0.9961611</td>
 </tr>
 <tr class="odd">
 <td align="left">生活服务场所</td>
 <td align="right">12</td>
-<td align="right">0.0005809</td>
-<td align="right">20592</td>
-<td align="right">0.9967569</td>
+<td align="right">0.0005831</td>
+<td align="right">20512</td>
+<td align="right">0.9967443</td>
 </tr>
 <tr class="even">
 <td align="left">公司</td>
 <td align="right">11</td>
-<td align="right">0.0005325</td>
-<td align="right">20603</td>
-<td align="right">0.9972893</td>
+<td align="right">0.0005345</td>
+<td align="right">20523</td>
+<td align="right">0.9972788</td>
 </tr>
 <tr class="odd">
 <td align="left">家电电子卖场</td>
 <td align="right">9</td>
-<td align="right">0.0004356</td>
-<td align="right">20612</td>
-<td align="right">0.9977250</td>
+<td align="right">0.0004373</td>
+<td align="right">20532</td>
+<td align="right">0.9977161</td>
 </tr>
 </tbody>
 </table>
@@ -845,108 +886,108 @@ knitr::kable(head(Desc(insc_sp$cate)[[1]][[&quot;freq&quot;]],15))</code></pre>
 <tbody>
 <tr class="odd">
 <td align="left">便民商店/便利店</td>
-<td align="right">10366</td>
-<td align="right">0.5017182</td>
-<td align="right">10366</td>
-<td align="right">0.5017182</td>
+<td align="right">10325</td>
+<td align="right">0.5016763</td>
+<td align="right">10325</td>
+<td align="right">0.5016763</td>
 </tr>
 <tr class="even">
 <td align="left">超级市场</td>
-<td align="right">4675</td>
-<td align="right">0.2262717</td>
-<td align="right">15041</td>
-<td align="right">0.7279899</td>
+<td align="right">4661</td>
+<td align="right">0.2264710</td>
+<td align="right">14986</td>
+<td align="right">0.7281473</td>
 </tr>
 <tr class="odd">
 <td align="left">生鲜超市</td>
-<td align="right">3745</td>
-<td align="right">0.1812594</td>
-<td align="right">18786</td>
-<td align="right">0.9092493</td>
+<td align="right">3722</td>
+<td align="right">0.1808464</td>
+<td align="right">18708</td>
+<td align="right">0.9089937</td>
 </tr>
 <tr class="even">
 <td align="left">综合市场</td>
-<td align="right">1618</td>
-<td align="right">0.0783118</td>
-<td align="right">20404</td>
-<td align="right">0.9875611</td>
+<td align="right">1616</td>
+<td align="right">0.0785190</td>
+<td align="right">20324</td>
+<td align="right">0.9875128</td>
 </tr>
 <tr class="odd">
 <td align="left">专卖店</td>
 <td align="right">121</td>
-<td align="right">0.0058564</td>
-<td align="right">20525</td>
-<td align="right">0.9934175</td>
+<td align="right">0.0058792</td>
+<td align="right">20445</td>
+<td align="right">0.9933920</td>
 </tr>
 <tr class="even">
 <td align="left">五金/日杂</td>
 <td align="right">50</td>
-<td align="right">0.0024200</td>
-<td align="right">20575</td>
-<td align="right">0.9958376</td>
+<td align="right">0.0024294</td>
+<td align="right">20495</td>
+<td align="right">0.9958214</td>
 </tr>
 <tr class="odd">
 <td align="left">服装鞋帽皮具店</td>
 <td align="right">14</td>
-<td align="right">0.0006776</td>
-<td align="right">20589</td>
-<td align="right">0.9965152</td>
+<td align="right">0.0006802</td>
+<td align="right">20509</td>
+<td align="right">0.9965016</td>
 </tr>
 <tr class="even">
 <td align="left">餐饮相关场所</td>
 <td align="right">13</td>
-<td align="right">0.0006292</td>
-<td align="right">20602</td>
-<td align="right">0.9971444</td>
+<td align="right">0.0006317</td>
+<td align="right">20522</td>
+<td align="right">0.9971333</td>
 </tr>
 <tr class="odd">
 <td align="left">中餐厅</td>
 <td align="right">10</td>
-<td align="right">0.0004840</td>
-<td align="right">20612</td>
-<td align="right">0.9976284</td>
+<td align="right">0.0004859</td>
+<td align="right">20532</td>
+<td align="right">0.9976192</td>
 </tr>
 <tr class="even">
 <td align="left">公司</td>
 <td align="right">8</td>
-<td align="right">0.0003872</td>
-<td align="right">20620</td>
-<td align="right">0.9980156</td>
+<td align="right">0.0003887</td>
+<td align="right">20540</td>
+<td align="right">0.9980079</td>
 </tr>
 <tr class="odd">
 <td align="left">家电电子卖场</td>
 <td align="right">5</td>
-<td align="right">0.0002420</td>
-<td align="right">20625</td>
-<td align="right">0.9982576</td>
+<td align="right">0.0002429</td>
+<td align="right">20545</td>
+<td align="right">0.9982508</td>
 </tr>
 <tr class="even">
 <td align="left">特色商业街</td>
 <td align="right">5</td>
-<td align="right">0.0002420</td>
-<td align="right">20630</td>
-<td align="right">0.9984996</td>
+<td align="right">0.0002429</td>
+<td align="right">20550</td>
+<td align="right">0.9984938</td>
 </tr>
 <tr class="odd">
 <td align="left">快餐厅</td>
 <td align="right">4</td>
-<td align="right">0.0001936</td>
-<td align="right">20634</td>
-<td align="right">0.9986932</td>
+<td align="right">0.0001944</td>
+<td align="right">20554</td>
+<td align="right">0.9986881</td>
 </tr>
 <tr class="even">
 <td align="left">物流速递</td>
 <td align="right">3</td>
-<td align="right">0.0001452</td>
-<td align="right">20637</td>
-<td align="right">0.9988384</td>
+<td align="right">0.0001458</td>
+<td align="right">20557</td>
+<td align="right">0.9988339</td>
 </tr>
 <tr class="odd">
 <td align="left">生活服务场所</td>
 <td align="right">3</td>
-<td align="right">0.0001452</td>
-<td align="right">20640</td>
-<td align="right">0.9989836</td>
+<td align="right">0.0001458</td>
+<td align="right">20560</td>
+<td align="right">0.9989796</td>
 </tr>
 </tbody>
 </table>
@@ -1080,6 +1121,7 @@ ggplot()+ geom_sf(data = gz_t_sp_fm_2,aes(fill= per_cnt,geometry = geometry))+
 <li>公园</li>
 <li>医院</li>
 <li>商场</li>
+<li>医院</li>
 <li>学校</li>
 <li>银行</li>
 </ul></li>

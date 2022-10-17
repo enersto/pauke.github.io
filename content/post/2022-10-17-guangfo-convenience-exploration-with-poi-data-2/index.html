@@ -1,0 +1,188 @@
+---
+title: "广佛生活便利程度街镇分布情况——基于POI数据的格栅分析 （二）"
+author: pauke
+date: '2022-10-17'
+slug: guangfo-convenience-exploration-with-poi-data
+categories: []
+tags:
+  - sf
+  - spitial_data
+  - poi
+output:
+  blogdown::html_page:
+    toc: true
+    toc_depth: 5
+---
+
+
+<div id="TOC">
+<ul>
+<li><a href="#商场" id="toc-商场">商场</a>
+<ul>
+<li><a href="#分类整理" id="toc-分类整理">分类整理</a></li>
+<li><a href="#商场全类" id="toc-商场全类">商场全类</a></li>
+<li><a href="#购物中心" id="toc-购物中心">购物中心</a></li>
+</ul></li>
+<li><a href="#银行" id="toc-银行">银行</a>
+<ul>
+<li><a href="#全域" id="toc-全域">全域</a></li>
+<li><a href="#核心区" id="toc-核心区">核心区</a></li>
+</ul></li>
+<li><a href="#公园" id="toc-公园">公园</a>
+<ul>
+<li><a href="#全域-1" id="toc-全域-1">全域</a></li>
+<li><a href="#核心区-1" id="toc-核心区-1">核心区</a></li>
+</ul></li>
+<li><a href="#医院" id="toc-医院">医院</a>
+<ul>
+<li><a href="#整体医疗设施分布" id="toc-整体医疗设施分布">整体医疗设施分布</a></li>
+<li><a href="#三甲医院分布" id="toc-三甲医院分布">三甲医院分布</a></li>
+</ul></li>
+<li><a href="#教育" id="toc-教育">教育</a>
+<ul>
+<li><a href="#分类整理-1" id="toc-分类整理-1">分类整理</a></li>
+<li><a href="#全域-2" id="toc-全域-2">全域</a></li>
+<li><a href="#核心区-2" id="toc-核心区-2">核心区</a></li>
+</ul></li>
+<li><a href="#政府服务机构" id="toc-政府服务机构">政府服务机构</a>
+<ul>
+<li><a href="#筛选" id="toc-筛选">筛选</a></li>
+<li><a href="#全域-3" id="toc-全域-3">全域</a></li>
+<li><a href="#核心区-3" id="toc-核心区-3">核心区</a></li>
+</ul></li>
+<li><a href="#餐饮" id="toc-餐饮">餐饮</a></li>
+<li><a href="#未完待续" id="toc-未完待续">未完待续</a></li>
+</ul>
+</div>
+
+<p>本文依赖的包：</p>
+<p>书接<a href="https://pauke.netlify.app/2022/10/14/guangfo-convenience-exploration-with-poi-data/">上回</a>，这篇文章会进一步展开讨论其余部分的poi数据。</p>
+<div id="商场" class="section level3">
+<h3>商场</h3>
+<p>商场部分经过前期的数据探查，不同街镇间相对合理，抽查部分点位后也与实际相仿，具有进一步实际探查的意义。</p>
+<p>进一步探查分类情况，该类数据分类中虽然有「购物相关场所」,「楼宇」,「商务住宅相关」等之类的分类，但也都是商场类别数据，这种分类方式存在一定的重叠和矛盾之处，不如先全部统一为商场一个分类。同时，诸如万达、正佳之类的商场与其余较小的商场有较大区别，有必要与其他商场做一个区分。根据连锁经营协会的<a href="http://www.ccfa.org.cn/portal/cn/xiangxi.jsp?type=10003&amp;id=442698">TOP60购物中心</a>数据，筛选并名列出其中的购物中心的部分。</p>
+<div id="分类整理" class="section level4">
+<h4>分类整理</h4>
+<p>整理后的数据也是采取与超市部分类似的方式，只取其中的TOP 99%的两类数据：</p>
+</div>
+<div id="商场全类" class="section level4">
+<h4>商场全类</h4>
+<p>首先是广佛全域的整体商场类设施的万人密度情况：</p>
+<ul>
+<li>除了越秀、天河这类核心区的超高密度外，连片建成区的街乡也想对有一定的分布。</li>
+</ul>
+</div>
+<div id="购物中心" class="section level4">
+<h4>购物中心</h4>
+<p>购物中心有高度的城市密集区依赖的属性，故而部分集中展示核心区的购物中心密度情况：</p>
+<ul>
+<li>广州中心部分表现出部分街道有较高密度的购物中心，有的街道则一个都没有，番禺、佛山则相对较为平均的每个街乡保持0.5个/万人的分布密度。</li>
+</ul>
+</div>
+</div>
+<div id="银行" class="section level3">
+<h3>银行</h3>
+<p>从银行poi的数据探查来看：</p>
+<ul>
+<li><p>该类数据类别相对集中，且分类没有显著意义区分故不做更多清洗和分类</p></li>
+<li><p>该类数据在各个街镇间的分布与实际相符</p></li>
+</ul>
+<div id="全域" class="section level4">
+<h4>全域</h4>
+<p>所以，可以直接先来列示广佛全域的银行类设施的万人密度图：</p>
+<ul>
+<li>高密度的街道基本集中在珠江新城为核心的广州CBD区域，其余街镇则相对均值。</li>
+</ul>
+</div>
+<div id="核心区" class="section level4">
+<h4>核心区</h4>
+<p>以及核心区域的万人密度情况：</p>
+<ul>
+<li>趋势与全域图一致，但可以更清晰看出越秀和天河的集中情况</li>
+</ul>
+</div>
+</div>
+<div id="公园" class="section level3">
+<h3>公园</h3>
+<p>公园部分数据分为了公园广场和风景名胜两个大类，数据较为均值，同时，两类在本系列文章的主旨下，区分的意义不大，故不作进一步处理和分类。</p>
+<div id="全域-1" class="section level4">
+<h4>全域</h4>
+<p>广佛全域公园类设施的街镇分布情况：</p>
+<ul>
+<li>公园类设施具有显著的非城市中心的属性，高人均的多以城郊乡镇为主</li>
+</ul>
+</div>
+<div id="核心区-1" class="section level4">
+<h4>核心区</h4>
+<p>核心城区的公园类设施的分布情况：</p>
+</div>
+</div>
+<div id="医院" class="section level3">
+<h3>医院</h3>
+<p>从二级分类来看，与前面两类类似，医院部分的数据同样表现出分类均质化程度高和分类上不具有进一步分类的意义的特征。在三级分类中，还做了三甲的一类分类，但因为该类数据量仅有75个，缺乏在分析意义的单独分类，故不会做进一步区分，但会在后面单独筛选列示以作参考。</p>
+<div id="整体医疗设施分布" class="section level4">
+<h4>整体医疗设施分布</h4>
+<p>广佛全域医疗类设施的街镇分布情况：</p>
+<ul>
+<li>除了越秀、荔湾核心区集中的公共设施普遍趋势外，部分外周乡镇凭借较低的人口基数，均摊获得了较高的万人医疗设施数量；</li>
+<li>广州城郊部分的医疗设施密度，与佛山相比有显著性的差异，特别是白云、花都更是形成塌陷区。</li>
+</ul>
+</div>
+<div id="三甲医院分布" class="section level4">
+<h4>三甲医院分布</h4>
+<p>虽然在外周乡镇有分布，三甲医院仍然高度集中在核心区域，故列示只做核心区域的分布情况：</p>
+<ul>
+<li>越秀、天河和荔湾仍然是三甲医院高密度街道的集中地</li>
+</ul>
+</div>
+</div>
+<div id="教育" class="section level3">
+<h3>教育</h3>
+<p>教育部分数据在街乡间的分布符合实际且无异常。</p>
+<div id="分类整理-1" class="section level4">
+<h4>分类整理</h4>
+<p>基于前期探查，教育部分的数据会做以下几类处理：</p>
+<ul>
+<li><p>区分出大学和中小学，大学不具有街道乡镇层级在地服务属性，故不会纳入本系列的密度情况计算；</p></li>
+<li><p>二级分类中的「科教文化场所」芜杂的掺入了培训学校、中高职、党校和大学等类型设施，与本系列的主旨并不相符，故该类数据也不纳入密度计算；</p></li>
+<li><p>经过筛选的中小学数量支持针对本文的分析。</p></li>
+</ul>
+</div>
+<div id="全域-2" class="section level4">
+<h4>全域</h4>
+<p>广佛全域中小学类设施的街镇分布情况：</p>
+<ul>
+<li>中小学的万人密度除了核心区域一如既往的高外，外周乡镇因为较低的人口基数，也有部分获得较高的人均密度。</li>
+</ul>
+</div>
+<div id="核心区-2" class="section level4">
+<h4>核心区</h4>
+<p>核心城区的中小学类设施的分布情况：</p>
+</div>
+</div>
+<div id="政府服务机构" class="section level3">
+<h3>政府服务机构</h3>
+<div id="筛选" class="section level4">
+<h4>筛选</h4>
+<p>政府机构部分的思路则是从名字中筛选出与服务窗口相关的设施</p>
+</div>
+<div id="全域-3" class="section level4">
+<h4>全域</h4>
+<ul>
+<li>尽管与已经单独调整计算方式，但政府机构一个场所多个牌子的情况仍然很难排除，导致整体万人人均数量相对较高；</li>
+<li>外周乡镇同样是整体人口规模较小，万人均值就相对较高；</li>
+</ul>
+</div>
+<div id="核心区-3" class="section level4">
+<h4>核心区</h4>
+<p>核心城区的政府服务类设施的分布情况：</p>
+</div>
+</div>
+<div id="餐饮" class="section level3">
+<h3>餐饮</h3>
+<p>正如<a href="https://pauke.netlify.app/2022/10/14/guangfo-convenience-exploration-with-poi-data/">前文</a>所叙，本次获得的餐饮poi数据存在部分街道乡镇缺失的情况，故无法列示和纳入整体分析。</p>
+</div>
+<div id="未完待续" class="section level2">
+<h2>未完待续</h2>
+<p>至此已经列示了本次参与分析的所有部分的所有poi数据情况，但本系列文章还会再针对如<a href="https://pauke.netlify.app/2022/10/14/guangfo-convenience-exploration-with-poi-data/">前文</a>结尾提到的，<strong>汇拢各个部分的结论，试着建设一个基于以上内容的指标模型</strong>。</p>
+</div>

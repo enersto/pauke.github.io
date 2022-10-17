@@ -1,5 +1,5 @@
 ---
-title: "广佛生活便利程度街镇分布情况——基于POI数据的街镇格栅分析 （一）"
+title: "广佛生活便利程度街镇分布情况——基于POI数据的格栅分析 （一）"
 author: pauke
 date: '2022-10-14'
 slug: guangfo-convenience-exploration-with-poi-data
@@ -8,6 +8,10 @@ tags:
   - sf
   - spitial_data
   - poi
+output:
+  blogdown::html_page:
+    toc: true
+    toc_depth: 5
 ---
 
 
@@ -52,7 +56,7 @@ poi数据均是基于单个地理点位的数据值，只有结合一定的汇�
 
 佛山的poi数据在[开始提及的数据源](https://youwuqiong.top/405807.html)可以同样获取，甚为便利。
 
-### 人口源
+### 人口数据源
 
 不得不说，作为一线的广州在数据公开方面还是不错的水平，在 [市统计局官网](http://tjj.gz.gov.cn/stats_newtjyw/zyxz/tjnjdzzz/content/post_7875471.html)的统计年鉴中，即可获取年度和七普的相关数据。
 
@@ -120,10 +124,6 @@ poi_bk_fs =read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/佛山/�
 poi_rs_fs =read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/佛山/餐饮.shp")
 ```
 
-
-```{r}
-
-```
 
 
 ### 数据处理
@@ -247,7 +247,7 @@ ggplot()+ geom_sf(data = gz_t[gz_t$core== T,],aes(fill= change_cut,geometry = ge
 
 
 
-## 分项
+## 分项列示
 
 本次获取的poi数据主要分为以下几个类别：
 
@@ -264,6 +264,7 @@ ggplot()+ geom_sf(data = gz_t[gz_t$core== T,],aes(fill= change_cut,geometry = ge
 - 银行
 - 餐饮
 - 菜市场
+- 政府机构
 
 围绕poi数据基于点的特征和生活便利这一本文母题（写字楼、小区、酒店排除），再结合前期的数据质量探查（餐饮排除），本文选取以下几个方面来做详细的展开：
 
@@ -276,6 +277,7 @@ ggplot()+ geom_sf(data = gz_t[gz_t$core== T,],aes(fill= change_cut,geometry = ge
 - 商场
 - 学校
 - 银行
+- 政府服务窗口
 
 限于精力，第一部分讨论以下部分：
 
@@ -346,9 +348,7 @@ poi_ms <- rbind(poi_ms[,c("cityname","lat","lon","name", "address" ,"type1","typ
                 poi_ms_fs[,c("cityname","lat","lon","name", "address" ,"type1","type2","type3","geometry")])
 
 insc_ms <- st_join(gz_t[,c("Name","layer1","layer2","geometry")],poi_ms)
-
 insc_ms_ag <- setDT(insc_ms)[!is.na(name),][,.(cnt= length(name)),by = c("Name","layer1","layer2","type1","type2","type3")]
-
 insc_ms_ag_1 <- insc_ms_ag[,.(cnt= sum(cnt)),by = c("Name")]
 
 gz_t_ms_1 <- left_join(gz_t,insc_ms_ag_1,by =c("Name"))
@@ -356,7 +356,7 @@ gz_t_ms_2 <- setDT(gz_t_ms_1)[,per_cnt := cnt/n7th*10000]
 gz_t_ms_2 <- st_as_sf(gz_t_ms_2)
 
 ggplot()+ geom_sf(data = gz_t_ms_1,aes(geometry = geometry))+
-  geom_sf(data = poi_ms,aes(geometry = geometry))
+  geom_sf(data = poi_ms,aes(geometry = geometry),size = 0.5, color = "red")
 
 ```
 
@@ -378,7 +378,7 @@ ggplot()+ geom_sf(data = gz_t_ms_2[gz_t_ms_2$core== T,],aes(fill= per_cnt,geomet
 ```
 
 
-### 购物市场/超市
+### 超市
 
 本部分合并且整理了原有数据的「超市」和「菜市场」两个部分的数据。经过前期探查发现，该poi数据的原有分类十分芜杂，需要进行进一步的清洗整理。
 
@@ -394,6 +394,8 @@ poi_sp_fs <- st_transform(poi_sp_fs,4326)
 poi_sp <- rbind(poi_sp[,c("cityname","lat","lon","name", "address" ,"type1","type2","type3","geometry")],
                 poi_mk[,c("cityname","lat","lon","name", "address" ,"type1","type2","type3","geometry")],
                 poi_sp_fs[,c("cityname","lat","lon","name", "address" ,"type1","type2","type3","geometry")])
+poi_sp <- unique(poi_sp)
+
 knitr::kable(head(Desc(poi_sp$type2)[[1]][["freq"]],15))
 
 ```
@@ -582,6 +584,7 @@ ggplot()+ geom_sf(data = gz_t_sp_fm_2[gz_t_sp_fm_2$core== T,],aes(fill= per_cnt,
   * 公园
   * 医院
   * 商场
+  * 医院
   * 学校
   * 银行
 - 汇拢各个部分的结论，试着建设一个基于以上内容的指标模型
