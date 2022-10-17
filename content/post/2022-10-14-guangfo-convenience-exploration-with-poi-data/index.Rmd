@@ -580,12 +580,13 @@ ggplot()+ geom_sf(data = gz_t_sp_fm_2[gz_t_sp_fm_2$core== T,],aes(fill= per_cnt,
 
 为精力所限，先行推发以上部分的内容，但不意味着这个小课题的结束，随后我还会：
 
-- 展开继续列示各个poi分项的情况：
+- [展开继续列示各个poi分项的情况](https://pauke.netlify.app/2022/10/17/guangfo-convenience-exploration-with-poi-data/)：
   * 公园
   * 医院
   * 商场
   * 医院
   * 学校
   * 银行
+  * 政府服务机构
 - 汇拢各个部分的结论，试着建设一个基于以上内容的指标模型
 
