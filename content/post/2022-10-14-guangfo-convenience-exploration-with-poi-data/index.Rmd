@@ -588,5 +588,5 @@ ggplot()+ geom_sf(data = gz_t_sp_fm_2[gz_t_sp_fm_2$core== T,],aes(fill= per_cnt,
   * 学校
   * 银行
   * 政府服务机构
-- 汇拢各个部分的结论，试着建设一个基于以上内容的指标模型
+- 汇拢各个部分的结论，试着建设一个基于以上内容的指标[模型](https://pauke.netlify.app/2022/10/18/guangfo-convenience-exploration-with-poi-data-3/)
 
