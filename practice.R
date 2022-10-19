@@ -16,6 +16,184 @@ gz_t <- st_transform(gz_t,4326)
 edge <- st_transform(edge,4326)
 
 
+d_sc <- scale(d_w[,-c(1:4,7)])
+rownames(d_sc) <- d_w$Name
+
+dbscan::kNNdistplot(d_sc, k =  5)
+abline(h = 0.15, lty = 2)
+
+db <- fpc::dbscan(d_sc, eps = 4, MinPts = 4)
+summary(db)
+plot(db, d_sc, main = "DBSCAN", frame = FALSE)
+
+fviz_cluster(db, d_sc, stand = FALSE, frame = FALSE, geom = "point")
+
+# Compute PCA with ncp = 3
+set.seed(1357)
+res.pca <- PCA(d_sc, graph = FALSE)
+
+get_eig(res.pca)
+
+fviz_screeplot(res.pca, addlabels = TRUE, ylim = c(0, 50),ggtheme = theme_minimal())
+
+res.pca <- PCA(d_sc, ncp = 4,graph = FALSE)
+# Compute hierarchical clustering on principal components
+res.hcpc <- HCPC(res.pca, nb.clust= 4,graph = FALSE)
+
+fviz_dend(res.hcpc, 
+          cex = 0.7,                     # Label size
+          palette = "jco",               # Color palette see ?ggpubr::ggpar
+          rect = TRUE, rect_fill = TRUE, # Add rectangle around groups
+          rect_border = "jco",           # Rectangle color
+          labels_track_height = 0.8,# Augment the room for labels
+          font.family = "Songti SC"
+)
+
+fviz_cluster(res.hcpc,
+             repel = TRUE,            # Avoid label overlapping
+             show.clust.cent = TRUE, # Show cluster centers
+             palette = "jco",         # Color palette see ?ggpubr::ggpar
+             ggtheme = theme_minimal(),
+             main = "Factor map",
+             font.family = "Songti SC"
+)
+
+plot(res.hcpc, choice = "3D.map",family = "Kai")
+
+d_km <- cbind(d_w, cluster = res.hcpc[["data.clust"]][["clust"]])
+d_km <- d_km[,cluster:= as.factor(cluster)]
+d_km_sf <- left_join(d_km,gz_t[,c(2,16)],by = "Name")
+d_km_sf <- st_as_sf(d_km_sf)
+
+
+ggplot()+ geom_sf(data = d_km_sf,aes(fill= cluster,geometry = geometry))+
+  scale_fill_brewer(palette="YlOrRd")+
+  geom_sf_text(data = d_km_sf[d_km_sf$cluster == 3 ,],aes(label = Name),
+               family='Songti SC',size = 3)+
+  theme(text = element_text(family='Songti SC'),         
+        axis.title.x=element_blank(),          
+        axis.title.y=element_blank())
+
+head(res.hcpc$data.clust, 10)
+
+res.hcpc$desc.axes$quanti
+
+d_pca <- PCA(d_sc,  graph = FALSE)
+
+get_eig(d_pca)
+
+fviz_screeplot(d_pca, addlabels = TRUE, ylim = c(0, 50),ggtheme = theme_minimal())
+
+var <- get_pca_var(d_pca)
+
+var$coord
+
+
+
+# Compute hierarchical clustering and cut into 4 clusters
+
+
+res <- hcut(d_sc, k = 4, stand = TRUE)
+# Visualize
+fviz_dend(res, rect = TRUE, cex = 0.5,
+          k_colors = c("#00AFBB","#2E9FDF", "#E7B800", "#FC4E07"))
+
+res.hc <- d_sc %>%                   # Scale the data
+  dist(method = "euclidean") %>% # Compute dissimilarity matrix
+  hclust(method = "ward.D2")     # Compute hierachical clustering
+
+# Visualize using factoextra
+# Cut in 4 groups and color by groups
+fviz_dend(res.hc, k = 4, # Cut in four groups
+          cex = 0.5, # label size
+          k_colors = c("#2E9FDF", "#00AFBB", "#E7B800", "#FC4E07"),
+          color_labels_by_k = TRUE, # color labels by groups
+          rect = TRUE, # Add rectangle around groups
+          font.family = "Songti SC"
+) + annotate(family = "Songti SC")
+
+d_km <- cbind(d_w, cluster = km_result$cluster)
+d_km <- d_km[,cluster:= as.factor(cluster)]
+d_km_sf <- left_join(d_km,gz_t[,c(2,16)],by = "Name")
+d_km_sf <- st_as_sf(d_km_sf)
+
+
+ggplot()+ geom_sf(data = d_km_sf,aes(fill= cluster,geometry = geometry))+
+  scale_fill_brewer(palette="YlOrRd")+
+  geom_sf_text(data = d_km_sf[d_km_sf$cluster == 4 ,],aes(label = Name),
+               family='Songti SC',size = 3)+
+  theme(text = element_text(family='Songti SC'),         
+        axis.title.x=element_blank(),          
+        axis.title.y=element_blank())
+###kmean only
+fviz_nbclust(d_sc, kmeans, method = "gap_stat") + 
+  geom_vline(xintercept = 4, linetype = 2)
+
+
+fviz_nbclust(d_sc, kmeans, method = "wss") + 
+  geom_vline(xintercept = 4, linetype = 2)
+
+
+set.seed(1357)
+#k-mean方式
+km_result <- kmeans(d_sc, 4, nstart = 24)
+
+summary(km_result)
+#提取类标签并且与原始数据进行合并
+d_km <- cbind(d_w, cluster = km_result$cluster)
+
+
+
+
+fviz_cluster(km_result, data = d_sc,
+             palette = c("#2E9FDF", "#00AFBB", "#E7B800", "#FC4E07"),
+             ellipse.type = "euclid",
+             star.plot = TRUE, 
+             repel = TRUE,
+             ggtheme = theme_minimal(),
+             font.family = "Songti SC"
+)
+
+t <-data.frame(Desc(as.factor(cluster)  ~ layer2,d_km)[["as.factor(cluster) ~ layer2"]][["tab"]])
+
+c("sp_tb","ed","sp_other","sp_cv","bs","pk","hp","ml",          
+"ms","sd","sp_fr","sp_ml",      
+"ml_top","sp","bk")
+
+
+c("专卖店","中小学","五金/日杂","便民商店/便利店","公交站","公园广场","医院","商场",          
+  "地铁站","政府服务","生鲜超市","综合市场",      
+  "购物中心","超级市场","银行")
+
+
+d_bs <-  gz_t_bs_2[,c("Name","layer1","layer2","code","cnt","per_cnt")]
+d_bs <- setDT(d_bs)[,-7][,cate:= "公交站"]
+
+d_ms <-  gz_t_ms_2[,c("Name","layer1","layer2","code","cnt","per_cnt")]
+d_ms <- setDT(d_ms)[,-7][,cate:= "地铁站"]
+
+d_sp <-  gz_t_sp_2[,c("Name","layer1","layer2","code","cnt","per_cnt","cate")]
+d_sp <- setDT(d_sp)[,-8]
+
+d_ml <-  gz_t_ml_2[,c("Name","layer1","layer2","code","cnt","per_cnt","cate")]
+d_ml <- setDT(d_ml)[,-8]
+
+d_bk <-  gz_t_bk_2[,c("Name","layer1","layer2","code","cnt","per_cnt")]
+d_bk <- setDT(d_bk)[,-7][,cate:= "银行"]
+
+d_pk <-  gz_t_pk_2[,c("Name","layer1","layer2","code","cnt","per_cnt")]
+d_pk <- setDT(d_pk)[,-7][,cate:= "公园广场"]
+
+d_hp <-  gz_t_hp_2[,c("Name","layer1","layer2","code","cnt","per_cnt")]
+d_hp <- setDT(d_hp)[,-7][,cate:= "医院"]
+
+d_ed <-  gz_t_ed_2[,c("Name","layer1","layer2","code","cnt","per_cnt")]
+d_ed <- setDT(d_ed)[,-7][,cate:= "中小学"]
+
+d_sd <-  gz_t_sd_2[,c("Name","layer1","layer2","code","cnt","per_cnt")]
+d_sd <- setDT(d_sd)[,-7][,cate:= "政府服务"]
+
+
 names(insc_ed)
 insc_ed_a <- insc_ed[,-12]
 insc_ed_b <- insc_ed[,c("Name","geometry")]

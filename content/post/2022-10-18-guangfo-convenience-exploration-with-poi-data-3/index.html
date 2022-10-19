@@ -1,0 +1,752 @@
+---
+title: "广佛生活便利程度街镇分布情况——聚类模型构建（三）"
+author: pauke
+date: '2022-10-18'
+slug: guangfo-convenience-exploration-with-poi-data-3
+categories: []
+tags:
+  - sf
+  - spitial_data
+  - poi
+  - caret
+output:
+  blogdown::html_page:
+    toc: true
+    toc_depth: 5
+---
+
+
+<div id="TOC">
+<ul>
+<li><a href="#数据汇集与清洗" id="toc-数据汇集与清洗">数据汇集与清洗</a>
+<ul>
+<li><a href="#数据汇集" id="toc-数据汇集">数据汇集</a></li>
+<li><a href="#数据清洗" id="toc-数据清洗">数据清洗</a></li>
+</ul></li>
+<li><a href="#基本思路" id="toc-基本思路">基本思路</a></li>
+<li><a href="#建模" id="toc-建模">建模</a>
+<ul>
+<li><a href="#主成分构拟pca" id="toc-主成分构拟pca">主成分构拟（PCA）</a></li>
+<li><a href="#模型构建" id="toc-模型构建">模型构建</a></li>
+<li><a href="#最终结果" id="toc-最终结果">最终结果</a></li>
+</ul></li>
+<li><a href="#评估与结论" id="toc-评估与结论">评估与结论</a></li>
+</ul>
+</div>
+
+<p>本文依赖的包：</p>
+<pre class="r"><code>library(knitr)
+library(ggplot2)
+library(data.table)
+library(sf)
+library(openxlsx)
+library(dplyr)
+library(RColorBrewer)
+library(DescTools)
+library(factoextra)
+library(FactoMineR)
+library(fpc)
+library(dbscan)
+
+
+options(scipen=8)</code></pre>
+<p>前期数据清洗汇总</p>
+<div id="数据汇集与清洗" class="section level2">
+<h2>数据汇集与清洗</h2>
+<p>此处抽取前两篇文章的列示和分析的分类、逐个街道乡镇和万人均值情况，简单整理合并成后续分析需要的数据样式。</p>
+<div id="数据汇集" class="section level3">
+<h3>数据汇集</h3>
+<p>合并后的长表如下：</p>
+<pre class="r"><code>d_bs &lt;-  gz_t_bs_2[,c(&quot;Name&quot;,&quot;layer1&quot;,&quot;layer2&quot;,&quot;code&quot;,&quot;cnt&quot;,&quot;per_cnt&quot;)]
+d_bs &lt;- setDT(d_bs)[,-7][,cate:= &quot;公交站&quot;]
+
+d_ms &lt;-  gz_t_ms_2[,c(&quot;Name&quot;,&quot;layer1&quot;,&quot;layer2&quot;,&quot;code&quot;,&quot;cnt&quot;,&quot;per_cnt&quot;)]
+d_ms &lt;- setDT(d_ms)[,-7][,cate:= &quot;地铁站&quot;]
+
+d_sp &lt;-  gz_t_sp_2[,c(&quot;Name&quot;,&quot;layer1&quot;,&quot;layer2&quot;,&quot;code&quot;,&quot;cnt&quot;,&quot;per_cnt&quot;,&quot;cate&quot;)]
+d_sp &lt;- setDT(d_sp)[,-8]
+
+d_ml &lt;-  gz_t_ml_2[,c(&quot;Name&quot;,&quot;layer1&quot;,&quot;layer2&quot;,&quot;code&quot;,&quot;cnt&quot;,&quot;per_cnt&quot;,&quot;cate&quot;)]
+d_ml &lt;- setDT(d_ml)[,-8]
+
+d_bk &lt;-  gz_t_bk_2[,c(&quot;Name&quot;,&quot;layer1&quot;,&quot;layer2&quot;,&quot;code&quot;,&quot;cnt&quot;,&quot;per_cnt&quot;)]
+d_bk &lt;- setDT(d_bk)[,-7][,cate:= &quot;银行&quot;]
+
+d_pk &lt;-  gz_t_pk_2[,c(&quot;Name&quot;,&quot;layer1&quot;,&quot;layer2&quot;,&quot;code&quot;,&quot;cnt&quot;,&quot;per_cnt&quot;)]
+d_pk &lt;- setDT(d_pk)[,-7][,cate:= &quot;公园广场&quot;]
+
+d_hp &lt;-  gz_t_hp_2[,c(&quot;Name&quot;,&quot;layer1&quot;,&quot;layer2&quot;,&quot;code&quot;,&quot;cnt&quot;,&quot;per_cnt&quot;)]
+d_hp &lt;- setDT(d_hp)[,-7][,cate:= &quot;医院&quot;]
+
+d_ed &lt;-  gz_t_ed_2[,c(&quot;Name&quot;,&quot;layer1&quot;,&quot;layer2&quot;,&quot;code&quot;,&quot;cnt&quot;,&quot;per_cnt&quot;)]
+d_ed &lt;- setDT(d_ed)[,-7][,cate:= &quot;中小学&quot;]
+
+d_sd &lt;-  gz_t_sd_2[,c(&quot;Name&quot;,&quot;layer1&quot;,&quot;layer2&quot;,&quot;code&quot;,&quot;cnt&quot;,&quot;per_cnt&quot;)]
+d_sd &lt;- setDT(d_sd)[,-7][,cate:= &quot;政府服务&quot;]
+
+d &lt;- rbind(d_bs,d_ms,d_sp,d_ml,d_bk,d_pk,d_hp,d_ed,d_sd)
+d &lt;- d[!is.na(per_cnt),]
+
+knitr::kable(d[sample(nrow(d),10),])</code></pre>
+<table>
+<colgroup>
+<col width="13%" />
+<col width="10%" />
+<col width="10%" />
+<col width="19%" />
+<col width="5%" />
+<col width="16%" />
+<col width="23%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Name</th>
+<th align="left">layer1</th>
+<th align="left">layer2</th>
+<th align="left">code</th>
+<th align="right">cnt</th>
+<th align="right">per_cnt</th>
+<th align="left">cate</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">红山街道</td>
+<td align="left">广州市</td>
+<td align="left">黄埔区</td>
+<td align="left">440112002000</td>
+<td align="right">9</td>
+<td align="right">1.9612971</td>
+<td align="left">超级市场</td>
+</tr>
+<tr class="even">
+<td align="left">朱村街道</td>
+<td align="left">广州市</td>
+<td align="left">增城区</td>
+<td align="left">440118003000</td>
+<td align="right">2</td>
+<td align="right">0.3406401</td>
+<td align="left">医院</td>
+</tr>
+<tr class="odd">
+<td align="left">矿泉街道</td>
+<td align="left">广州市</td>
+<td align="left">越秀区</td>
+<td align="left">440104022000</td>
+<td align="right">26</td>
+<td align="right">3.3550552</td>
+<td align="left">银行</td>
+</tr>
+<tr class="even">
+<td align="left">同和街道</td>
+<td align="left">广州市</td>
+<td align="left">白云区</td>
+<td align="left">440111009000</td>
+<td align="right">4</td>
+<td align="right">0.2644751</td>
+<td align="left">公园广场</td>
+</tr>
+<tr class="odd">
+<td align="left">石基镇</td>
+<td align="left">广州市</td>
+<td align="left">番禺区</td>
+<td align="left">440113120000</td>
+<td align="right">22</td>
+<td align="right">1.6024590</td>
+<td align="left">政府服务</td>
+</tr>
+<tr class="even">
+<td align="left">乐从镇</td>
+<td align="left">佛山市</td>
+<td align="left">顺德区</td>
+<td align="left">440606103000</td>
+<td align="right">43</td>
+<td align="right">1.1971513</td>
+<td align="left">生鲜超市</td>
+</tr>
+<tr class="odd">
+<td align="left">龙穴街道</td>
+<td align="left">广州市</td>
+<td align="left">南沙区</td>
+<td align="left">440115003000</td>
+<td align="right">14</td>
+<td align="right">10.3032087</td>
+<td align="left">便民商店/便利店</td>
+</tr>
+<tr class="even">
+<td align="left">文冲街道</td>
+<td align="left">广州市</td>
+<td align="left">黄埔区</td>
+<td align="left">440112006000</td>
+<td align="right">12</td>
+<td align="right">1.6767036</td>
+<td align="left">超级市场</td>
+</tr>
+<tr class="odd">
+<td align="left">龙凤街道</td>
+<td align="left">广州市</td>
+<td align="left">海珠区</td>
+<td align="left">440105009000</td>
+<td align="right">1</td>
+<td align="right">0.1030418</td>
+<td align="left">专卖店</td>
+</tr>
+<tr class="even">
+<td align="left">花地街道</td>
+<td align="left">广州市</td>
+<td align="left">荔湾区</td>
+<td align="left">440103016000</td>
+<td align="right">5</td>
+<td align="right">1.4238118</td>
+<td align="left">商场</td>
+</tr>
+</tbody>
+</table>
+<p>用于建模的宽表如下：</p>
+<pre class="r"><code>d_w &lt;- dcast(d,Name + layer1 + layer2 +code  ~ cate, value.var = c(&quot;per_cnt&quot;))
+names(d_w)[5:19] &lt;- c(&quot;sp_tb&quot;,&quot;ed&quot;,&quot;sp_other&quot;,&quot;sp_cv&quot;,&quot;bs&quot;,&quot;pk&quot;,&quot;hp&quot;,&quot;ml&quot;,          
+&quot;ms&quot;,&quot;sd&quot;,&quot;sp_fr&quot;,&quot;sp_ml&quot;,      
+&quot;ml_top&quot;,&quot;sp&quot;,&quot;bk&quot;)
+d_w &lt;- left_join(d_w,gz_t[,c(&quot;Name&quot;,&quot;change&quot;,&quot;densities&quot;)],by = c(&quot;Name&quot;))
+d_w &lt;- setDT(d_w)[,-22] #构建用于分析使用的宽表
+
+knitr::kable(d_w[sample(nrow(d_w),10),])</code></pre>
+<table style="width:100%;">
+<colgroup>
+<col width="5%" />
+<col width="3%" />
+<col width="3%" />
+<col width="6%" />
+<col width="4%" />
+<col width="4%" />
+<col width="4%" />
+<col width="4%" />
+<col width="5%" />
+<col width="4%" />
+<col width="4%" />
+<col width="4%" />
+<col width="4%" />
+<col width="5%" />
+<col width="4%" />
+<col width="4%" />
+<col width="4%" />
+<col width="4%" />
+<col width="4%" />
+<col width="4%" />
+<col width="5%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Name</th>
+<th align="left">layer1</th>
+<th align="left">layer2</th>
+<th align="left">code</th>
+<th align="right">sp_tb</th>
+<th align="right">ed</th>
+<th align="right">sp_other</th>
+<th align="right">sp_cv</th>
+<th align="right">bs</th>
+<th align="right">pk</th>
+<th align="right">hp</th>
+<th align="right">ml</th>
+<th align="right">ms</th>
+<th align="right">sd</th>
+<th align="right">sp_fr</th>
+<th align="right">sp_ml</th>
+<th align="right">ml_top</th>
+<th align="right">sp</th>
+<th align="right">bk</th>
+<th align="right">change</th>
+<th align="right">densities</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">萝岗街道</td>
+<td align="left">广州市</td>
+<td align="left">黄埔区</td>
+<td align="left">440112012000</td>
+<td align="right">NA</td>
+<td align="right">1.6479119</td>
+<td align="right">NA</td>
+<td align="right">5.532275</td>
+<td align="right">12.3593390</td>
+<td align="right">0.9416639</td>
+<td align="right">0.7062479</td>
+<td align="right">0.3531240</td>
+<td align="right">0.5885400</td>
+<td align="right">2.3541598</td>
+<td align="right">1.7656199</td>
+<td align="right">0.4708320</td>
+<td align="right">0.2354160</td>
+<td align="right">3.2958237</td>
+<td align="right">4.355196</td>
+<td align="right">0.8583022</td>
+<td align="right">1129.5838</td>
+</tr>
+<tr class="even">
+<td align="left">棠下街道</td>
+<td align="left">广州市</td>
+<td align="left">天河区</td>
+<td align="left">440106011000</td>
+<td align="right">NA</td>
+<td align="right">0.6419721</td>
+<td align="right">NA</td>
+<td align="right">2.228021</td>
+<td align="right">0.9063136</td>
+<td align="right">0.0755261</td>
+<td align="right">0.2643415</td>
+<td align="right">0.3021045</td>
+<td align="right">0.0377631</td>
+<td align="right">0.3398676</td>
+<td align="right">1.2839443</td>
+<td align="right">0.3021045</td>
+<td align="right">NA</td>
+<td align="right">0.9063136</td>
+<td align="right">1.434997</td>
+<td align="right">0.4888285</td>
+<td align="right">34797.5033</td>
+</tr>
+<tr class="odd">
+<td align="left">石基镇</td>
+<td align="left">广州市</td>
+<td align="left">番禺区</td>
+<td align="left">440113120000</td>
+<td align="right">0.0728390</td>
+<td align="right">1.6752981</td>
+<td align="right">NA</td>
+<td align="right">2.258011</td>
+<td align="right">5.3900895</td>
+<td align="right">0.3641952</td>
+<td align="right">0.8012295</td>
+<td align="right">0.8740686</td>
+<td align="right">0.4370343</td>
+<td align="right">1.6024590</td>
+<td align="right">1.0197467</td>
+<td align="right">0.5827124</td>
+<td align="right">0.1456781</td>
+<td align="right">1.9666543</td>
+<td align="right">2.403689</td>
+<td align="right">0.4090461</td>
+<td align="right">2918.5587</td>
+</tr>
+<tr class="even">
+<td align="left">更合镇</td>
+<td align="left">佛山市</td>
+<td align="left">高明区</td>
+<td align="left">440608108000</td>
+<td align="right">0.1979571</td>
+<td align="right">2.5734421</td>
+<td align="right">NA</td>
+<td align="right">9.501940</td>
+<td align="right">27.9119487</td>
+<td align="right">0.1979571</td>
+<td align="right">0.7918283</td>
+<td align="right">0.7918283</td>
+<td align="right">NA</td>
+<td align="right">10.6896825</td>
+<td align="right">0.5938712</td>
+<td align="right">0.7918283</td>
+<td align="right">NA</td>
+<td align="right">4.1570987</td>
+<td align="right">2.771399</td>
+<td align="right">0.0857118</td>
+<td align="right">145.5751</td>
+</tr>
+<tr class="odd">
+<td align="left">乐从镇</td>
+<td align="left">佛山市</td>
+<td align="left">顺德区</td>
+<td align="left">440606103000</td>
+<td align="right">NA</td>
+<td align="right">0.6681775</td>
+<td align="right">NA</td>
+<td align="right">2.449984</td>
+<td align="right">1.8374881</td>
+<td align="right">1.0857884</td>
+<td align="right">0.4732924</td>
+<td align="right">0.6124960</td>
+<td align="right">0.1392036</td>
+<td align="right">1.0579477</td>
+<td align="right">1.1971513</td>
+<td align="right">0.9744255</td>
+<td align="right">0.1948851</td>
+<td align="right">1.2806735</td>
+<td align="right">3.591454</td>
+<td align="right">0.3825747</td>
+<td align="right">4613.8215</td>
+</tr>
+<tr class="even">
+<td align="left">花东镇</td>
+<td align="left">广州市</td>
+<td align="left">花都区</td>
+<td align="left">440114105000</td>
+<td align="right">NA</td>
+<td align="right">1.7607334</td>
+<td align="right">NA</td>
+<td align="right">2.669499</td>
+<td align="right">8.7468690</td>
+<td align="right">0.3975850</td>
+<td align="right">0.1703936</td>
+<td align="right">0.3975850</td>
+<td align="right">0.1135957</td>
+<td align="right">2.0447226</td>
+<td align="right">0.3407871</td>
+<td align="right">0.3407871</td>
+<td align="right">0.0567979</td>
+<td align="right">1.0791592</td>
+<td align="right">2.044723</td>
+<td align="right">0.4828106</td>
+<td align="right">842.6486</td>
+</tr>
+<tr class="odd">
+<td align="left">赤岗街道</td>
+<td align="left">广州市</td>
+<td align="left">海珠区</td>
+<td align="left">440105001000</td>
+<td align="right">NA</td>
+<td align="right">1.0646026</td>
+<td align="right">NA</td>
+<td align="right">3.131184</td>
+<td align="right">2.5049473</td>
+<td align="right">NA</td>
+<td align="right">0.5636131</td>
+<td align="right">0.6262368</td>
+<td align="right">0.3131184</td>
+<td align="right">0.7514842</td>
+<td align="right">1.3777210</td>
+<td align="right">0.2504947</td>
+<td align="right">0.0626237</td>
+<td align="right">1.4403447</td>
+<td align="right">6.450239</td>
+<td align="right">0.3888222</td>
+<td align="right">28113.3803</td>
+</tr>
+<tr class="even">
+<td align="left">天河南街道</td>
+<td align="left">广州市</td>
+<td align="left">天河区</td>
+<td align="left">440106008000</td>
+<td align="right">NA</td>
+<td align="right">0.8590573</td>
+<td align="right">0.4295287</td>
+<td align="right">6.729282</td>
+<td align="right">2.7203482</td>
+<td align="right">NA</td>
+<td align="right">0.5727049</td>
+<td align="right">1.7181147</td>
+<td align="right">0.8590573</td>
+<td align="right">1.7181147</td>
+<td align="right">1.4317622</td>
+<td align="right">0.5727049</td>
+<td align="right">1.0022335</td>
+<td align="right">2.0044671</td>
+<td align="right">15.033503</td>
+<td align="right">0.1101857</td>
+<td align="right">27176.6537</td>
+</tr>
+<tr class="odd">
+<td align="left">均安镇</td>
+<td align="left">佛山市</td>
+<td align="left">顺德区</td>
+<td align="left">440606106000</td>
+<td align="right">0.0612111</td>
+<td align="right">0.7957446</td>
+<td align="right">NA</td>
+<td align="right">1.407856</td>
+<td align="right">4.1011453</td>
+<td align="right">0.6733224</td>
+<td align="right">0.6733224</td>
+<td align="right">0.8569557</td>
+<td align="right">NA</td>
+<td align="right">0.7957446</td>
+<td align="right">0.7957446</td>
+<td align="right">0.5509001</td>
+<td align="right">0.2448445</td>
+<td align="right">0.9793780</td>
+<td align="right">2.815712</td>
+<td align="right">0.1526288</td>
+<td align="right">2056.2492</td>
+</tr>
+<tr class="even">
+<td align="left">赤坭镇</td>
+<td align="left">广州市</td>
+<td align="left">花都区</td>
+<td align="left">440114108000</td>
+<td align="right">NA</td>
+<td align="right">2.8816490</td>
+<td align="right">NA</td>
+<td align="right">1.017053</td>
+<td align="right">12.0351222</td>
+<td align="right">0.1695088</td>
+<td align="right">0.1695088</td>
+<td align="right">0.5085263</td>
+<td align="right">NA</td>
+<td align="right">2.8816490</td>
+<td align="right">0.5085263</td>
+<td align="right">0.1695088</td>
+<td align="right">NA</td>
+<td align="right">0.5085263</td>
+<td align="right">2.203614</td>
+<td align="right">0.0421311</td>
+<td align="right">370.7516</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="数据清洗" class="section level3">
+<h3>数据清洗</h3>
+<p>本分析的清洗主要解决：</p>
+<ul>
+<li>缺失值：将所有缺失值以0替代；</li>
+<li>变量因素选择：根据前期探查，最终，
+<ul>
+<li>剔除「五金杂百」这个缺失数据较多的变量；</li>
+<li>增补「10年人口变化率」和「人口密度」两个变量，以指示各个街乡的底色情况；</li>
+</ul></li>
+<li>标量化：将参与建模的所有变量进行标量化。</li>
+</ul>
+<pre class="r"><code>d_w &lt;- d_w[,lapply(.SD, function(x) 
+  replace(x, which(is.na(x)), 0))][Name %in% c(&quot;新雅街道&quot;,&quot;凤凰街道&quot;),change := 0]
+d_sc &lt;- scale(d_w[,-c(1:4,7)])
+rownames(d_sc) &lt;- d_w$Name</code></pre>
+</div>
+</div>
+<div id="基本思路" class="section level2">
+<h2>基本思路</h2>
+<p>本系列文章的最终目的是，<strong>在没有既有分类标准的前提下，基于各类POI数据在各个街镇的万人密度分布情况，形成一个对于广佛街镇的分类方式</strong>，聚类模型这类开放式的无监督学习算法，正是适合本次目的的建模方式。</p>
+<p>同时，本案数据还有建模变量众多的情况，为拉大变量间的方差，提高聚类的辨析度，有必要在聚类前，针对参与的变量进行一次降维构拟，而能够有效统合主成分分析（PCA）和k-mean聚类建模的方案<a href="http://www.sthda.com/english/articles/31-principal-component-methods-in-r-practical-guide/117-hcpc-hierarchical-clustering-on-principal-components-essentials/">层级聚类</a>正好符合本案需求。</p>
+</div>
+<div id="建模" class="section level2">
+<h2>建模</h2>
+<div id="主成分构拟pca" class="section level4">
+<h4>主成分构拟（PCA）</h4>
+<p>第一步是确认需要构拟的变量数量：</p>
+<pre class="r"><code>d_pca &lt;- PCA(d_sc,  graph = FALSE)
+fviz_screeplot(d_pca, addlabels = TRUE, ylim = c(0, 50),
+               ggtheme = theme_minimal())</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>在以上的碎石图可见，拟合到4个变量时，能够达到损失的信息值降低到10%以内，初步确认拟合为四个新的主成分变量。</p>
+<p>基于最终拟合4个的新变量的方案，形成用于后续聚类的数据，且列示新变量与原变量的关系如下：</p>
+<pre class="r"><code>d_pca &lt;- PCA(d_sc, ncp = 4,graph = FALSE)
+var &lt;- get_pca_var(d_pca)
+var$coord</code></pre>
+<pre><code>##                 Dim.1       Dim.2       Dim.3       Dim.4
+## sp_tb      0.41284031 -0.13422170 -0.50234212 -0.34970642
+## ed         0.27671237 -0.53368343  0.51436224 -0.12328288
+## sp_cv      0.78258943  0.09999706 -0.14906784 -0.20481372
+## bs         0.53577455 -0.64214780  0.11908245  0.03362478
+## pk         0.26022303 -0.35291946  0.32144458  0.59333071
+## hp         0.58352333  0.15589315  0.06572395 -0.07719721
+## ml         0.55976268  0.54610373 -0.02393144  0.23332236
+## ms         0.36522457  0.56091596  0.31373167  0.12843442
+## sd         0.52087220 -0.69362272  0.21817219 -0.14617829
+## sp_fr      0.13748184  0.39325041 -0.45461935  0.31653599
+## sp_ml      0.42703211 -0.10661725 -0.58569813  0.29521194
+## ml_top     0.33771292  0.63129216  0.32874918  0.11838126
+## sp         0.75475479 -0.09481090 -0.42124328 -0.10669786
+## bk         0.53335721  0.42024711  0.50759308  0.00084107
+## change    -0.26951699  0.09431361 -0.13360411  0.20787666
+## densities -0.05465096  0.51976783  0.11201192 -0.66931841</code></pre>
+</div>
+<div id="模型构建" class="section level4">
+<h4>模型构建</h4>
+<p>层级聚类确认最终聚类类群数量方式，与单独的k-mean聚类有一些区别。本案使用的FactoMineR包中的HCPC函数已经包含了算法推荐的类群数量，并先以分类树的方式进行展示：</p>
+<pre class="r"><code>set.seed(1357)
+d_hcpc &lt;- HCPC(d_pca, graph = FALSE) #初步建模
+par(family=&#39;Songti SC&#39;)
+
+fviz_dend(d_hcpc, 
+          cex = 0.2,                     
+          palette = &quot;jco&quot;,               
+          rect = TRUE, 
+          rect_fill = TRUE,
+          rect_border = &quot;jco&quot;,           
+          labels_track_height = 1,
+          horiz = TRUE,
+          ggtheme = theme_minimal(),
+          show_labels = F,
+          main = &quot;分类树状图&quot;,
+          font.family = &quot;Songti SC&quot;,
+          xlab = &quot;&quot;,
+          ylab = &quot;&quot;
+)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-6-1.png" width="450" /></p>
+<ul>
+<li>算法默认给出的是3个分类，该方案分类间差距最大，重叠性最小，但另一方面，该分类的结果在实际可解释性上很成问题，且有一个较大分类项，分类均匀度存在问题；</li>
+<li>经过前期探查，在分类间重叠性提升较小的前提下，可进一步细分默认分类中最大的一个类别，采用4个类群的分类策略。</li>
+</ul>
+<pre class="r"><code>d_hcpc &lt;- HCPC(d_pca, nb.clust= 4,graph = FALSE)
+
+fviz_dend(d_hcpc, 
+          cex = 0.2,                     
+          palette = &quot;jco&quot;,               
+          rect = TRUE, 
+          rect_fill = TRUE,
+          rect_border = &quot;jco&quot;,           
+          labels_track_height = 1,
+          horiz = TRUE,
+          ggtheme = theme_minimal(),
+          show_labels = F,
+          main = &quot;分类树状图&quot;,
+          font.family = &quot;Songti SC&quot;,
+          xlab = &quot;&quot;,
+          ylab = &quot;&quot;
+)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-7-1.png" width="450" /></p>
+<p>进一步探查该方案在k-mean要素地图的前提下:</p>
+<pre class="r"><code>fviz_cluster(d_hcpc,
+             repel = TRUE,            
+             show.clust.cent = TRUE, 
+             palette = &quot;jco&quot;,         
+             ggtheme = theme_minimal(),
+             main = &quot;要素地图&quot;,
+             font.family = &quot;Songti SC&quot;
+)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-8-1.png" width="450" /></p>
+</div>
+<div id="最终结果" class="section level3">
+<h3>最终结果</h3>
+<p>将该分类回归到广佛全域图后的结果：</p>
+<pre class="r"><code>d_km &lt;- cbind(d_w, cluster = d_hcpc[[&quot;data.clust&quot;]][[&quot;clust&quot;]])
+d_km &lt;- d_km[,cluster:= as.factor(cluster)]
+d_km_sf &lt;- left_join(d_km,gz_t[,c(2,16)],by = &quot;Name&quot;)
+d_km_sf &lt;- st_as_sf(d_km_sf)
+
+
+ggplot()+ geom_sf(data = d_km_sf,aes(fill= cluster,geometry = geometry))+
+  scale_fill_brewer(palette=&quot;jco&quot;)+
+  geom_sf_text(data = d_km_sf[d_km_sf$cluster == 3 ,],aes(label = Name),
+               family=&#39;Songti SC&#39;,size = 3)+
+  theme(text = element_text(family=&#39;Songti SC&#39;),         
+        axis.title.x=element_blank(),          
+        axis.title.y=element_blank())</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-9-1.png" width="1000" /></p>
+</div>
+</div>
+<div id="评估与结论" class="section level2">
+<h2>评估与结论</h2>
+<p>抽取当前各个分类的特征构成变量如下：</p>
+<pre class="r"><code>d_hcpc$desc.var$quanti</code></pre>
+<pre><code>## $`1`
+##              v.test Mean in category  Overall mean sd in category Overall sd
+## densities  4.086841       0.17797952  9.381385e-17      1.0214361  0.9974969
+## change     2.212234       0.09634152 -3.957945e-16      1.0471825  0.9974969
+## ml        -2.992747      -0.13033239  3.555489e-16      0.6142468  0.9974969
+## bk        -3.690277      -0.16070941  2.822742e-16      0.6291435  0.9974969
+## sp_ml     -3.793349      -0.16519812 -1.449396e-15      0.8206166  0.9974969
+## hp        -4.130771      -0.17989266 -3.386180e-16      0.6809212  0.9974969
+## sp_tb     -4.264116      -0.18569977 -3.663736e-17      0.7024135  0.9974969
+## pk        -4.657310      -0.20282313  7.838175e-16      0.5952324  0.9974969
+## sp_cv     -6.225367      -0.27111112 -6.661338e-18      0.6503569  0.9974969
+## ed        -6.417143      -0.27946285 -1.406653e-15      0.6725990  0.9974969
+## sp        -7.313051      -0.31847910 -5.950795e-16      0.4884490  0.9974969
+## bs        -9.410438      -0.40981909  1.310063e-16      0.3326348  0.9974969
+## sd        -9.413894      -0.40996960 -5.540013e-16      0.3585527  0.9974969
+##                p.value
+## densities 4.372874e-05
+## change    2.695047e-02
+## ml        2.764788e-03
+## bk        2.240101e-04
+## sp_ml     1.486293e-04
+## hp        3.615489e-05
+## sp_tb     2.006951e-05
+## pk        3.203679e-06
+## sp_cv     4.804290e-10
+## ed        1.388553e-10
+## sp        2.611442e-13
+## bs        4.940733e-21
+## sd        4.780883e-21
+## 
+## $`2`
+##              v.test Mean in category  Overall mean sd in category Overall sd
+## sd         9.280715        1.9687369 -5.540013e-16      1.3845299  0.9974969
+## ed         8.843903        1.8760752 -1.406653e-15      1.0892331  0.9974969
+## bs         8.496865        1.8024572  1.310063e-16      1.6455546  0.9974969
+## pk         4.417447        0.9370821  7.838175e-16      2.0646067  0.9974969
+## change    -2.378694       -0.5045972 -3.957945e-16      0.2666578  0.9974969
+## ms        -2.471344       -0.5242512  1.232348e-16      0.8073722  0.9974969
+## ml_top    -2.759604       -0.5854005  1.432188e-16      0.1009189  0.9974969
+## ml        -3.097225       -0.6570207  3.555489e-16      0.5452644  0.9974969
+## densities -3.544248       -0.7518485  9.381385e-17      0.1093888  0.9974969
+## sp_fr     -5.156106       -1.0937754  4.307665e-16      0.3590692  0.9974969
+##                p.value
+## sd        1.683454e-20
+## ed        9.243147e-19
+## bs        1.947805e-17
+## pk        9.987338e-06
+## change    1.737409e-02
+## ms        1.346064e-02
+## ml_top    5.787142e-03
+## ml        1.953413e-03
+## densities 3.937349e-04
+## sp_fr     2.521376e-07
+## 
+## $`3`
+##              v.test Mean in category  Overall mean sd in category Overall sd
+## sp         9.138561        1.6015778 -5.950795e-16      1.1358260  0.9974969
+## sp_tb      7.234554        1.2678912 -3.663736e-17      1.5186651  0.9974969
+## sp_cv      6.689997        1.1724548 -6.661338e-18      1.0727104  0.9974969
+## sp_ml      5.765868        1.0104966 -1.449396e-15      1.1722560  0.9974969
+## bs         4.538816        0.7954498  1.310063e-16      0.7822490  0.9974969
+## sd         4.301853        0.7539209 -5.540013e-16      0.8195634  0.9974969
+## sp_fr      3.066094        0.5373481  4.307665e-16      1.5496701  0.9974969
+## pk         2.193223        0.3843731  7.838175e-16      0.9833041  0.9974969
+## hp         2.081008        0.3647068 -3.386180e-16      1.2953606  0.9974969
+## densities -3.348188       -0.5867865  9.381385e-17      0.4341670  0.9974969
+##                p.value
+## sp        6.328866e-20
+## sp_tb     4.670609e-13
+## sp_cv     2.231755e-11
+## sp_ml     8.123885e-09
+## bs        5.657095e-06
+## sd        1.693757e-05
+## sp_fr     2.168750e-03
+## pk        2.829133e-02
+## hp        3.743322e-02
+## densities 8.134172e-04
+## 
+## $`4`
+##              v.test Mean in category  Overall mean sd in category Overall sd
+## ml_top    10.209648        3.7907523  1.432188e-16       1.816602  0.9974969
+## ml         9.091413        3.3755614  3.555489e-16       1.792027  0.9974969
+## bk         8.450063        3.1374340  2.822742e-16       1.377776  0.9974969
+## ms         7.934607        2.9460497  1.232348e-16       1.968249  0.9974969
+## hp         4.760465        1.7675187 -3.386180e-16       1.515772  0.9974969
+## sp_cv      3.914080        1.4532635 -6.661338e-18       1.931457  0.9974969
+## densities  2.177713        0.8085657  9.381385e-17       1.313857  0.9974969
+## sp         2.003483        0.7438757 -5.950795e-16       1.324606  0.9974969
+##                p.value
+## ml_top    1.795148e-24
+## ml        9.776034e-20
+## bk        2.911448e-17
+## ms        2.111624e-15
+## hp        1.931474e-06
+## sp_cv     9.074948e-05
+## densities 2.942739e-02
+## sp        4.512542e-02</code></pre>
+<p>由上可以进一步归纳最终出来的4个类型：</p>
+<ul>
+<li>1类型：人口密度较高，10年人口增长率也较高，同时，不论是商业业态，还是公共服务设施的资源密度，均跟不上广佛整体均值，由上面分布地图可见为广佛建成区快速扩张的部分；</li>
+<li>2类型：公共服务人均值相对较高，但商业业态又都是相当匮乏，在地理空间上的特征为广佛外围街乡；</li>
+<li>3类型：商业业态的资源差事相比最高，同时公共服务的密度也有相对保障，地理空间特征为广佛各个组团和卫星城的核心区域；</li>
+<li>4类型：商场、银行、地铁等资源高度集中的街道，地理特征是最为典型的CBD和老越秀核心精华区域。</li>
+</ul>
+<p>4个类型特征值最强的街镇为：</p>
+<pre class="r"><code>d_hcpc$desc.ind$para</code></pre>
+<pre><code>## Cluster: 1
+##   兴华街道   沙东街道   茶滘街道   景泰街道 石围塘街道 
+##  0.2704888  0.4387793  0.4657876  0.5506102  0.5805251 
+## ------------------------------------------------------------ 
+## Cluster: 2
+##   温泉镇   鳌头镇   明城镇   良口镇   吕田镇 
+## 1.108643 1.885427 1.913702 1.933239 1.967195 
+## ------------------------------------------------------------ 
+## Cluster: 3
+##    白坭镇  西南街道  龙穴街道    乐平镇  南沙街道 
+## 0.7262929 1.1711256 1.2174692 1.3727952 1.5430970 
+## ------------------------------------------------------------ 
+## Cluster: 4
+## 天河南街道   北京街道 三元里街道   冼村街道   猎德街道 
+##   1.763820   2.182110   2.389929   2.814730   3.196359</code></pre>
+</div>

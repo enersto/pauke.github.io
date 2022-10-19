@@ -6,7 +6,16 @@
     <description>Recent content in caret on IFF</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Sun, 31 Jan 2021 00:00:00 +0000</lastBuildDate><atom:link href="/tags/caret/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 18 Oct 2022 00:00:00 +0000</lastBuildDate><atom:link href="/tags/caret/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>广佛生活便利程度街镇分布情况——聚类模型构建（三）</title>
+      <link>/2022/10/18/guangfo-convenience-exploration-with-poi-data-3/</link>
+      <pubDate>Tue, 18 Oct 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/2022/10/18/guangfo-convenience-exploration-with-poi-data-3/</guid>
+      <description>数据汇集与清洗 数据汇集 数据清洗 基本思路 建模 主成分构拟（PCA） 模型构建 最终结果 评估与结论 本文依赖的包： library(knitr) library(ggplot2) library(data.table) library(sf) library(openxlsx) library(dplyr) library(RColorBrewer) library(DescTools) library(factoextra) library(FactoMineR) library(fpc) library(dbscan) options(scipen=8) 前期数据清洗</description>
+    </item>
+    
     <item>
       <title>Workflow with Caret</title>
       <link>/2021/01/31/workflow-with-caret/</link>

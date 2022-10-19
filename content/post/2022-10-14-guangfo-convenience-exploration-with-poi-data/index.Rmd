@@ -212,7 +212,7 @@ ggplot()+ geom_sf(data = gz_t,aes(fill= densities,geometry = geometry))+
 
 ggplot()+ geom_sf(data = gz_t[gz_t$core== T,],aes(fill= densities,geometry = geometry))+
   scale_fill_distiller(palette='Spectral')+
-  geom_sf_text(data = gz_t[gz_t$n7th >= 400000,],aes(label = Name),
+  geom_sf_text(data = gz_t[gz_t$densities >= 50000,],aes(label = Name),
                family='Songti SC',size = 3)+
   theme(text = element_text(family='Songti SC'),         
         axis.title.x=element_blank(),          

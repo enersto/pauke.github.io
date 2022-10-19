@@ -1,0 +1,517 @@
+---
+title: "广佛生活便利程度街镇分布情况——聚类模型构建（三）"
+author: pauke
+date: '2022-10-18'
+slug: guangfo-convenience-exploration-with-poi-data-3
+categories: []
+tags:
+  - sf
+  - spitial_data
+  - poi
+  - caret
+output:
+  blogdown::html_page:
+    toc: true
+    toc_depth: 5
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = TRUE,
+	message = FALSE,
+	warning =FALSE
+)
+```
+
+本文依赖的包：
+
+```{r message=FALSE, warning=FALSE}
+library(knitr)
+library(ggplot2)
+library(data.table)
+library(sf)
+library(openxlsx)
+library(dplyr)
+library(RColorBrewer)
+library(DescTools)
+library(factoextra)
+library(FactoMineR)
+library(fpc)
+library(dbscan)
+
+
+options(scipen=8)
+
+```
+
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+t1<- read.xlsx("/Users/pauke/Downloads/矢量数据/街道层级人口.xlsx")
+gz_t <- read_sf("/Users/pauke/Downloads/矢量数据/行政区划/乡镇街道/广东省_乡镇边界.shp",options = "ENCODING=GBK")
+
+poi_ms = read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/广州地铁站.shp")
+poi_bs = read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/广州公交站.shp")
+poi_pk = read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/广州公园.shp")
+poi_bb = read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/广州写字楼.shp")
+poi_hp = read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/广州医院.shp")
+poi_ml = read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/广州商场.shp")
+poi_ed = read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/广州学校.shp")
+poi_ls = read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/广州小区.shp")
+poi_sp = read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/广州超市.shp")
+poi_ht = read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/广州酒店.shp")
+poi_bk = read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/广州银行.shp")
+poi_rs = read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/广州餐饮.shp")
+poi_mk = read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/广州菜市场.shp")
+poi_sd = read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/广州政府.shp")
+
+poi_ms_fs =read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/佛山/地铁站.shp")
+poi_bs_fs =read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/佛山/公交站.shp")
+poi_pk_fs =read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/佛山/公园.shp")
+poi_bb_fs =read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/佛山/写字楼.shp")
+poi_hp_fs =read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/佛山/医院.shp")
+poi_ml_fs =read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/佛山/商场.shp")
+poi_ed_fs =read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/佛山/学校.shp")
+poi_ls_fs =read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/佛山/住宅.shp")
+poi_sp_fs =read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/佛山/购物.shp")
+poi_ht_fs =read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/佛山/酒店.shp")
+poi_bk_fs =read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/佛山/银行.shp")
+poi_rs_fs =read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/佛山/餐饮.shp")
+poi_sd_fs =read_sf("/Users/pauke/Downloads/矢量数据/POI数据_2020/佛山/政府机构.shp")
+
+t1 <- setDT(t1)[,densities:= n7th/area][,change:=
+                                          (n7th-n6th)/n6th][,change_cut:=
+                                                              cut(change,c(-Inf,-0.1,0,0.1,
+                                                                        0.2,0.5,1,2,7,Inf),right = F)]
+t1 <- t1[,n7th_s := n7th/10000]
+gz_t <- gz_t[substr(gz_t$code,1,4) %in% c('4401','4406'),]
+gz_t <- left_join(gz_t,t1,by =c("Name"= "town"))
+
+gz_t <- setDT(gz_t)[densities >= 6000,core := T][n7th>= 400000,core := T]
+
+gz_t <- st_as_sf(gz_t)
+gz_t <- st_transform(gz_t,4326)
+
+```
+
+前期数据清洗汇总
+
+```{r fig.height=8, fig.width=10, warning=FALSE, include=FALSE}
+#公交
+poi_bs <- st_transform(poi_bs,4326)
+poi_bs_fs <- st_transform(poi_bs_fs,4326)
+
+poi_bs <- rbind(poi_bs[,c("cityname","lat","lon","name", "address" ,"type1","type2","type3","geometry")],
+                poi_bs_fs[,c("cityname","lat","lon","name", "address" ,"type1","type2","type3","geometry")])
+insc_bs <- st_join(gz_t[,c("Name","layer1","layer2","geometry")],poi_bs)
+insc_bs_ag <- setDT(insc_bs)[!is.na(name),][,.(cnt= uniqueN(name)),by = c("Name","layer1","layer2","type1","type2","type3")]
+insc_bs_ag_1 <- insc_bs_ag[,.(cnt= sum(cnt)),by = c("Name")]
+gz_t_bs_1 <- left_join(gz_t,insc_bs_ag_1,by =c("Name"))
+gz_t_bs_2 <- setDT(gz_t_bs_1)[,per_cnt := cnt/n7th*10000]
+gz_t_bs_2 <- st_as_sf(gz_t_bs_2)
+
+
+#地铁
+poi_ms <- st_transform(poi_ms,4326)
+poi_ms_fs <- st_transform(poi_ms_fs,4326)
+
+poi_ms <- rbind(poi_ms[,c("cityname","lat","lon","name", "address" ,"type1","type2","type3","geometry")],
+                poi_ms_fs[,c("cityname","lat","lon","name", "address" ,"type1","type2","type3","geometry")])
+
+insc_ms <- st_join(gz_t[,c("Name","layer1","layer2","geometry")],poi_ms)
+insc_ms_ag <- setDT(insc_ms)[!is.na(name),][,.(cnt= length(name)),by = c("Name","layer1","layer2","type1","type2","type3")]
+insc_ms_ag_1 <- insc_ms_ag[,.(cnt= sum(cnt)),by = c("Name")]
+
+gz_t_ms_1 <- left_join(gz_t,insc_ms_ag_1,by =c("Name"))
+gz_t_ms_2 <- setDT(gz_t_ms_1)[,per_cnt := cnt/n7th*10000]
+gz_t_ms_2 <- st_as_sf(gz_t_ms_2)
+
+
+
+#超市
+
+poi_sp <- st_transform(poi_sp,4326)
+poi_mk <- st_transform(poi_mk,4326)
+poi_sp_fs <- st_transform(poi_sp_fs,4326)
+
+
+poi_sp <- rbind(poi_sp[,c("cityname","lat","lon","name", "address" ,"type1","type2","type3","geometry")],
+                poi_mk[,c("cityname","lat","lon","name", "address" ,"type1","type2","type3","geometry")],
+                poi_sp_fs[,c("cityname","lat","lon","name", "address" ,"type1","type2","type3","geometry")])
+poi_sp <- unique(poi_sp)
+
+insc_sp <- st_join(gz_t[,c("Name","layer1","layer2","geometry")],poi_sp)
+insc_sp <- setDT(insc_sp)[,cate:= type2 ]
+
+##提取出所有便利店
+pat <- "7-|71|便利店|便利"
+insc_sp <- insc_sp[grep(pat,name, perl = TRUE) ,cate:= "便民商店/便利店"]
+
+##构建一个新的分类生鲜超市
+pat <- "钱大妈|水超市|蔬|果|生鲜|兴盛优选|肉|菜"
+insc_sp <- insc_sp[grep(pat,name, perl = TRUE) ,cate:= "生鲜超市"]
+
+##进一步归拢和集中超市相关的数据
+pat <- "便利超市"
+insc_sp <- insc_sp[grep(pat,name, perl = TRUE) ,cate:= "超级市场"]
+
+pat <- "超市|永旺"
+insc_sp <- insc_sp[type2 %in% c("购物相关场所","商场") &grep(pat,name, perl = TRUE) ,cate:= "超级市场"]
+
+##进一步归拢和集中其他分类
+insc_sp <- insc_sp[type2 %in% c("家居建材市场","个人用品/化妆品店") ,cate:= "五金/日杂"]
+
+category <- head(Desc(insc_sp$cate)[[1]][["freq"]],6)$level
+insc_sp_ag <- insc_sp[!is.na(name),][cate %in% category][,.(cnt= length(name)),
+                                                         by = c("Name","layer1","layer2","cate")]
+
+gz_t_sp_1 <- left_join(gz_t,insc_sp_ag,by =c("Name","layer1","layer2"))
+gz_t_sp_2 <- setDT(gz_t_sp_1)[,per_cnt := cnt/n7th*10000]
+gz_t_sp_2 <- st_as_sf(gz_t_sp_2)
+
+
+#商场
+poi_ml <- st_transform(poi_ml,4326)
+poi_ml_fs <- st_transform(poi_ml_fs,4326)
+
+poi_ml <- rbind(poi_ml[,c("cityname","lat","lon","name", "address" ,"type1","type2","type3","geometry")],
+                poi_ml_fs[,c("cityname","lat","lon","name", "address" ,"type1","type2","type3","geometry")])
+poi_ml <- unique(poi_ml)
+
+insc_ml <- st_join(gz_t[,c("Name","layer1","layer2","geometry")],poi_ml)
+insc_ml <- setDT(insc_ml)[,cate:= type2 ]
+
+##冗余或错误分类，均归为商场一类
+
+insc_ml <- insc_ml[type2 %in% c("购物相关场所","楼宇","商务住宅相关","便民商店/便利店","超级市场",
+                                "专卖店","综合市场","服装鞋帽皮具店","家电电子卖场",
+                                "家居建材市场") ,cate:= "商场"]
+
+
+##根据原有分类和实际情况下的购物中心信息区分出购物中心分类
+
+pat <- "万达广场|吾悦广场|世纪金源购物中心|方圆荟|印象城|印象汇|印象里|印象城MEG|宝龙一城|宝龙城|宝龙广场|宝龙天地|天街|星悦荟|家悦荟|万象城|万象汇|万象天地|五彩城|凯德MALL|来福士|凯德广场|金地广场|金地中心|银泰城|银泰in|银泰荟|金鹰购物中心|苏宁广场|王府井购物中心|王府井奥莱|天虹购物中心|爱琴海|百联购物中心|百联奥特莱斯|银泰百货|保利广场|BHGMALL|蛇口花园城|海上世界|九方|融创文旅城|COCOPark|COCOCity|iCO|COCOGarden|永旺梦乐城|步步高新天地|步步高广场|世茂广场|益田假日|中南城|大悦城|大悦春风里|祥云小镇|八佰伴购物中心|UNIC环宇系购物中心|砂之船奥莱|首创奥特莱斯|新天地|佳兆业|佳纷天地|中骏世界城|APM|环贸广场|天环|天汇广场|览秀城|J·LIFE|金茂汇|万科广场|大融城|禹洲广场|禹悦里|环球港|合生汇|合生广场|合生新天地|武商广场|富力广场|富力城|远洋未来广场|远洋未来汇|恒隆广场|杉杉奥莱|IFS国金中心|东百中心|鲁能城|鲁能美丽汇|悠方|魔方|悠方天地|旭辉广场|旭辉里|SM广场|中环购物中心|佛罗伦萨小镇|嘉里中心|弘阳广场|荟聚|太古里|太古汇|颐堤港"
+insc_ml <- insc_ml[grep(pat,name, perl = TRUE) ,cate:= "购物中心"][type3 %in% c("购物中心"),cate:= "购物中心"]
+
+category <- head(Desc(insc_ml$cate)[[1]][["freq"]],2)$level
+insc_ml_ag <- insc_ml[!is.na(name),][cate %in% category][,.(cnt= length(name)),by = c("Name","layer1","layer2","cate")]
+
+
+gz_t_ml_1 <- left_join(gz_t,insc_ml_ag,by =c("Name","layer1","layer2"))
+gz_t_ml_2 <- setDT(gz_t_ml_1)[,per_cnt := cnt/n7th*10000]
+gz_t_ml_2 <- st_as_sf(gz_t_ml_2)
+
+#银行
+poi_bk <- st_transform(poi_bk,4326)
+poi_bk_fs <- st_transform(poi_bk_fs,4326)
+
+poi_bk <- rbind(poi_bk[,c("cityname","lat","lon","name", "address" ,"type1","type2","type3","geometry")],
+                poi_bk_fs[,c("cityname","lat","lon","name", "address" ,"type1","type2","type3","geometry")])
+poi_bk <- unique(poi_bk)
+
+insc_bk <- st_join(gz_t[,c("Name","layer1","layer2","geometry")],poi_bk)
+insc_bk_ag <- setDT(insc_bk)[!is.na(name),][,.(cnt= length(name)),by = c("Name","layer1","layer2","type1","type2","type3")]
+insc_bk_ag_1 <- insc_bk_ag[,.(cnt= sum(cnt)),by = c("Name")]
+
+gz_t_bk_1 <- left_join(gz_t,insc_bk_ag_1,by =c("Name"))
+gz_t_bk_2 <- setDT(gz_t_bk_1)[,per_cnt := cnt/n7th*10000]
+gz_t_bk_2 <- st_as_sf(gz_t_bk_2)
+
+#公园
+poi_pk <- st_transform(poi_pk,4326)
+poi_pk_fs <- st_transform(poi_pk_fs,4326)
+
+poi_pk <- rbind(poi_pk[,c("cityname","lat","lon","name", "address" ,"type1","type2","type3","geometry")],
+                poi_pk_fs[,c("cityname","lat","lon","name", "address" ,"type1","type2","type3","geometry")])
+poi_pk <- unique(poi_pk)
+
+insc_pk <- st_join(gz_t[,c("Name","layer1","layer2","geometry")],poi_pk)
+insc_pk_ag <- setDT(insc_pk)[!is.na(name),][,.(cnt= length(name)),by = c("Name","layer1","layer2","type1","type2","type3")]
+insc_pk_ag_1 <- insc_pk_ag[type2== "公园广场",][,.(cnt= sum(cnt)),by = c("Name")]
+
+gz_t_pk_1 <- left_join(gz_t,insc_pk_ag_1,by =c("Name"))
+gz_t_pk_2 <- setDT(gz_t_pk_1)[,per_cnt := cnt/n7th*10000]
+gz_t_pk_2 <- st_as_sf(gz_t_pk_2)
+
+#医院
+poi_hp <- st_transform(poi_hp,4326)
+poi_hp_fs <- st_transform(poi_hp_fs,4326)
+
+poi_hp <- rbind(poi_hp[,c("cityname","lat","lon","name", "address" ,"type1","type2","type3","geometry")],
+                poi_hp_fs[,c("cityname","lat","lon","name", "address" ,"type1","type2","type3","geometry")])
+poi_hp <- unique(poi_hp)
+
+insc_hp <- st_join(gz_t[,c("Name","layer1","layer2","geometry")],poi_hp)
+insc_hp_ag <- setDT(insc_hp)[!is.na(name),][,.(cnt= length(name)),by = c("Name","layer1","layer2","type1","type2","type3")]
+insc_hp_ag_1 <- insc_hp_ag[,.(cnt= sum(cnt)),by = c("Name")]
+
+gz_t_hp_1 <- left_join(gz_t,insc_hp_ag_1,by =c("Name"))
+gz_t_hp_2 <- setDT(gz_t_hp_1)[,per_cnt := cnt/n7th*10000]
+gz_t_hp_2 <- st_as_sf(gz_t_hp_2)
+
+
+
+#教育
+poi_ed <- st_transform(poi_ed,4326)
+poi_ed_fs <- st_transform(poi_ed_fs,4326)
+
+poi_ed <- rbind(poi_ed[,c("cityname","lat","lon","name", "address" ,"type1","type2","type3","geometry")],
+                poi_ed_fs[,c("cityname","lat","lon","name", "address" ,"type1","type2","type3","geometry")])
+poi_ed <- unique(poi_ed)
+
+insc_ed <- st_join(gz_t[,c("Name","layer1","layer2","geometry")],poi_ed)
+insc_ed <- setDT(insc_ed)[,cate:= type2 ]
+
+##提取出中小学相关数据
+
+pat <- "中学|小学|附|外国|初中|高中"
+  insc_ed <- insc_ed[type3 %in% c("中学","小学","中学|科教文化服务","小学|科教文化服务") ,
+                     cate:= "中小学"][grep(pat,name, perl = TRUE) ,cate:= "中小学"]
+
+insc_ed_ag <- setDT(insc_ed)[!is.na(name),][,.(cnt= length(name)),by = c("Name","layer1","layer2","cate")]
+
+insc_ed_ag_1 <- insc_ed_ag[cate == "中小学",][,.(cnt= sum(cnt)),by = c("Name")]
+
+gz_t_ed_1 <- left_join(gz_t,insc_ed_ag_1,by =c("Name"))
+gz_t_ed_2 <- setDT(gz_t_ed_1)[,per_cnt := cnt/n7th*10000]
+gz_t_ed_2 <- st_as_sf(gz_t_ed_2)
+
+#政府服务
+poi_sd <- st_transform(poi_sd,4326)
+poi_sd_fs <- st_transform(poi_sd_fs,4326)
+
+poi_sd <- rbind(poi_sd[,c("cityname","lat","lon","name", "address" ,"type1","type2","type3","geometry")],
+                poi_sd_fs[,c("cityname","lat","lon","name", "address" ,"type1","type2","type3","geometry")])
+
+poi_sd <- unique(poi_sd)
+
+insc_sd <- st_join(gz_t[,c("Name","layer1","layer2","geometry")],poi_sd)
+
+insc_sd <- setDT(insc_sd)[,cate:= type2 ]
+
+##提取出政府机构中的窗口性设施
+
+pat <- "服务|居委会|村民委员会|村委会|社区委员会|村务监督委员会|来访接待|信访"
+  insc_sd <- insc_sd[grep(pat,name, perl = TRUE) ,cate:= "服务机构"]
+  
+insc_sd_ag <- setDT(insc_sd)[!is.na(name),][,cnt:= paste0(substr(lat,1,6),substr(lon,1,6),address)][,.(cnt= uniqueN(cnt)),by = c("Name","layer1","layer2","cate")]
+
+insc_sd_ag_1 <- insc_sd_ag[cate== "服务机构",][,.(cnt= sum(cnt)),by = c("Name")]
+
+gz_t_sd_1 <- left_join(gz_t,insc_sd_ag_1,by =c("Name"))
+gz_t_sd_2 <- setDT(gz_t_sd_1)[,per_cnt := cnt/n7th*10000]
+gz_t_sd_2 <- st_as_sf(gz_t_sd_2)
+  
+```
+
+## 数据汇集与清洗
+
+此处抽取前两篇文章的列示和分析的分类、逐个街道乡镇和万人均值情况，简单整理合并成后续分析需要的数据样式。
+
+### 数据汇集
+合并后的长表如下：
+```{r data_format,fig.height=8, fig.width=10, warning=FALSE, dpi= 100}
+d_bs <-  gz_t_bs_2[,c("Name","layer1","layer2","code","cnt","per_cnt")]
+d_bs <- setDT(d_bs)[,-7][,cate:= "公交站"]
+
+d_ms <-  gz_t_ms_2[,c("Name","layer1","layer2","code","cnt","per_cnt")]
+d_ms <- setDT(d_ms)[,-7][,cate:= "地铁站"]
+
+d_sp <-  gz_t_sp_2[,c("Name","layer1","layer2","code","cnt","per_cnt","cate")]
+d_sp <- setDT(d_sp)[,-8]
+
+d_ml <-  gz_t_ml_2[,c("Name","layer1","layer2","code","cnt","per_cnt","cate")]
+d_ml <- setDT(d_ml)[,-8]
+
+d_bk <-  gz_t_bk_2[,c("Name","layer1","layer2","code","cnt","per_cnt")]
+d_bk <- setDT(d_bk)[,-7][,cate:= "银行"]
+
+d_pk <-  gz_t_pk_2[,c("Name","layer1","layer2","code","cnt","per_cnt")]
+d_pk <- setDT(d_pk)[,-7][,cate:= "公园广场"]
+
+d_hp <-  gz_t_hp_2[,c("Name","layer1","layer2","code","cnt","per_cnt")]
+d_hp <- setDT(d_hp)[,-7][,cate:= "医院"]
+
+d_ed <-  gz_t_ed_2[,c("Name","layer1","layer2","code","cnt","per_cnt")]
+d_ed <- setDT(d_ed)[,-7][,cate:= "中小学"]
+
+d_sd <-  gz_t_sd_2[,c("Name","layer1","layer2","code","cnt","per_cnt")]
+d_sd <- setDT(d_sd)[,-7][,cate:= "政府服务"]
+
+d <- rbind(d_bs,d_ms,d_sp,d_ml,d_bk,d_pk,d_hp,d_ed,d_sd)
+d <- d[!is.na(per_cnt),]
+
+knitr::kable(d[sample(nrow(d),10),])
+
+```
+
+用于建模的宽表如下：
+```{r data_clean,fig.height=8, fig.width=10, warning=FALSE, dpi= 100}
+d_w <- dcast(d,Name + layer1 + layer2 +code  ~ cate, value.var = c("per_cnt"))
+names(d_w)[5:19] <- c("sp_tb","ed","sp_other","sp_cv","bs","pk","hp","ml",          
+"ms","sd","sp_fr","sp_ml",      
+"ml_top","sp","bk")
+d_w <- left_join(d_w,gz_t[,c("Name","change","densities")],by = c("Name"))
+d_w <- setDT(d_w)[,-22] #构建用于分析使用的宽表
+
+knitr::kable(d_w[sample(nrow(d_w),10),])
+
+```
+
+### 数据清洗
+
+本分析的清洗主要解决：
+
+- 缺失值：将所有缺失值以0替代；
+- 变量因素选择：根据前期探查，最终，
+  * 剔除「五金杂百」这个缺失数据较多的变量；
+  * 增补「10年人口变化率」和「人口密度」两个变量，以指示各个街乡的底色情况；
+- 标量化：将参与建模的所有变量进行标量化。
+
+
+```{r data_prepare,fig.height=8, fig.width=10, warning=FALSE, dpi= 100}
+d_w <- d_w[,lapply(.SD, function(x) 
+  replace(x, which(is.na(x)), 0))][Name %in% c("新雅街道","凤凰街道"),change := 0]
+d_sc <- scale(d_w[,-c(1:4,7)])
+rownames(d_sc) <- d_w$Name
+```
+
+## 基本思路
+
+本系列文章的最终目的是，**在没有既有分类标准的前提下，基于各类POI数据在各个街镇的万人密度分布情况，形成一个对于广佛街镇的分类方式**，聚类模型这类开放式的无监督学习算法，正是适合本次目的的建模方式。
+
+同时，本案数据还有建模变量众多的情况，为拉大变量间的方差，提高聚类的辨析度，有必要在聚类前，针对参与的变量进行一次降维构拟，而能够有效统合主成分分析（PCA）和k-mean聚类建模的方案[层级聚类](http://www.sthda.com/english/articles/31-principal-component-methods-in-r-practical-guide/117-hcpc-hierarchical-clustering-on-principal-components-essentials/)正好符合本案需求。
+
+## 建模
+
+#### 主成分构拟（PCA）
+
+第一步是确认需要构拟的变量数量：
+
+```{r warning=FALSE}
+d_pca <- PCA(d_sc,  graph = FALSE)
+fviz_screeplot(d_pca, addlabels = TRUE, ylim = c(0, 50),
+               ggtheme = theme_minimal())
+```
+
+在以上的碎石图可见，拟合到4个变量时，能够达到损失的信息值降低到10%以内，初步确认拟合为四个新的主成分变量。
+
+基于最终拟合4个的新变量的方案，形成用于后续聚类的数据，且列示新变量与原变量的关系如下：
+
+```{r warning=FALSE}
+d_pca <- PCA(d_sc, ncp = 4,graph = FALSE)
+var <- get_pca_var(d_pca)
+var$coord
+```
+
+#### 模型构建
+
+层级聚类确认最终聚类类群数量方式，与单独的k-mean聚类有一些区别。本案使用的FactoMineR包中的HCPC函数已经包含了算法推荐的类群数量，并先以分类树的方式进行展示：
+
+```{r fig.height=4, fig.width=6, warning=FALSE, dpi=75}
+set.seed(1357)
+d_hcpc <- HCPC(d_pca, graph = FALSE) #初步建模
+par(family='Songti SC')
+
+fviz_dend(d_hcpc, 
+          cex = 0.2,                     
+          palette = "jco",               
+          rect = TRUE, 
+          rect_fill = TRUE,
+          rect_border = "jco",           
+          labels_track_height = 1,
+          horiz = TRUE,
+          ggtheme = theme_minimal(),
+          show_labels = F,
+          main = "分类树状图",
+          font.family = "Songti SC",
+          xlab = "",
+          ylab = ""
+)
+
+```
+
+- 算法默认给出的是3个分类，该方案分类间差距最大，重叠性最小，但另一方面，该分类的结果在实际可解释性上很成问题，且有一个较大分类项，分类均匀度存在问题；
+- 经过前期探查，在分类间重叠性提升较小的前提下，可进一步细分默认分类中最大的一个类别，采用4个类群的分类策略。
+
+
+```{r fig.height=4, fig.width=6, warning=FALSE, dpi=75}
+d_hcpc <- HCPC(d_pca, nb.clust= 4,graph = FALSE)
+
+fviz_dend(d_hcpc, 
+          cex = 0.2,                     
+          palette = "jco",               
+          rect = TRUE, 
+          rect_fill = TRUE,
+          rect_border = "jco",           
+          labels_track_height = 1,
+          horiz = TRUE,
+          ggtheme = theme_minimal(),
+          show_labels = F,
+          main = "分类树状图",
+          font.family = "Songti SC",
+          xlab = "",
+          ylab = ""
+)
+```
+
+进一步探查该方案在k-mean要素地图的前提下:
+
+```{r fig.height=6, fig.width=6, warning=FALSE, dpi=75}
+fviz_cluster(d_hcpc,
+             repel = TRUE,            
+             show.clust.cent = TRUE, 
+             palette = "jco",         
+             ggtheme = theme_minimal(),
+             main = "要素地图",
+             font.family = "Songti SC"
+)
+
+```
+
+### 最终结果
+
+
+
+
+将该分类回归到广佛全域图后的结果：
+
+```{r fig.height=8, fig.width=10, warning=FALSE,  dpi= 100}
+
+d_km <- cbind(d_w, cluster = d_hcpc[["data.clust"]][["clust"]])
+d_km <- d_km[,cluster:= as.factor(cluster)]
+d_km_sf <- left_join(d_km,gz_t[,c(2,16)],by = "Name")
+d_km_sf <- st_as_sf(d_km_sf)
+
+
+ggplot()+ geom_sf(data = d_km_sf,aes(fill= cluster,geometry = geometry))+
+  scale_fill_brewer(palette="jco")+
+  geom_sf_text(data = d_km_sf[d_km_sf$cluster == 3 ,],aes(label = Name),
+               family='Songti SC',size = 3)+
+  theme(text = element_text(family='Songti SC'),         
+        axis.title.x=element_blank(),          
+        axis.title.y=element_blank())
+
+```
+
+## 评估与结论
+
+抽取当前各个分类的特征构成变量如下：
+
+```{r warning=FALSE}
+d_hcpc$desc.var$quanti
+```
+
+由上可以进一步归纳最终出来的4个类型：
+
+- 1类型：人口密度较高，10年人口增长率也较高，同时，不论是商业业态，还是公共服务设施的资源密度，均跟不上广佛整体均值，由上面分布地图可见为广佛建成区快速扩张的部分；
+- 2类型：公共服务人均值相对较高，但商业业态又都是相当匮乏，在地理空间上的特征为广佛外围街乡；
+- 3类型：商业业态的资源差事相比最高，同时公共服务的密度也有相对保障，地理空间特征为广佛各个组团和卫星城的核心区域；
+- 4类型：商场、银行、地铁等资源高度集中的街道，地理特征是最为典型的CBD和老越秀核心精华区域。
+
+4个类型特征值最强的街镇为：
+
+```{r warning=FALSE}
+d_hcpc$desc.ind$para
+```
+
+
