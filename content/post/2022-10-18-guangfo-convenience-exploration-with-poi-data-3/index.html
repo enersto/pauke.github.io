@@ -8,7 +8,8 @@ tags:
   - sf
   - spitial_data
   - poi
-  - caret
+  - cluster
+  - pca
 output:
   blogdown::html_page:
     toc: true
@@ -53,7 +54,7 @@ options(scipen=8)</code></pre>
 <p>前期数据清洗汇总</p>
 <div id="数据汇集与清洗" class="section level2">
 <h2>数据汇集与清洗</h2>
-<p>此处抽取前两篇文章的列示和分析的分类、逐个街道乡镇和万人均值情况，简单整理合并成后续分析需要的数据样式。</p>
+<p>此处抽取前两篇文章（<a href="https://pauke.netlify.app/2022/10/14/guangfo-convenience-exploration-with-poi-data/">整体介绍</a>和<a href="https://pauke.netlify.app/2022/10/17/guangfo-convenience-exploration-with-poi-data/">分类数据展示</a>）的列示和分析的分类、逐个街道乡镇和万人均值情况，简单整理合并成后续分析需要的数据样式。</p>
 <div id="数据汇集" class="section level3">
 <h3>数据汇集</h3>
 <p>合并后的长表如下：</p>
@@ -90,12 +91,12 @@ d &lt;- d[!is.na(per_cnt),]
 knitr::kable(d[sample(nrow(d),10),])</code></pre>
 <table>
 <colgroup>
-<col width="13%" />
+<col width="16%" />
 <col width="10%" />
 <col width="10%" />
 <col width="19%" />
 <col width="5%" />
-<col width="16%" />
+<col width="14%" />
 <col width="23%" />
 </colgroup>
 <thead>
@@ -111,94 +112,94 @@ knitr::kable(d[sample(nrow(d),10),])</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">红山街道</td>
+<td align="left">白鹤洞街道</td>
 <td align="left">广州市</td>
-<td align="left">黄埔区</td>
-<td align="left">440112002000</td>
-<td align="right">9</td>
-<td align="right">1.9612971</td>
-<td align="left">超级市场</td>
-</tr>
-<tr class="even">
-<td align="left">朱村街道</td>
-<td align="left">广州市</td>
-<td align="left">增城区</td>
-<td align="left">440118003000</td>
-<td align="right">2</td>
-<td align="right">0.3406401</td>
-<td align="left">医院</td>
-</tr>
-<tr class="odd">
-<td align="left">矿泉街道</td>
-<td align="left">广州市</td>
-<td align="left">越秀区</td>
-<td align="left">440104022000</td>
-<td align="right">26</td>
-<td align="right">3.3550552</td>
-<td align="left">银行</td>
-</tr>
-<tr class="even">
-<td align="left">同和街道</td>
-<td align="left">广州市</td>
-<td align="left">白云区</td>
-<td align="left">440111009000</td>
-<td align="right">4</td>
-<td align="right">0.2644751</td>
-<td align="left">公园广场</td>
-</tr>
-<tr class="odd">
-<td align="left">石基镇</td>
-<td align="left">广州市</td>
-<td align="left">番禺区</td>
-<td align="left">440113120000</td>
-<td align="right">22</td>
-<td align="right">1.6024590</td>
-<td align="left">政府服务</td>
-</tr>
-<tr class="even">
-<td align="left">乐从镇</td>
-<td align="left">佛山市</td>
-<td align="left">顺德区</td>
-<td align="left">440606103000</td>
-<td align="right">43</td>
-<td align="right">1.1971513</td>
-<td align="left">生鲜超市</td>
-</tr>
-<tr class="odd">
-<td align="left">龙穴街道</td>
-<td align="left">广州市</td>
-<td align="left">南沙区</td>
-<td align="left">440115003000</td>
-<td align="right">14</td>
-<td align="right">10.3032087</td>
+<td align="left">荔湾区</td>
+<td align="left">440103014000</td>
+<td align="right">30</td>
+<td align="right">4.0299831</td>
 <td align="left">便民商店/便利店</td>
 </tr>
 <tr class="even">
-<td align="left">文冲街道</td>
-<td align="left">广州市</td>
-<td align="left">黄埔区</td>
-<td align="left">440112006000</td>
-<td align="right">12</td>
-<td align="right">1.6767036</td>
-<td align="left">超级市场</td>
-</tr>
-<tr class="odd">
-<td align="left">龙凤街道</td>
+<td align="left">新港街道</td>
 <td align="left">广州市</td>
 <td align="left">海珠区</td>
-<td align="left">440105009000</td>
-<td align="right">1</td>
-<td align="right">0.1030418</td>
-<td align="left">专卖店</td>
+<td align="left">440105002000</td>
+<td align="right">7</td>
+<td align="right">0.6386046</td>
+<td align="left">医院</td>
+</tr>
+<tr class="odd">
+<td align="left">石门街道</td>
+<td align="left">广州市</td>
+<td align="left">白云区</td>
+<td align="left">440111019000</td>
+<td align="right">12</td>
+<td align="right">1.2047709</td>
+<td align="left">银行</td>
 </tr>
 <tr class="even">
-<td align="left">花地街道</td>
+<td align="left">冼村街道</td>
 <td align="left">广州市</td>
-<td align="left">荔湾区</td>
-<td align="left">440103016000</td>
-<td align="right">5</td>
-<td align="right">1.4238118</td>
-<td align="left">商场</td>
+<td align="left">天河区</td>
+<td align="left">440106014000</td>
+<td align="right">8</td>
+<td align="right">1.3663535</td>
+<td align="left">生鲜超市</td>
+</tr>
+<tr class="odd">
+<td align="left">仙村镇</td>
+<td align="left">广州市</td>
+<td align="left">增城区</td>
+<td align="left">440118107000</td>
+<td align="right">3</td>
+<td align="right">0.5513287</td>
+<td align="left">公园广场</td>
+</tr>
+<tr class="even">
+<td align="left">张槎街道</td>
+<td align="left">佛山市</td>
+<td align="left">禅城区</td>
+<td align="left">440604011000</td>
+<td align="right">22</td>
+<td align="right">0.7410027</td>
+<td align="left">公园广场</td>
+</tr>
+<tr class="odd">
+<td align="left">龙江镇</td>
+<td align="left">佛山市</td>
+<td align="left">顺德区</td>
+<td align="left">440606104000</td>
+<td align="right">41</td>
+<td align="right">1.3226105</td>
+<td align="left">生鲜超市</td>
+</tr>
+<tr class="even">
+<td align="left">夏港街道</td>
+<td align="left">广州市</td>
+<td align="left">黄埔区</td>
+<td align="left">440112011000</td>
+<td align="right">18</td>
+<td align="right">4.0321677</td>
+<td align="left">政府服务</td>
+</tr>
+<tr class="odd">
+<td align="left">兴华街道</td>
+<td align="left">广州市</td>
+<td align="left">天河区</td>
+<td align="left">440106010000</td>
+<td align="right">8</td>
+<td align="right">0.7127965</td>
+<td align="left">综合市场</td>
+</tr>
+<tr class="even">
+<td align="left">黄埔街道</td>
+<td align="left">广州市</td>
+<td align="left">黄埔区</td>
+<td align="left">440112001000</td>
+<td align="right">9</td>
+<td align="right">0.9722582</td>
+<td align="left">中小学</td>
 </tr>
 </tbody>
 </table>
@@ -213,20 +214,20 @@ d_w &lt;- setDT(d_w)[,-22] #构建用于分析使用的宽表
 knitr::kable(d_w[sample(nrow(d_w),10),])</code></pre>
 <table style="width:100%;">
 <colgroup>
-<col width="5%" />
+<col width="4%" />
 <col width="3%" />
 <col width="3%" />
 <col width="6%" />
 <col width="4%" />
 <col width="4%" />
 <col width="4%" />
-<col width="4%" />
 <col width="5%" />
 <col width="4%" />
 <col width="4%" />
 <col width="4%" />
 <col width="4%" />
-<col width="5%" />
+<col width="4%" />
+<col width="4%" />
 <col width="4%" />
 <col width="4%" />
 <col width="4%" />
@@ -262,234 +263,234 @@ knitr::kable(d_w[sample(nrow(d_w),10),])</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">萝岗街道</td>
+<td align="left">万顷沙镇</td>
 <td align="left">广州市</td>
-<td align="left">黄埔区</td>
-<td align="left">440112012000</td>
+<td align="left">南沙区</td>
+<td align="left">440115100000</td>
+<td align="right">0.2171788</td>
+<td align="right">1.3030731</td>
+<td align="right">0.2171788</td>
+<td align="right">4.7779346</td>
+<td align="right">9.555869</td>
+<td align="right">1.5202519</td>
+<td align="right">0.2171788</td>
+<td align="right">0.6515365</td>
 <td align="right">NA</td>
-<td align="right">1.6479119</td>
+<td align="right">3.9092192</td>
+<td align="right">0.6515365</td>
+<td align="right">0.8687154</td>
 <td align="right">NA</td>
-<td align="right">5.532275</td>
-<td align="right">12.3593390</td>
-<td align="right">0.9416639</td>
-<td align="right">0.7062479</td>
-<td align="right">0.3531240</td>
-<td align="right">0.5885400</td>
-<td align="right">2.3541598</td>
-<td align="right">1.7656199</td>
-<td align="right">0.4708320</td>
-<td align="right">0.2354160</td>
-<td align="right">3.2958237</td>
-<td align="right">4.355196</td>
-<td align="right">0.8583022</td>
-<td align="right">1129.5838</td>
+<td align="right">2.3889673</td>
+<td align="right">3.909219</td>
+<td align="right">0.0257067</td>
+<td align="right">244.3872</td>
 </tr>
 <tr class="even">
-<td align="left">棠下街道</td>
+<td align="left">金沙街道</td>
 <td align="left">广州市</td>
-<td align="left">天河区</td>
-<td align="left">440106011000</td>
+<td align="left">白云区</td>
+<td align="left">440111015000</td>
 <td align="right">NA</td>
-<td align="right">0.6419721</td>
+<td align="right">1.3130511</td>
 <td align="right">NA</td>
-<td align="right">2.228021</td>
-<td align="right">0.9063136</td>
-<td align="right">0.0755261</td>
-<td align="right">0.2643415</td>
-<td align="right">0.3021045</td>
-<td align="right">0.0377631</td>
-<td align="right">0.3398676</td>
-<td align="right">1.2839443</td>
-<td align="right">0.3021045</td>
-<td align="right">NA</td>
-<td align="right">0.9063136</td>
-<td align="right">1.434997</td>
-<td align="right">0.4888285</td>
-<td align="right">34797.5033</td>
+<td align="right">0.6565255</td>
+<td align="right">2.494797</td>
+<td align="right">0.3282628</td>
+<td align="right">0.2626102</td>
+<td align="right">0.0656526</td>
+<td align="right">0.2626102</td>
+<td align="right">0.2626102</td>
+<td align="right">2.2321868</td>
+<td align="right">0.3282628</td>
+<td align="right">0.0656526</td>
+<td align="right">0.9191357</td>
+<td align="right">1.838272</td>
+<td align="right">1.8926259</td>
+<td align="right">18197.9689</td>
 </tr>
 <tr class="odd">
-<td align="left">石基镇</td>
-<td align="left">广州市</td>
-<td align="left">番禺区</td>
-<td align="left">440113120000</td>
-<td align="right">0.0728390</td>
-<td align="right">1.6752981</td>
-<td align="right">NA</td>
-<td align="right">2.258011</td>
-<td align="right">5.3900895</td>
-<td align="right">0.3641952</td>
-<td align="right">0.8012295</td>
-<td align="right">0.8740686</td>
-<td align="right">0.4370343</td>
-<td align="right">1.6024590</td>
-<td align="right">1.0197467</td>
-<td align="right">0.5827124</td>
-<td align="right">0.1456781</td>
-<td align="right">1.9666543</td>
-<td align="right">2.403689</td>
-<td align="right">0.4090461</td>
-<td align="right">2918.5587</td>
-</tr>
-<tr class="even">
-<td align="left">更合镇</td>
+<td align="left">芦苞镇</td>
 <td align="left">佛山市</td>
-<td align="left">高明区</td>
-<td align="left">440608108000</td>
-<td align="right">0.1979571</td>
-<td align="right">2.5734421</td>
+<td align="left">三水区</td>
+<td align="left">440607105000</td>
+<td align="right">0.2165956</td>
+<td align="right">2.1659555</td>
+<td align="right">0.2165956</td>
+<td align="right">6.2812710</td>
+<td align="right">15.811475</td>
+<td align="right">0.8663822</td>
+<td align="right">1.2995733</td>
+<td align="right">0.4331911</td>
 <td align="right">NA</td>
-<td align="right">9.501940</td>
-<td align="right">27.9119487</td>
-<td align="right">0.1979571</td>
-<td align="right">0.7918283</td>
-<td align="right">0.7918283</td>
-<td align="right">NA</td>
-<td align="right">10.6896825</td>
-<td align="right">0.5938712</td>
-<td align="right">0.7918283</td>
-<td align="right">NA</td>
-<td align="right">4.1570987</td>
-<td align="right">2.771399</td>
-<td align="right">0.0857118</td>
-<td align="right">145.5751</td>
-</tr>
-<tr class="odd">
-<td align="left">乐从镇</td>
-<td align="left">佛山市</td>
-<td align="left">顺德区</td>
-<td align="left">440606103000</td>
-<td align="right">NA</td>
-<td align="right">0.6681775</td>
-<td align="right">NA</td>
-<td align="right">2.449984</td>
-<td align="right">1.8374881</td>
-<td align="right">1.0857884</td>
-<td align="right">0.4732924</td>
-<td align="right">0.6124960</td>
-<td align="right">0.1392036</td>
-<td align="right">1.0579477</td>
-<td align="right">1.1971513</td>
-<td align="right">0.9744255</td>
-<td align="right">0.1948851</td>
-<td align="right">1.2806735</td>
-<td align="right">3.591454</td>
-<td align="right">0.3825747</td>
-<td align="right">4613.8215</td>
+<td align="right">5.1982932</td>
+<td align="right">0.8663822</td>
+<td align="right">0.6497867</td>
+<td align="right">0.2165956</td>
+<td align="right">5.6314843</td>
+<td align="right">3.465529</td>
+<td align="right">0.1364397</td>
+<td align="right">444.1462</td>
 </tr>
 <tr class="even">
-<td align="left">花东镇</td>
-<td align="left">广州市</td>
-<td align="left">花都区</td>
-<td align="left">440114105000</td>
-<td align="right">NA</td>
-<td align="right">1.7607334</td>
-<td align="right">NA</td>
-<td align="right">2.669499</td>
-<td align="right">8.7468690</td>
-<td align="right">0.3975850</td>
-<td align="right">0.1703936</td>
-<td align="right">0.3975850</td>
-<td align="right">0.1135957</td>
-<td align="right">2.0447226</td>
-<td align="right">0.3407871</td>
-<td align="right">0.3407871</td>
-<td align="right">0.0567979</td>
-<td align="right">1.0791592</td>
-<td align="right">2.044723</td>
-<td align="right">0.4828106</td>
-<td align="right">842.6486</td>
-</tr>
-<tr class="odd">
-<td align="left">赤岗街道</td>
+<td align="left">沙园街道</td>
 <td align="left">广州市</td>
 <td align="left">海珠区</td>
-<td align="left">440105001000</td>
+<td align="left">440105010000</td>
 <td align="right">NA</td>
-<td align="right">1.0646026</td>
+<td align="right">0.9561535</td>
 <td align="right">NA</td>
-<td align="right">3.131184</td>
-<td align="right">2.5049473</td>
-<td align="right">NA</td>
-<td align="right">0.5636131</td>
-<td align="right">0.6262368</td>
-<td align="right">0.3131184</td>
-<td align="right">0.7514842</td>
-<td align="right">1.3777210</td>
-<td align="right">0.2504947</td>
-<td align="right">0.0626237</td>
-<td align="right">1.4403447</td>
-<td align="right">6.450239</td>
-<td align="right">0.3888222</td>
-<td align="right">28113.3803</td>
-</tr>
-<tr class="even">
-<td align="left">天河南街道</td>
-<td align="left">广州市</td>
-<td align="left">天河区</td>
-<td align="left">440106008000</td>
-<td align="right">NA</td>
-<td align="right">0.8590573</td>
-<td align="right">0.4295287</td>
-<td align="right">6.729282</td>
-<td align="right">2.7203482</td>
-<td align="right">NA</td>
-<td align="right">0.5727049</td>
-<td align="right">1.7181147</td>
-<td align="right">0.8590573</td>
-<td align="right">1.7181147</td>
-<td align="right">1.4317622</td>
-<td align="right">0.5727049</td>
-<td align="right">1.0022335</td>
-<td align="right">2.0044671</td>
-<td align="right">15.033503</td>
-<td align="right">0.1101857</td>
-<td align="right">27176.6537</td>
+<td align="right">2.0489004</td>
+<td align="right">1.639120</td>
+<td align="right">0.1365934</td>
+<td align="right">1.0927469</td>
+<td align="right">0.2731867</td>
+<td align="right">0.2731867</td>
+<td align="right">0.4097801</td>
+<td align="right">1.2293403</td>
+<td align="right">0.6829668</td>
+<td align="right">0.2731867</td>
+<td align="right">1.7757137</td>
+<td align="right">3.961207</td>
+<td align="right">0.0874603</td>
+<td align="right">49466.2162</td>
 </tr>
 <tr class="odd">
-<td align="left">均安镇</td>
-<td align="left">佛山市</td>
-<td align="left">顺德区</td>
-<td align="left">440606106000</td>
-<td align="right">0.0612111</td>
-<td align="right">0.7957446</td>
+<td align="left">石楼镇</td>
+<td align="left">广州市</td>
+<td align="left">番禺区</td>
+<td align="left">440113105000</td>
 <td align="right">NA</td>
-<td align="right">1.407856</td>
-<td align="right">4.1011453</td>
-<td align="right">0.6733224</td>
-<td align="right">0.6733224</td>
-<td align="right">0.8569557</td>
+<td align="right">1.4783627</td>
 <td align="right">NA</td>
-<td align="right">0.7957446</td>
-<td align="right">0.7957446</td>
-<td align="right">0.5509001</td>
-<td align="right">0.2448445</td>
-<td align="right">0.9793780</td>
-<td align="right">2.815712</td>
-<td align="right">0.1526288</td>
-<td align="right">2056.2492</td>
+<td align="right">1.4192282</td>
+<td align="right">4.849030</td>
+<td align="right">0.8870176</td>
+<td align="right">0.6504796</td>
+<td align="right">0.2365380</td>
+<td align="right">NA</td>
+<td align="right">1.0644211</td>
+<td align="right">0.6504796</td>
+<td align="right">0.5322106</td>
+<td align="right">NA</td>
+<td align="right">1.3009592</td>
+<td align="right">2.542784</td>
+<td align="right">0.8710348</td>
+<td align="right">1463.6143</td>
 </tr>
 <tr class="even">
-<td align="left">赤坭镇</td>
+<td align="left">中新镇</td>
 <td align="left">广州市</td>
-<td align="left">花都区</td>
-<td align="left">440114108000</td>
+<td align="left">增城区</td>
+<td align="left">440118103000</td>
 <td align="right">NA</td>
-<td align="right">2.8816490</td>
+<td align="right">2.7191893</td>
 <td align="right">NA</td>
-<td align="right">1.017053</td>
-<td align="right">12.0351222</td>
-<td align="right">0.1695088</td>
-<td align="right">0.1695088</td>
-<td align="right">0.5085263</td>
+<td align="right">2.0847118</td>
+<td align="right">9.245244</td>
+<td align="right">0.2719189</td>
+<td align="right">0.1812793</td>
+<td align="right">0.2719189</td>
+<td align="right">0.1812793</td>
+<td align="right">1.9940722</td>
+<td align="right">0.3625586</td>
+<td align="right">0.1812793</td>
 <td align="right">NA</td>
-<td align="right">2.8816490</td>
-<td align="right">0.5085263</td>
-<td align="right">0.1695088</td>
+<td align="right">0.4531982</td>
+<td align="right">2.175352</td>
+<td align="right">0.4091554</td>
+<td align="right">481.5460</td>
+</tr>
+<tr class="odd">
+<td align="left">红山街道</td>
+<td align="left">广州市</td>
+<td align="left">黄埔区</td>
+<td align="left">440112002000</td>
 <td align="right">NA</td>
-<td align="right">0.5085263</td>
-<td align="right">2.203614</td>
-<td align="right">0.0421311</td>
-<td align="right">370.7516</td>
+<td align="right">0.6537657</td>
+<td align="right">NA</td>
+<td align="right">3.7046722</td>
+<td align="right">2.179219</td>
+<td align="right">1.0896095</td>
+<td align="right">0.6537657</td>
+<td align="right">0.6537657</td>
+<td align="right">0.2179219</td>
+<td align="right">1.3075314</td>
+<td align="right">1.0896095</td>
+<td align="right">0.2179219</td>
+<td align="right">NA</td>
+<td align="right">1.9612971</td>
+<td align="right">3.268829</td>
+<td align="right">0.0974052</td>
+<td align="right">6364.4938</td>
+</tr>
+<tr class="even">
+<td align="left">杨和镇</td>
+<td align="left">佛山市</td>
+<td align="left">高明区</td>
+<td align="left">440608106000</td>
+<td align="right">0.3651501</td>
+<td align="right">1.2780253</td>
+<td align="right">0.1825750</td>
+<td align="right">15.3363032</td>
+<td align="right">16.066603</td>
+<td align="right">NA</td>
+<td align="right">0.9128752</td>
+<td align="right">0.9128752</td>
+<td align="right">NA</td>
+<td align="right">5.8424012</td>
+<td align="right">1.0954502</td>
+<td align="right">1.0954502</td>
+<td align="right">NA</td>
+<td align="right">5.6598262</td>
+<td align="right">4.929526</td>
+<td align="right">0.0290846</td>
+<td align="right">239.8809</td>
+</tr>
+<tr class="odd">
+<td align="left">南洲街道</td>
+<td align="left">广州市</td>
+<td align="left">海珠区</td>
+<td align="left">440105016000</td>
+<td align="right">NA</td>
+<td align="right">0.8673296</td>
+<td align="right">NA</td>
+<td align="right">5.2659294</td>
+<td align="right">3.159558</td>
+<td align="right">0.5575690</td>
+<td align="right">0.5575690</td>
+<td align="right">0.9912338</td>
+<td align="right">0.2478084</td>
+<td align="right">0.8053774</td>
+<td align="right">1.6107549</td>
+<td align="right">0.5575690</td>
+<td align="right">NA</td>
+<td align="right">1.8585633</td>
+<td align="right">1.920515</td>
+<td align="right">0.9051413</td>
+<td align="right">13080.6321</td>
+</tr>
+<tr class="even">
+<td align="left">大石街道</td>
+<td align="left">广州市</td>
+<td align="left">番禺区</td>
+<td align="left">440113012000</td>
+<td align="right">0.0356066</td>
+<td align="right">0.4628855</td>
+<td align="right">NA</td>
+<td align="right">2.5636735</td>
+<td align="right">1.887148</td>
+<td align="right">0.2136395</td>
+<td align="right">0.3204592</td>
+<td align="right">0.6409184</td>
+<td align="right">0.0712132</td>
+<td align="right">0.4272789</td>
+<td align="right">1.5310828</td>
+<td align="right">0.4272789</td>
+<td align="right">0.1780329</td>
+<td align="right">1.1038039</td>
+<td align="right">2.492460</td>
+<td align="right">1.4188636</td>
+<td align="right">14734.8898</td>
 </tr>
 </tbody>
 </table>

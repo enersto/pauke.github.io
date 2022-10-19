@@ -8,7 +8,8 @@ tags:
   - sf
   - spitial_data
   - poi
-  - caret
+  - cluster
+  - pca
 output:
   blogdown::html_page:
     toc: true
@@ -305,7 +306,7 @@ gz_t_sd_2 <- st_as_sf(gz_t_sd_2)
 
 ## 数据汇集与清洗
 
-此处抽取前两篇文章的列示和分析的分类、逐个街道乡镇和万人均值情况，简单整理合并成后续分析需要的数据样式。
+此处抽取前两篇文章（[整体介绍](https://pauke.netlify.app/2022/10/14/guangfo-convenience-exploration-with-poi-data/)和[分类数据展示](https://pauke.netlify.app/2022/10/17/guangfo-convenience-exploration-with-poi-data/)）的列示和分析的分类、逐个街道乡镇和万人均值情况，简单整理合并成后续分析需要的数据样式。
 
 ### 数据汇集
 合并后的长表如下：
