@@ -9,25 +9,81 @@ library(dplyr)
 library(RColorBrewer)
 library(tmap)
 
+library(mlr3)
+
+
+
+d_sc <- scale(d_w[,-c(1:4,7)])
+rownames(d_sc) <- d_w$Name
+library(cluster)
+d_ds <- daisy(d_w[,-c(1:4,7)])
+hc <- hclust(d_ds,method = "complete")
+plot(hc)
+library(mclust)
+mc<- Mclust(d_sc)
+summary(mc)
+mc_pca<- Mclust(d_pca)
+
+
+fviz_cluster(mc,
+             repel = TRUE,            
+             show.clust.cent = TRUE, 
+             palette = "jco",         
+             ggtheme = theme_minimal(),
+             main = "要素地图",
+             font.family = "Songti SC"
+)
+
+
 gz <- read_sf("/Users/pauke/Downloads/广州市/广州市_乡镇边界.shp",options = "ENCODING=GBK")
 #gd <- read_sf("/Users/pauke/Downloads/广州市/矢量数据/广东省/广东省_乡镇边界.dbf",options = "ENCODING=GBK")
 edge <- read_sf("/Users/pauke/Downloads/矢量数据/建成区/广州.shp",options = "ENCODING=GBK")
 gz_t <- st_transform(gz_t,4326)
-edge <- st_transform(edge,4326)
+
+
+
+  
+
+
 
 
 d_sc <- scale(d_w[,-c(1:4,7)])
 rownames(d_sc) <- d_w$Name
 
 dbscan::kNNdistplot(d_sc, k =  5)
-abline(h = 0.15, lty = 2)
+abline(h = 4, lty = 2)
 
-db <- fpc::dbscan(d_sc, eps = 4, MinPts = 4)
-summary(db)
-plot(db, d_sc, main = "DBSCAN", frame = FALSE)
-
+db <- fpc::dbscan(d_sc, eps = 3.8, MinPts = 2)
 fviz_cluster(db, d_sc, stand = FALSE, frame = FALSE, geom = "point")
 
+d_hcpc <- HCPC(d_pca, nb.clust= 5,graph = FALSE)
+
+fviz_dend(d_hcpc, 
+          cex = 0.2,                     
+          palette = "jco",               
+          rect = TRUE, 
+          rect_fill = TRUE,
+          rect_border = "jco",           
+          labels_track_height = 1,
+          horiz = TRUE,
+          ggtheme = theme_minimal(),
+          show_labels = F,
+          main = "分类树状图",
+          font.family = "Songti SC",
+          xlab = "",
+          ylab = ""
+)
+
+fviz_cluster(d_hcpc,
+             repel = TRUE,            
+             show.clust.cent = TRUE, 
+             palette = "jco",         
+             ggtheme = theme_minimal(),
+             main = "要素地图",
+             font.family = "Songti SC"
+)
+
+d_hcpc$desc.var$quanti
 # Compute PCA with ncp = 3
 set.seed(1357)
 res.pca <- PCA(d_sc, graph = FALSE)
@@ -142,8 +198,15 @@ summary(km_result)
 #提取类标签并且与原始数据进行合并
 d_km <- cbind(d_w, cluster = km_result$cluster)
 
-
-
+fviz_cluster(d_hcpc,
+             repel = TRUE,            
+             show.clust.cent = TRUE, 
+             palette = "jco",         
+             ggtheme = theme_minimal(),
+             main = "要素地图",
+             font.family = "Songti SC"
+)
+summary(km_result)
 
 fviz_cluster(km_result, data = d_sc,
              palette = c("#2E9FDF", "#00AFBB", "#E7B800", "#FC4E07"),
@@ -383,6 +446,13 @@ names(poi_bk_fs)
 names(poi_rs_fs)
 
 
+gz_t <- read_sf("/Users/pauke/Downloads/矢量数据/行政区划/乡镇街道/广东省_乡镇边界.shp",options = "ENCODING=GBK")
+gz_t <- gz_t[substr(gz_t$code,1,4) %in% c('4401','4406'),]
+gz_t <- st_transform(gz_t,3857)
+ggplot()+ geom_sf(data = gz_t,aes(geometry = geometry))
+
+  coord_sf(crs = "+proj=aeqd +lat_0=23 +lon_0=113")
+
 
 building <- read_sf("/Users/pauke/Desktop/广州建筑轮廓数据/广州.shp")
 ggplot()+ geom_sf(data = building,aes(geometry = geometry))
@@ -391,9 +461,45 @@ building <- read_sf("/Users/pauke/Downloads/矢量数据/水系/水系.shp")
 ggplot()+ geom_sf(data = gz_c,aes(geometry = geometry))+
   geom_sf(data = building,aes(geometry = geometry),color = "lightblue")
 
-gz_c <- read_sf("/Users/pauke/Downloads/矢量数据/行政区划/县区/广东省_县界.shp",options = "ENCODING=GBK")
-gz_c <- gz_c[substr(gz_c$code,1,4) %in% c('4401','4406'),]
 
+3035
+4326
+gz_c <- read_sf("/Users/pauke/Downloads/矢量数据/行政区划/县区/广东省_县界.shp",options = "ENCODING=GBK")
+#gz_c <- gz_c[substr(gz_c$code,1,4) %in% c('4401','4406'),]
+ggplot()+ geom_sf(data = gz_c,aes(geometry = geometry),fill = "antiquewhite")+ 
+  coord_sf(crs = st_crs(3857))
+
+
+
+
+library("rnaturalearth")
+library("rnaturalearthdata")
+
+world <- ne_countries(scale = "medium", returnclass = "sf")
+
+library("sf")
+world_points<- st_centroid(world)
+world_points <- cbind(world, st_coordinates(st_centroid(world$geometry)))
+
+ggplot() +  
+  geom_sf(data = world,fill = alpha("antiquewhite", .5))+
+  coord_sf(xlim = c(106, 122), ylim = c(13, 26), expand = FALSE)+
+  theme(panel.grid.major = element_line(color = gray(.5), 
+                                        linetype = "dashed", size = 0.5), 
+        panel.background = element_rect(fill = "aliceblue"))
+
+gz_c <- st_transform(gz_c,3857)
+ggplot()+
+geom_sf(data = gz_c,aes(geometry = geometry),fill = "antiquewhite")+
+  coord_sf(crs ="+proj=aeqd +lat_0=22 +lon_0=114")
+
+ggplot(data = world) +
+  geom_sf() +
+  geom_text(data= world_points,aes(x=X, y=Y, label=name),
+            color = "darkblue", fontface = "bold", check_overlap = FALSE) +
+  annotate(geom = "text", x = -90, y = 26, label = "Gulf of Mexico", 
+           fontface = "italic", color = "grey22", size = 6) +
+  coord_sf(xlim = c(-102.15, -74.12), ylim = c(7.65, 33.97), expand = FALSE)
 
 
 gz_t <- read_sf("/Users/pauke/Downloads/矢量数据/行政区划/乡镇街道/广东省_乡镇边界.shp",options = "ENCODING=GBK")
