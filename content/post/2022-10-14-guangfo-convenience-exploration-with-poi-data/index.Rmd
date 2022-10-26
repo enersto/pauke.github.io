@@ -1,5 +1,6 @@
 ---
-title: "广佛生活便利程度街镇分布情况——基于POI数据的格栅分析 （一）"
+title: POI数据挖掘思路 
+description: "广佛生活便利程度街镇分布情况探微（一）"
 author: pauke
 date: '2022-10-14'
 slug: guangfo-convenience-exploration-with-poi-data

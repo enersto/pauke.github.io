@@ -17,7 +17,7 @@
     </item>
     
     <item>
-      <title>广佛生活便利程度街镇分布情况——聚类模型构建（三）</title>
+      <title>聚类模型构建</title>
       <link>/2022/10/18/guangfo-convenience-exploration-with-poi-data-3/</link>
       <pubDate>Tue, 18 Oct 2022 00:00:00 +0000</pubDate>
       
@@ -26,16 +26,16 @@
     </item>
     
     <item>
-      <title>广佛生活便利程度街镇分布情况——基于POI数据的格栅分析 （二）</title>
-      <link>/2022/10/17/guangfo-convenience-exploration-with-poi-data/</link>
+      <title>POI数据的分析与展示</title>
+      <link>/2022/10/17/guangfo-convenience-exploration-with-poi-data-2/</link>
       <pubDate>Mon, 17 Oct 2022 00:00:00 +0000</pubDate>
       
-      <guid>/2022/10/17/guangfo-convenience-exploration-with-poi-data/</guid>
+      <guid>/2022/10/17/guangfo-convenience-exploration-with-poi-data-2/</guid>
       <description>商场 分类整理 商场全类 购物中心 银行 全域 核心区 公园 全域 核心区 医院 整体医疗设施分布 三甲医院分布 教育 分类整理 全域 核心区 政府服务机构 筛选 全域 核心区 餐饮</description>
     </item>
     
     <item>
-      <title>广佛生活便利程度街镇分布情况——基于POI数据的格栅分析 （一）</title>
+      <title>POI数据挖掘思路</title>
       <link>/2022/10/14/guangfo-convenience-exploration-with-poi-data/</link>
       <pubDate>Fri, 14 Oct 2022 00:00:00 +0000</pubDate>
       
@@ -59,6 +59,17 @@
       
       <guid>/2021/01/31/workflow-with-caret/</guid>
       <description>Foreword Structure Data Splitting Based on Outcome Based on Predictors Time Serias Data Splitting Preprocessing preProcess() Function Set Other preprocessing function Turning Numerical Recode the Categorical Variable as Numeric dummyVars() in Caret dummy_cols() in FastDummies Removing Correlated Basic Model Training Quick example Backbone of the model Subside of Model Train Resampling Options Performance Metrics Grid Search Subsampling After Trainging Quick example Variable Importance Measure Perfomance Regression Predicted Classes Class Probabilities All the packages needed in here:</description>
+    </item>
+    
+    <item>
+      <title>Hello R Markdown</title>
+      <link>/2020/12/01/hello-r-markdown/</link>
+      <pubDate>Tue, 01 Dec 2020 21:13:14 -0500</pubDate>
+      
+      <guid>/2020/12/01/hello-r-markdown/</guid>
+      <description>R Markdown This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see http://rmarkdown.rstudio.com.
+You can embed an R code chunk like this:
+summary(cars) ## speed dist ## Min. : 4.0 Min. : 2.00 ## 1st Qu.:12.0 1st Qu.: 26.00 ## Median :15.0 Median : 36.00 ## Mean :15.4 Mean : 42.98 ## 3rd Qu.</description>
     </item>
     
     <item>

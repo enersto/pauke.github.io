@@ -1,5 +1,6 @@
 ---
-title: "广佛生活便利程度街镇分布情况——聚类模型构建（三）"
+title: 聚类模型构建
+description: "广佛生活便利程度街镇分布情况探微（三）"
 author: pauke
 date: '2022-10-18'
 slug: guangfo-convenience-exploration-with-poi-data-3

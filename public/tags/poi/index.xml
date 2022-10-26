@@ -8,7 +8,7 @@
     <language>zh-cn</language>
     <lastBuildDate>Tue, 18 Oct 2022 00:00:00 +0000</lastBuildDate><atom:link href="/tags/poi/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>广佛生活便利程度街镇分布情况——聚类模型构建（三）</title>
+      <title>聚类模型构建</title>
       <link>/2022/10/18/guangfo-convenience-exploration-with-poi-data-3/</link>
       <pubDate>Tue, 18 Oct 2022 00:00:00 +0000</pubDate>
       
@@ -17,16 +17,16 @@
     </item>
     
     <item>
-      <title>广佛生活便利程度街镇分布情况——基于POI数据的格栅分析 （二）</title>
-      <link>/2022/10/17/guangfo-convenience-exploration-with-poi-data/</link>
+      <title>POI数据的分析与展示</title>
+      <link>/2022/10/17/guangfo-convenience-exploration-with-poi-data-2/</link>
       <pubDate>Mon, 17 Oct 2022 00:00:00 +0000</pubDate>
       
-      <guid>/2022/10/17/guangfo-convenience-exploration-with-poi-data/</guid>
+      <guid>/2022/10/17/guangfo-convenience-exploration-with-poi-data-2/</guid>
       <description>商场 分类整理 商场全类 购物中心 银行 全域 核心区 公园 全域 核心区 医院 整体医疗设施分布 三甲医院分布 教育 分类整理 全域 核心区 政府服务机构 筛选 全域 核心区 餐饮</description>
     </item>
     
     <item>
-      <title>广佛生活便利程度街镇分布情况——基于POI数据的格栅分析 （一）</title>
+      <title>POI数据挖掘思路</title>
       <link>/2022/10/14/guangfo-convenience-exploration-with-poi-data/</link>
       <pubDate>Fri, 14 Oct 2022 00:00:00 +0000</pubDate>
       

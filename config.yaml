@@ -1,7 +1,7 @@
 baseurl: /
 languageCode: zh-cn
 title: IFF
-theme: hugo-lithium
+theme: "hugo-lithium"
 googleAnalytics: 'UA-132686713-1'
 disqusShortname: 'pauke-netlify-app'
 hasCJKLanguage: true 
@@ -17,16 +17,11 @@ ignoreFiles:
   - \.utf8\.md$
 permalinks:
   post: /:year/:month/:day/:slug/
-menu:
-  main:
-    - name: About
-      url: /about/
-    - name: Tag
-      url: /tags/
-    - name: Telegram
-      url: https://t.me/quatsch_von_h
+
       
 params:
+  sitename: "IFF"
+  Subtitle: "Initiative, Freiheit, Fortschritt"
   MathJaxCDN: //cdnjs.cloudflare.com/ajax/libs
   MathJaxVersion: 2.7.5
   description: A website built through Hugo and blogdown.
@@ -42,6 +37,18 @@ params:
     height: 90
     url: logo.png
     width: 120
+    
+menu:
+  main:
+    - name: Home
+      url: /
+    - name: Tag
+      url: /tags/
+    - name: Telegram
+      url: https://t.me/quatsch_von_h
+    - name: About
+      url: /about/
+      
 markup:
   defaultMarkdownHandler: goldmark
   goldmark:
