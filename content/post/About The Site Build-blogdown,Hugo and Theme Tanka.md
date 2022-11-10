@@ -3,7 +3,7 @@ categories: ["English","introduce"]
 tags: ["markdown","Hugo","theme","Hexo"]
 author: pauke
 date: "2019-01-18"
-title: "About This Site Build: blogdown, Hugo and Theme Tanka"
+title: "About This Site Build: blogdown, Hugo and Theme"
 ---
 
 ## Why blogdown and Hugo
@@ -14,7 +14,7 @@ As for the building workflow, I think blogdown has optimized so extremely that y
 
 
 ## About the Theme
-My site is based on the theme [Tanka](https://github.com/road2stat/hugo-tanka), which is a totally simple, clean and word orientation Hugo theme.
+My site is based on the theme [lithium](https://github.com/jrutheiser/hugo-lithium-theme), which is a totally simple, clean and word orientation Hugo theme.
 On the other, the theme is so simple that I need to enrich more functions to feed my blog needs by myself.It is the way I customize this theme,and also the way I get learning things about Hugo, css and HTML. And this is the parts I change or add:
 
 ### taxonomies index
@@ -37,7 +37,7 @@ Though disqus loses some reputation recently, but for a cozy way to show feeling
 - [Various ways to include comments on your static site](https://darekkay.com/blog/static-site-comments/) 
 - [第三方评论系统推荐](https://3mile.github.io/archives/128/).
 
-~~ And my demand of comments is: **simple and lightweight, self-host, anonymous and not blocked in China**. And [valine](https://valine.js.org/en/) is just fitted. And this is an good [article](https://www.smslit.top/2018/07/08/hugo-valine/) to maintain the build way in Hugo.~~ (valine's background has required ID verified now, I have to give it up )
+~~And my demand of comments is: **simple and lightweight, self-host, anonymous and not blocked in China**. And [valine](https://valine.js.org/en/) is just fitted. And this is an good [article](https://www.smslit.top/2018/07/08/hugo-valine/) to maintain the build way in Hugo.~~  (valine's background requires ID verified now, I have to give it up )
 
 ### mermaid
 [Mermaid](https://mermaidjs.github.io/) is a simple and useful markdown-like script language for generating charts from text via javascript.
