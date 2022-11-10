@@ -55,12 +55,18 @@ markup:
     renderer:
       unsafe: yes
       
-params.valine:
-    enable : true
-    appId : 'yjXDgIm4adLfC65VUSshkA1W-gzGzoHsz'
-    appKey : '81KLyE7xLDCR0ExKcEib8qjv'
-    notify : false  # mail notifier , https://github.com/xCss/Valine/wiki
-    verify : false # Verification code
-    avatar : 'mm' 
-    placeholder : 'ヾﾉ≧∀≦)o来啊，快活啊!'
-    visitor : true
+# params.valine:
+#     enable : true
+#     appId : 'yjXDgIm4adLfC65VUSshkA1W-gzGzoHsz'
+#     appKey : '81KLyE7xLDCR0ExKcEib8qjv'
+#     notify : false  # mail notifier , https://github.com/xCss/Valine/wiki
+#     verify : false # Verification code
+#     avatar : 'mm' 
+#     placeholder : 'ヾﾉ≧∀≦)o来啊，快活啊!'
+#     visitor : true
+
+params.utterances:
+    enable: true
+    repo: enersto/pauke.github.io
+    issueTerm : pathname
+    theme: github-light
