@@ -42,7 +42,6 @@ To make sure how I intent to do, I urge myself to start with a rough way, [build
 ## Other things about this site
 The specific site building is all in this [post](https://pauke.live/post/about-the-site-build-blogdownhugo-and-theme-tanka/), if you, the reader, have more question,help yourself, just leave the message under the post.
 
-As for the language of this site, it all depends on which one makes me more comfortable to express, when I manage to write. My priority is 汉语, English and Deutsch.  
 
 
 

@@ -30,12 +30,14 @@ There is no table setting in the theme too, and my site also gets code from Xmin
 |          4.7|         3.2|          1.3|         0.2|setosa  |
 
 ### comments system
-The comments system of original theme is hugo embedded comments, Disqus. I don't find much articles comparing of comments in Hugo, which recommends [these comments system](https://gohugo.io/content-management/comments/#comments-alternatives) on documents. But Hexo and other static site generators articles are also sightly:
+For the visitor beneath the GFW, I choose the [utteranc](https://utteranc.es/?installation_id=31085135&setup_action=install) to get a communicate platform in a easy and security way. In this [post](https://mscipio.github.io/post/utterances-comment-engine/), the method to install in hugo is presented so clearly.
 
-- [Various ways to include comments on your static site](https://darekkay.com/blog/static-site-comments/)
+Though disqus loses some reputation recently, but for a cozy way to show feeling about the article, I still keep the disqus then. The comments system of original theme is hugo embedded comments, Disqus. I don't find much articles comparing of comments in Hugo, which recommends [these comments system](https://gohugo.io/content-management/comments/#comments-alternatives) on documents. But Hexo and other static site generators articles are also sightly:
+
+- [Various ways to include comments on your static site](https://darekkay.com/blog/static-site-comments/) 
 - [第三方评论系统推荐](https://3mile.github.io/archives/128/).
 
-And my demand of comments is: **simple and lightweight, self-host, anonymous and not blocked in China**. And [valine](https://valine.js.org/en/) is just fitted. And this is an good [article](https://www.smslit.top/2018/07/08/hugo-valine/) to maintain the build way in Hugo.
+~~ And my demand of comments is: **simple and lightweight, self-host, anonymous and not blocked in China**. And [valine](https://valine.js.org/en/) is just fitted. And this is an good [article](https://www.smslit.top/2018/07/08/hugo-valine/) to maintain the build way in Hugo.~~ (valine's background has required ID verified now, I have to give it up )
 
 ### mermaid
 [Mermaid](https://mermaidjs.github.io/) is a simple and useful markdown-like script language for generating charts from text via javascript.
