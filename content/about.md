@@ -1,6 +1,5 @@
 ---
 date: "2018-12-01"
-menu: main
 title: About
 weight: 50
 ---
