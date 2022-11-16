@@ -6,14 +6,25 @@
     <description>Recent content on IFF</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Mon, 24 Oct 2022 00:00:00 +0000</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 14 Nov 2022 00:00:00 +0000</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>About</title>
       <link>/about/</link>
       <pubDate>Sat, 01 Dec 2018 00:00:00 +0000</pubDate>
       
       <guid>/about/</guid>
-      <description>This site is hosted by Pauke Huang, and the site title “IFF” is the abbreviation of “Initiative, Freiheit, Fortschritt | Initiative, Liberty, Progress”(yep, I got inspired fromLiberté, Égal</description>
+      <description>This site is hosted by Pauke Huang, and the site title “IFF” is the abbreviation of “Initiative, Freiheit, Fortschritt | Initiative, Liberty, Progress”(yep, I got inspired fromLiberté, Égalité, Fraternité), which is my motto and what I intent to express in this blog’s articles.
+What kind of post does this site contain The core principle of my writing place, this site, is ,or I manage to be, about:
+Initiative, eine Anregung, die jemand hat oder durch etwas ändert.</description>
+    </item>
+    
+    <item>
+      <title>购物篮规则的推荐算法应用</title>
+      <link>/2022/11/14/market-basket-analysis/</link>
+      <pubDate>Mon, 14 Nov 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/2022/11/14/market-basket-analysis/</guid>
+      <description>数据来源与情况 前置数据探索与清洗 数据结构 数据质量 数量情况 订单时间分布 订单特征信息提取 分析思路 关联规则的应用方式 关联规则的短板 模型数据准备 模型</description>
     </item>
     
     <item>
@@ -100,11 +111,11 @@ summary(cars) ## speed dist ## Min. : 4.0 Min. : 2.00 ## 1st Qu.:12.0 1st Qu.: 2
     </item>
     
     <item>
-      <title>About This Site Build: blogdown, Hugo and Theme Tanka</title>
-      <link>/2019/01/18/about-this-site-build-blogdown-hugo-and-theme-tanka/</link>
+      <title>About This Site Build: blogdown, Hugo and Theme</title>
+      <link>/2019/01/18/about-this-site-build-blogdown-hugo-and-theme/</link>
       <pubDate>Fri, 18 Jan 2019 00:00:00 +0000</pubDate>
       
-      <guid>/2019/01/18/about-this-site-build-blogdown-hugo-and-theme-tanka/</guid>
+      <guid>/2019/01/18/about-this-site-build-blogdown-hugo-and-theme/</guid>
       <description>Why blogdown and Hugo My initiate site build way is by Hexo. The wreckage is still on. The theme and build process are enough satisfied, and I also got to learn things about git and github basically in the process. But when I want actually to post my article, which is based on Rmarkdown, I find blogdown, the product both comes from Yihui,Rstudio, whom My R learning process benefits superbly</description>
     </item>
     

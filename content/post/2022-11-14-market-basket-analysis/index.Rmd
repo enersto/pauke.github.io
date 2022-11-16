@@ -1,0 +1,357 @@
+---
+title: 购物篮规则的推荐算法应用
+description: "基于礼品电商订单明细的关联规则模型探索"
+author: Package Build
+date: '2022-11-14'
+slug: market-basket-analysis
+tags: 
+  - 推荐算法
+  - recommendation_algorithm
+  - 电商
+  - e-commercial
+  - 关联规则
+  - association_rule
+output:
+  blogdown::html_page:
+    toc: true
+    toc_depth: 5
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = TRUE,
+	message = FALSE,
+	warning =FALSE
+)
+```
+
+
+本文依赖的包：
+
+```{r message=FALSE, warning=FALSE}
+library(knitr)
+library(ggplot2)
+library(data.table)
+library(openxlsx)
+library(dplyr)
+library(RColorBrewer)
+library(DescTools)
+library(anytime)
+library(lubridate)
+library(stringr)
+library(arules)
+library(arulesViz)
+library(plotly)
+library(DiagrammeR)
+
+options(scipen=20)
+
+```
+
+## 数据来源与情况
+
+本文所用数据来自kaggle的[online-retail](https://www.kaggle.com/datasets/tunguz/online-retail)，是2010-2011年间的以礼品主辅料为主题，用户混杂了零售和批发的线上电商数据。
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+online_retail<- read.csv("/Users/pauke/Desktop/RFile/online_retail.csv")
+
+```
+
+
+## 前置数据探索与清洗
+
+### 数据结构
+
+从数据结构大致来看，该数据是明细到订单商品明细层级的数据，包含了在线电商订单数据的四个核心要素：
+
+- 订单商品信息（StockCode，Description）
+- 订单金额（Quantity，UnitPrice）
+- 订单时间（InvoiceDate）
+- 订单条信息（InvoiceNo）
+- 用户信息（CustomerID，Country）
+
+最原初的数据
+```{r}
+knitr::kable(online_retail[sample(nrow(online_retail),10),])
+```
+
+可以说是非常典型的电商订单数据。
+
+### 数据质量
+
+#### 数量情况
+```{r}
+#整体条目数量
+length(online_retail$InvoiceNo)
+```
+
+```{r}
+#整体订单数量
+uniqueN(online_retail$InvoiceNo)
+```
+
+```{r}
+#整体用户数量
+uniqueN(online_retail$CustomerID)
+```
+
+#### 订单时间分布
+
+数据订单时间横跨一年多许（373日），从2010-12-01至2012年12-09月。从月份条目数量分布情况来看，除了2012-12外，各个月份的条目数量差异程度相对较低，差异基本可用礼品行业的销售周期分布差异解释，即9-11月显著多于1-4月，初步看没有显著数据质量问题。
+
+```{r}
+#时间字段的清理
+online_retail <- setDT(online_retail)[,date_time:=mdy_hm(InvoiceDate)][,dates := anydate(date_time)][,ym:= strftime(dates, format = "%Y-%m")]
+ym <- Desc(online_retail$ym)[[1]][["freq"]]
+knitr::kable(ym)
+```
+```{r}
+#时间跨度
+max(online_retail$dates) - min(online_retail$dates)
+```
+
+#### 订单特征信息提取
+
+观察明细后发现，订单id（InvoiceNo）上附带「C」的，均为负向金额，同时该类订单用户大多（2010-12月例外）有同样商品、数量和金额的正向订单，推测该类订单为退款取消的负向订单。整体来看，负向订单占比低于2%，相对较小
+
+```{r}
+#提取退款订单并用新字段标记
+online_retail <- online_retail[,status:= ifelse(is.na(str_extract(InvoiceNo,"[:alpha:]")),"pay",
+                                                      ifelse(str_extract(InvoiceNo,"[:alpha:]") == "C","withdraw","adjust"))]
+withdraw_ord <- Desc(online_retail$status)[[1]][["freq"]]
+knitr::kable(withdraw_ord)
+```
+
+
+进一步探索订单商品信息，其中已经有了一部分内容通过逗号进行修饰说明，例如「TRAY, BREAKFAST IN BED」、「WOBBLY CHICKEN, METAL」，其以「,」的方式分隔连接，这会妨碍后续分析（使用形成稀疏矩阵时候混淆），需要做处理。
+
+
+```{r}
+#替换源数据中套餐性商品的连接符
+online_retail <- online_retail[,Description := str_replace_all(Description,"\\,"," &")]
+
+#区分非正常商品（邮费、损失等）和正常商品并用新字段标记
+online_retail <- online_retail[,StockCode_status := str_detect(str_sub(StockCode,1,1),"\\D")]
+item_list <- unique(online_retail[StockCode_status == F,c("StockCode","Description")])
+problem_description<- Desc(item_list$Description)[[1]][["freq"]]
+problem_description_list <- c("AMAZON", "CHECK","AMAZON FEE",
+                              "DAMAGED")
+problem_description <- setDT(problem_description)[!(level %in%problem_description_list),]
+```
+
+同时商品信息中还包含了空白值、「damages?」，「???missing」、「thrown away」、「Unsaleable & destroyed.	」等无效信息。
+
+```{r}
+knitr::kable(problem_description[level=="",][1:5,])
+```
+
+```{r}
+knitr::kable(problem_description[str_detect(level,"\\?")==T,][1:10,])
+```
+
+```{r}
+knitr::kable(problem_description[str_detect(level,"[:lower:]{3,}"),][1:10,])
+```
+
+先通过标记该类条目，为后续筛选做准备。同时，无效条目的整体占比不到0.1%，影响相对较小。
+
+```{r}
+#区分标记正常和无效商品信息条目
+problem_description <- problem_description[level!="",
+                                                  ][str_detect(level,"\\?")==F,
+                                                    ][!(str_detect(level,"[:lower:]{3,}")),]
+online_retail <- online_retail[,item_status := ifelse(Description %in% problem_description$level,"nm","oth")]
+item_status <- Desc(online_retail$item_status)[[1]][["freq"]]
+knitr::kable(item_status)
+```
+
+
+## 分析思路
+
+至目前情况来看，该数据包含电商订单数据的核心信息，且数据质量较好。可以由此从两个方面做推荐模型：
+
+- 基于订单商品组合情况的关联规则模型（association_Rule），也称做购物篮分析的无监督模型；
+- 基于用户订单的特征工程所产生的预测监督模型
+
+本文先行做关联规则的应用探索，特征预测监督模型后续另文探讨。
+
+
+### 关联规则的应用方式
+
+关于关联规则/购物篮分析的详细介绍已经汗牛充栋，此处列出一些对于理解该分析方法有用的文章：([基本定义](https://en.wikipedia.org/wiki/Association_rule_learning), [商业应用方式](https://jelly.jd.com/article/5efdb4977c53070156dd6748)，[基本实现方式](https://medium.com/@niharika.goel/market-basket-analysis-association-rules-e7c27b377bd8))。既然已经珠玉在前，本文此处也就只做一些基于个人理解的陈述。
+
+关联规则所做的是在海量元素构成成单位数据中，找到各种元素的组合成单位的规律。商业应用中，主要用于基于历史订单明细、行为数据，找到符合特定目的的商品组合和行为组合。为了满足特定目的，关联规则可以从一下几个方面来进行调节：
+
+- 支持度（support）：组合的出现频率，业务上可理解为商品/商品组合购买的订单量在整体中的占比，指示的是基于这些组合的推荐规则能够产生的订单量，是输入性指标。
+- 关联度（confidence）：组合的可信程度，即商品组合的因果和密切程度，指示的是基于这些组合的推荐规则产生单量的可靠程度，是输入性指标。
+- 提升度（lift）：组合的必要程度，即商品组合起来相比与不组合产生的提升程度，该指标是模型的结果评价性指标，可用于对比不同支持度和关联度下模型的效果。
+
+![关键概念](/Users/pauke/Documents/GitHub/pauke.github.io/content/post/2022-11-14-market-basket-analysis/index_files/explanation.png) [^1]
+
+关联规则是**一种在应用过程中需要平衡组合的奇异性和平庸性的营销数据挖掘工具，其最有价值的点不是简单的找出高频且高关联度的组合，而是要在繁浩的数据中，找到被忽略或一般数据分析不易察觉且有一定出现频率的组合**，即**好的关联规则模型需要找惊奇**。具体而言，产出{烟雾探测器,电池}这种相当显而易见结论的推荐模型，并不一定是好的模型。另一方面，奇异性很大程度也伴随了稀缺性，平庸性的组合则多为普遍。这就意味着，关联规则的结果应用需要高度结合业务实际需求和所处情况，取舍其间。
+
+### 关联规则的短板
+
+关联规则模型实现过程，只有**组合频次、元素频次和组合内元素的横向及纵向频次**的统计信息，默认所有的组合和元素（订单和订单内商品）都是均质的。因此，关联规则存在以下短板：
+
+- 无法区分各个元素的特征：模型构建时，无法直接区分每个元素的不同，高单价/利润商品与低单价/利润商品会被同一对待；
+- 无法体现各个元素的权重：在一般订单明细数据中，同一订单的同一商品只会出现一条，并辅以单位量进行说明订单内的商品整体数量，这导致100个单品的商品和1个单品的商品在一个订单中会被同一对待；
+- 无法区分各个组合的特征：不同金额的订单也会被模型同一对待；
+
+为此，就有必要在模型构建之前，前置性的进行数据筛选，避免异常值干扰模型结果。本文基于前序的探索，提取正向订单和正常显示的商品描述。
+
+```{r}
+#筛选后条目数量
+length(online_retail[status == "pay" & item_status == "nm",
+                          ]$InvoiceNo)
+```
+
+```{r}
+#筛选后订单数量
+uniqueN(online_retail[status == "pay" & item_status == "nm",
+                          ]$InvoiceNo)
+```
+
+
+## 模型数据准备
+
+关联规则模型构建，需要输入以组合为单位的元素簇格式的信息。对应到当前数据则是需要以订单为单位，压缩当前每个商品行为单个订单行的商品组。
+
+```{r}
+trans_df <- online_retail[status == "pay" & item_status == "nm",
+                          ][,Description := tolower(Description)][,.(items = str_c(Description,collapse = ",")),
+                            by =c("InvoiceNo")]
+knitr::kable(trans_df[1:10,])
+```
+然后通过`read.transactions()`转换为可用的数据格式：
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+write.csv(trans_df[,2],"/Users/pauke/Desktop/RFile/trans_df.csv", quote = FALSE, row.names = FALSE)
+trs <- read.transactions('/Users/pauke/Desktop/RFile/trans_df.csv', format = 'basket', sep=',')
+```
+
+```{r eval=FALSE, message=FALSE, warning=FALSE}
+write.csv(trans_df[,2],"~/trans_df.csv", quote = FALSE, row.names = FALSE)
+trs <- read.transactions('~/trans_df.csv', format = 'basket', sep=',')
+```
+
+可简单探查出现高频次（高支持度）的单品：
+```{r warning=FALSE}
+itemFrequencyPlot(trs,topN=20,type="absolute",horiz = T,col = brewer.pal(10,"Spectral"))
+```
+
+```{r warning=FALSE}
+itemFrequencyPlot(trs,topN=20,type="relative",horiz = T,col = brewer.pal(10,"Spectral"))
+```
+```{r warning=FALSE}
+summary(trs)
+```
+随后是数据的基础汇总信息：
+
+- 有1693个订单中，只有一个商品，在19794个整体订单中占比接近10%。这意味着模型构建时候，有必要剔除该类订单；
+
+```{r warning=FALSE}
+summary(itemFrequency(trs,"relative"))
+```
+- 商品出现频次分布相当分散，即不同订单内的商品重合程度较低，出现在0.18%的订单中的商品竟然已经是四分之三线；
+- 不同商品的销售集中程度也差异很大，均质也已经超过四分之三线，这意味着高单量商品很少且单量很大。
+
+
+## 模型构拟与选择
+
+最初的模型的参数supp（支持度）取值以上面探索为基准，先查看均值线/四分之三线以上单品的情况，取0.002。基于当前数据量（总单量为19793）较多的情况，conf（关联度）根据以往经验，可取相对保守的0.9。模型最后如下：
+
+```{r warning=FALSE}
+basic_r <- apriori(trs, parameter = list(supp = 0.002, conf = 0.9,minlen =2))
+summary(basic_r)
+```
+
+关联规则模型单个组参数取值不容易判断模型好坏，一方面可进一步查看模型结果的明细，确认这些规则是否适宜：
+
+```{r warning=FALSE}
+inspect(sort(basic_r,by = "lift")[1:10])
+```
+
+另一方面，可以围绕参数进行微调尝试，对比lift（提升度）情况：
+
+```{r echo=TRUE,results = 'hide', message=FALSE, warning=FALSE}
+apr_ap_md <- function(supp,conf){
+    rules <- apriori(trs, parameter = list(supp = supp, conf = conf,minlen =2))
+    rl <- summary(rules)
+    lift_mean <-  str_extract_all(rl@quality[4,4],"\\d{1,2}[.,]\\d{1,3}")
+    lift_median <-  str_extract_all(rl@quality[3,4],"\\d{1,2}[.,]\\d{1,3}")
+    rule_length <- rl@length
+    df <- data.frame(supp = supp,
+                     conf = conf,
+                     rule_length = rule_length,
+                     lifts_mean = as.numeric(lift_mean),
+                     lifts_median = as.numeric(lift_median))
+    return(output = df)
+}
+
+df_1<- apr_ap_md(0.003,0.9)
+df_2<- apr_ap_md(0.002,0.9)
+df_3<- apr_ap_md(0.001,0.9)
+df_4<- apr_ap_md(0.003,0.8)
+df_5<- apr_ap_md(0.002,0.8)
+df_6<- apr_ap_md(0.001,0.8)
+df_7<- apr_ap_md(0.0025,0.95)
+df_8<- apr_ap_md(0.003,0.95)
+df_9<- apr_ap_md(0.002,0.95)
+df_10<- apr_ap_md(0.0015,0.95)
+
+cf_df <- rbind(df_1,df_2,df_3,df_4,df_5,df_6,df_7,df_8,df_9,df_10)
+```
+
+根据几组参数取值，并且结合建模和业务目标，取其中符合目标的：
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+cf_df <- setDT(cf_df)[, deviation :=(lifts_mean-lifts_median)/lifts_mean]
+knitr::kable(cf_df)
+```
+
+
+例如，可根据**较为精简的规则数量，以覆盖头部品类为主**这样一个业务目的，取supp = 0.003, conf = 0.9作为最终的模型参数：
+
+```{r warning=FALSE}
+final_r <- apriori(trs, parameter = list(supp = 0.003, conf = 0.9,minlen =2))
+summary(final_r)
+```
+
+
+
+### 结果探索工具
+
+- 针对最终选定的模型，可以进一步根据需求，探查情况。例如，在给定关联度和提升度的前提下，挑选频次最高的组合规则。
+
+```{r warning=FALSE}
+inspect(sort(final_r,by = "support")[1:10])
+```
+- 通过plotly交互图，更方便的查看不同组合规则：
+
+```{r warning=FALSE}
+plot(final_r,engine = "plotly")
+```
+
+- 进一步查看能够带来更多销量的某个单品的组合，例如「百里香装饰（herb marker thyme）」这个商品可生成的模型：
+
+```{r warning=FALSE}
+lunch_bag_r <- apriori(trs, parameter = list(supp = 0.003, conf = 0.9,minlen =2),
+                   appearance = list(default="lhs",rhs="lunch bag red retrospot"))
+summary(lunch_bag_r)
+
+```
+
+```{r warning=FALSE}
+plot(lunch_bag_r,engine = "plotly")
+```
+## 总结
+
+经过建模后，再来回顾上面提到的**寻在惊奇**的目标，却不得不承认，这是一个并不容易的过程，因为从上面的结果来看，在这个以经销商为主的数据中，平均每个订单就有20个商品，更有上百品的订单存在，这导致当前组合本身就是以类似的、只是有稍微变化的品类组合产出，很难称得上好的推荐模型。
+
+所以，还是有必要进一步结合该数据的其他特征，进行进一步挖掘。
+
+最后，关于关联规则的应用实践，还有一些不错的案例[1](https://towardsdatascience.com/apriori-analysis-in-r-beyond-sells-ffdf56c1d95c), [2](https://www.datacamp.com/tutorial/market-basket-analysis-r), [3](https://datascienceplus.com/a-gentle-introduction-on-market-basket-analysis%E2%80%8A-%E2%80%8Aassociation-rules/)。
+
+[^1]: https://towardsdatascience.com/a-gentle-introduction-on-market-basket-analysis-association-rules-fa4b986a40ce

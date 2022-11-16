@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>recommendation_algorithm on IFF</title>
+    <link>/tags/recommendation_algorithm/</link>
+    <description>Recent content in recommendation_algorithm on IFF</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Mon, 14 Nov 2022 00:00:00 +0000</lastBuildDate><atom:link href="/tags/recommendation_algorithm/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>购物篮规则的推荐算法应用</title>
+      <link>/2022/11/14/market-basket-analysis/</link>
+      <pubDate>Mon, 14 Nov 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/2022/11/14/market-basket-analysis/</guid>
+      <description>数据来源与情况 前置数据探索与清洗 数据结构 数据质量 数量情况 订单时间分布 订单特征信息提取 分析思路 关联规则的应用方式 关联规则的短板 模型数据准备 模型</description>
+    </item>
+    
+  </channel>
+</rss>

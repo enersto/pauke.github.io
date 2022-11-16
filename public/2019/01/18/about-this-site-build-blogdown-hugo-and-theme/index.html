@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.104.3" />
+
+
+<title>About This Site Build: blogdown, Hugo and Theme - IFF</title>
+<meta property="og:title" content="About This Site Build: blogdown, Hugo and Theme - IFF">
+
+
+  <link href='/favicon.ico' rel='icon' type='image/x-icon'/>
+
+
+
+  
+
+
+
+
+
+
+
+
+<link href='//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="/css/fonts.css" media="all">
+<link rel="stylesheet" href="/css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="/" class="nav-logo">
+    <img src="/images/logo.png"
+         width="120"
+         height="90"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="/about/">About</a></li>
+    
+    <li><a href="/">Home</a></li>
+    
+    <li><a href="/tags/">Tag</a></li>
+    
+    <li><a href="https://t.me/quatsch_von_h">Telegram</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">2 min read</span>
+    
+
+    <h1 class="article-title">About This Site Build: blogdown, Hugo and Theme</h1>
+    <h2></h2>
+
+    
+    <span class="article-date">2019-01-18 · 718 words · </span>
+    
+
+    <div class="article-content">
+      <h2 id="why-blogdown-and-hugo">Why blogdown and Hugo</h2>
+<p>My initiate site build way is by Hexo. The <a href="https://enersto.github.io/">wreckage</a> is still on. The theme and build process are enough satisfied, and I also got to learn things about git and github basically in the process. But when I want actually to post my article, which is  based on Rmarkdown, I find <a href="https://bookdown.org/yihui/blogdown/">blogdown</a>, the product both comes from <a href="https://yihui.name/cn/about/">Yihui</a>,Rstudio, whom My R learning process benefits superbly from.
+The profound tutorial material and theme libraries, super family GUI tool(Rstudio) and seem fast build process(heard the fast character of go before). These are my thought about the blogdown after read the <a href="https://bookdown.org/yihui/blogdown/">book</a>.
+So why not switch my site build to hugo.
+As for the building workflow, I think blogdown has optimized so extremely that you can just dive in without any web site and deployment knowledge, and the <a href="https://bookdown.org/yihui/blogdown/workflow.html">article</a> make me think that I have no need to build wheel again.</p>
+<h2 id="about-the-theme">About the Theme</h2>
+<p>My site is based on the theme <a href="https://github.com/jrutheiser/hugo-lithium-theme">lithium</a>, which is a totally simple, clean and word orientation Hugo theme.
+On the other, the theme is so simple that I need to enrich more functions to feed my blog needs by myself.It is the way I customize this theme,and also the way I get learning things about Hugo, css and HTML. And this is the parts I change or add:</p>
+<h3 id="taxonomies-index">taxonomies index</h3>
+<p>Tanka has not  tags and categories index, but the social account line. And I think an achieved index is necessary for a blog site. And I fork the code of taxonomies from <a href="https://github.com/yihui/hugo-xmin">Xmin</a>.</p>
+<h3 id="table-format">table format</h3>
+<p>There is no table setting in the theme too, and my site also gets code from Xmin.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:right">Sepal.Length</th>
+<th style="text-align:right">Sepal.Width</th>
+<th style="text-align:right">Petal.Length</th>
+<th style="text-align:right">Petal.Width</th>
+<th style="text-align:left">Species</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right">5.1</td>
+<td style="text-align:right">3.5</td>
+<td style="text-align:right">1.4</td>
+<td style="text-align:right">0.2</td>
+<td style="text-align:left">setosa</td>
+</tr>
+<tr>
+<td style="text-align:right">4.9</td>
+<td style="text-align:right">3.0</td>
+<td style="text-align:right">1.4</td>
+<td style="text-align:right">0.2</td>
+<td style="text-align:left">setosa</td>
+</tr>
+<tr>
+<td style="text-align:right">4.7</td>
+<td style="text-align:right">3.2</td>
+<td style="text-align:right">1.3</td>
+<td style="text-align:right">0.2</td>
+<td style="text-align:left">setosa</td>
+</tr>
+</tbody>
+</table>
+<h3 id="comments-system">comments system</h3>
+<p>For the visitor beneath the GFW, I choose the <a href="https://utteranc.es/?installation_id=31085135&amp;setup_action=install">utteranc</a> to get a communicate platform in a easy and security way. In this <a href="https://mscipio.github.io/post/utterances-comment-engine/">post</a>, the method to install in hugo is presented so clearly.</p>
+<p>Though disqus loses some reputation recently, but for a cozy way to show feeling about the article, I still keep the disqus then. The comments system of original theme is hugo embedded comments, Disqus. I don&rsquo;t find much articles comparing of comments in Hugo, which recommends <a href="https://gohugo.io/content-management/comments/#comments-alternatives">these comments system</a> on documents. But Hexo and other static site generators articles are also sightly:</p>
+<ul>
+<li><a href="https://darekkay.com/blog/static-site-comments/">Various ways to include comments on your static site</a></li>
+<li><a href="https://3mile.github.io/archives/128/">第三方评论系统推荐</a>.</li>
+</ul>
+<p><del>And my demand of comments is: <strong>simple and lightweight, self-host, anonymous and not blocked in China</strong>. And <a href="https://valine.js.org/en/">valine</a> is just fitted. And this is an good <a href="https://www.smslit.top/2018/07/08/hugo-valine/">article</a> to maintain the build way in Hugo.</del>  (valine&rsquo;s background requires ID verified now, I have to give it up )</p>
+<h3 id="mermaid">mermaid</h3>
+<p><a href="https://mermaidjs.github.io/">Mermaid</a> is a simple and useful markdown-like script language for generating charts from text via javascript.</p>
+<link href="/mermaid/mermaid.css" type="text/css" rel="stylesheet"/>
+<script defer src="/mermaid/mermaid.js">mermaid.initialize({startOnLoad:true});</script>
+<div class="mermaid" align="center" >
+sequenceDiagram
+    participant Alice
+    participant Bob
+    Alice->>John: Hello John, how are you?
+    loop Healthcheck
+        John->John: Fight against hypochondria
+    end
+    Note right of John: Rational thoughts <br/>prevail...
+    John-->Alice: Great!
+    John->Bob: How about you?
+    Bob-->John: Jolly good!
+</div>
+
+<p>My site mermaid function is forked from the theme <a href="https://github.com/matcornic/hugo-theme-learn">learn</a>. This is the method you can add the function on your theme:</p>
+<ul>
+<li>get the <code>mermaid.html</code>  from <code>hugo-theme-learn\layouts\shortcodes</code> to <code>your_theme_file\layouts\shortcodes</code>;</li>
+<li>fork the &ldquo;mermaid file&rdquo; in <code>hugo-theme-learn\static\</code> to <code>your_theme_file\static\</code>, which contains 4 files.</li>
+</ul>
+<h3 id="highlight-of-code">highlight of code</h3>
+<p>About the highlight setting for blog build, this <a href="https://amber.rbind.io/blog/2017/11/15/syntax-highlighting/">article</a> interprets very profound.
+My highlight style choice is the &ldquo;Tomorrow&rdquo;.And this is the highlight demo:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>library(ggplot2)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>centre &lt;- function(x, type, <span style="color:#00f">...</span>) {
+</span></span><span style="display:flex;"><span>  switch(type,
+</span></span><span style="display:flex;"><span>         mean = mean(x),
+</span></span><span style="display:flex;"><span>         median = median(x),
+</span></span><span style="display:flex;"><span>         trimmed = mean(x, trim = .1))
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>data$x
+</span></span><span style="display:flex;"><span>foo <span style="color:#a31515">&#34;bar&#34;</span> baz
+</span></span><span style="display:flex;"><span><span style="color:#008000"># test &#34;test&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a31515">&#34;test # test&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>(123) (1) (10) (0.1) (.2) (1e-7)
+</span></span><span style="display:flex;"><span>(3.) (3.E10) <span style="color:#008000"># BUG: .E10 should be part of number</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>plot(cars, xlim=20)
+</span></span><span style="display:flex;"><span>plot(cars, xlim=0x20)
+</span></span><span style="display:flex;"><span>foo&lt;-30
+</span></span><span style="display:flex;"><span>my.data.3 &lt;- read() <span style="color:#008000"># not a number</span>
+</span></span><span style="display:flex;"><span>c(1,2,3)
+</span></span><span style="display:flex;"><span>1%%2
+</span></span></code></pre></div><h3 id="table-of-contents">table of contents</h3>
+<p>The smart table of contents function(smartToc), which is forked from this theme <a href="https://github.com/carsonip/hugo-theme-minos">minos</a>, is deep into 6th. header, and is fixed when rolling the page.
+You can get this function in this way:</p>
+<ul>
+<li>
+<p>fork the function part file on the this <a href="https://github.com/enersto/customized_hugo_theme/blob/master/themes/hugo-tanka/layouts/partials/smart_toc.html">repo</a>, and lay down on the <code>your_theme_name/layouts/partials/</code>;</p>
+</li>
+<li>
+<p>leave a partial html function on <code>your_theme_name/layouts/_default/single.html</code>(you also can get the code on my repo file);</p>
+</li>
+<li>
+<p>set style on the <code>your_theme_name/static/css/style.css</code> about the toc.</p>
+</li>
+</ul>
+
+    </div>
+  </article>
+
+
+  
+  
+  <div class="article-toc" >
+      <h3>目录 | Contents</h3>
+      <nav id="TableOfContents">
+  <ul>
+    <li><a href="#why-blogdown-and-hugo">Why blogdown and Hugo</a></li>
+    <li><a href="#about-the-theme">About the Theme</a>
+      <ul>
+        <li><a href="#taxonomies-index">taxonomies index</a></li>
+        <li><a href="#table-format">table format</a></li>
+        <li><a href="#comments-system">comments system</a></li>
+        <li><a href="#mermaid">mermaid</a></li>
+        <li><a href="#highlight-of-code">highlight of code</a></li>
+        <li><a href="#table-of-contents">table of contents</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+  
+  
+
+ 
+
+  <div id=links>
+    
+      <a class="basic-alignment left" href="/2019/01/17/hello-markdown/">&laquo; Hello, Markdown</a>
+    
+    
+      <a class="basic-alignment left" href="/2019/03/25/%E4%BF%A1%E7%94%A8%E8%AF%84%E5%88%86%E5%8D%A1%E6%A8%A1%E5%9E%8B%E4%B8%8E%E5%88%BB%E5%BA%A6/">信用评分卡模型与刻度建立 &raquo;</a>
+    
+  </div>
+</section>
+
+
+
+<script src="https://utteranc.es/client.js"
+        repo="enersto/pauke.github.io"
+        issue-term="pathname"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>
+
+
+<section id="comments">
+  <div id="disqus_thread"></div>
+  <script>
+  var disqus_config = function () {
+  
+  };
+  (function() {
+    var inIFrame = function() {
+      var iframe = true;
+      try { iframe = window.self !== window.top; } catch (e) {}
+      return iframe;
+    };
+    if (inIFrame()) return;
+    var d = document, s = d.createElement('script');
+    s.src = '//pauke-netlify-app.disqus.com/embed.js'; s.async = true;
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</section>
+
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="/images/hugo-logo.png" alt="Img link to Hugo website" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/r.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+<script src="/js/math-code.js"></script>
+<script async src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-132686713-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+  </body>
+</html>
+

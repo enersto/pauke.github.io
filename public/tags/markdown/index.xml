@@ -8,11 +8,11 @@
     <language>zh-cn</language>
     <lastBuildDate>Fri, 18 Jan 2019 00:00:00 +0000</lastBuildDate><atom:link href="/tags/markdown/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>About This Site Build: blogdown, Hugo and Theme Tanka</title>
-      <link>/2019/01/18/about-this-site-build-blogdown-hugo-and-theme-tanka/</link>
+      <title>About This Site Build: blogdown, Hugo and Theme</title>
+      <link>/2019/01/18/about-this-site-build-blogdown-hugo-and-theme/</link>
       <pubDate>Fri, 18 Jan 2019 00:00:00 +0000</pubDate>
       
-      <guid>/2019/01/18/about-this-site-build-blogdown-hugo-and-theme-tanka/</guid>
+      <guid>/2019/01/18/about-this-site-build-blogdown-hugo-and-theme/</guid>
       <description>Why blogdown and Hugo My initiate site build way is by Hexo. The wreckage is still on. The theme and build process are enough satisfied, and I also got to learn things about git and github basically in the process. But when I want actually to post my article, which is based on Rmarkdown, I find blogdown, the product both comes from Yihui,Rstudio, whom My R learning process benefits superbly</description>
     </item>
     
